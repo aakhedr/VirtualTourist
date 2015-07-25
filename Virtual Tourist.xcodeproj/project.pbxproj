@@ -13,6 +13,7 @@
 		362EBCD21B643EBD00A1320B /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 362EBCD11B643EBD00A1320B /* Images.xcassets */; };
 		362EBCD51B643EBD00A1320B /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 362EBCD31B643EBD00A1320B /* LaunchScreen.xib */; };
 		362EBCE11B643EBD00A1320B /* Virtual_TouristTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 362EBCE01B643EBD00A1320B /* Virtual_TouristTests.swift */; };
+		362EBCEB1B643EDB00A1320B /* CoreDataStackManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 362EBCEA1B643EDB00A1320B /* CoreDataStackManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -36,6 +37,7 @@
 		362EBCDA1B643EBD00A1320B /* Virtual TouristTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Virtual TouristTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		362EBCDF1B643EBD00A1320B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		362EBCE01B643EBD00A1320B /* Virtual_TouristTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Virtual_TouristTests.swift; sourceTree = "<group>"; };
+		362EBCEA1B643EDB00A1320B /* CoreDataStackManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataStackManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -78,6 +80,7 @@
 			isa = PBXGroup;
 			children = (
 				362EBCCA1B643EBD00A1320B /* AppDelegate.swift */,
+				362EBCEA1B643EDB00A1320B /* CoreDataStackManager.swift */,
 				362EBCCC1B643EBD00A1320B /* ViewController.swift */,
 				362EBCCE1B643EBD00A1320B /* Main.storyboard */,
 				362EBCD11B643EBD00A1320B /* Images.xcassets */,
@@ -214,6 +217,7 @@
 			files = (
 				362EBCCD1B643EBD00A1320B /* ViewController.swift in Sources */,
 				362EBCCB1B643EBD00A1320B /* AppDelegate.swift in Sources */,
+				362EBCEB1B643EDB00A1320B /* CoreDataStackManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
