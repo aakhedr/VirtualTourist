@@ -6,12 +6,26 @@
 //  Copyright (c) 2015 Ahmed Khedr. All rights reserved.
 //
 
-import Foundation
 import MapKit
+import CoreData
 
-class Pin {
+@objc(Pin)
+
+class Pin: NSManagedObject {
     
-    private var lat: CLLocationDegrees!
-    private var lon: CLLocationDegrees!
-    private var photoes: [Photo]!
+    @NSManaged private var lat: NSNumber!
+    @NSManaged private var lon: NSNumber!
+    @NSManaged private var photos: [Photo]!
+    
+    override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
+        super.init(entity: entity, insertIntoManagedObjectContext: context)
+    }
+    
+    init(dictionary: [String : AnyObject], context: NSManagedObjectContext) {
+        let entity = NSEntityDescription.entityForName("Pin", inManagedObjectContext: context)!
+        super.init(entity: entity, insertIntoManagedObjectContext: context)
+        
+        lat = dictionary["lat"] as! NSNumber
+        lon = dictionary["lon"] as! NSNumber
+    }
 }

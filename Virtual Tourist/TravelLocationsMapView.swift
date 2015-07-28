@@ -9,13 +9,13 @@
 import UIKit
 import MapKit
 
-private struct PinData {
+private struct RegionData {
     static let Lat = "lat"
     static let Lon = "lon"
     static let LatDelta = "latDelta"
     static let LonDelta = "lonDelta"
     
-    static let Key = "pinLocationData"
+    static let Key = "regionData"
 }
 
 class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureRecognizerDelegate {
@@ -23,7 +23,7 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
     @IBOutlet weak var mapView: MKMapView!
     
     private var longPressGestureRecognizer: UILongPressGestureRecognizer!
-    private var pinLocationDataDictinoary: [String : CLLocationDegrees]!
+    private var regionDataDictinoary: [String : CLLocationDegrees]!
     
     // MARK:- View lifecycle
     
@@ -34,6 +34,7 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
         mapView.delegate = self
 
         // Long press gesture recognizer
+        
         longPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: "handleLongPressGesture:")
         longPressGestureRecognizer.minimumPressDuration = 1
         longPressGestureRecognizer.numberOfTouchesRequired = 1
@@ -41,9 +42,10 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
         mapView.addGestureRecognizer(longPressGestureRecognizer)
         
         // Set the mapView region
-        pinLocationDataDictinoary = readValue()
+        
+        regionDataDictinoary = readValue()
 
-        if pinLocationDataDictinoary == nil {
+        if regionDataDictinoary == nil {
             println("First time app is used")
             
             let initialRegion = MKCoordinateRegionForMapRect(MKMapRectWorld)
@@ -53,12 +55,12 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
             // In case there's a previous region saved.
             // Set the mapView region to the last region.
             let span = MKCoordinateSpanMake(
-                pinLocationDataDictinoary[PinData.LatDelta]!,
-                pinLocationDataDictinoary[PinData.LonDelta]!
+                regionDataDictinoary[RegionData.LatDelta]!,
+                regionDataDictinoary[RegionData.LonDelta]!
             )
             let center = CLLocationCoordinate2DMake(
-                pinLocationDataDictinoary[PinData.Lat]!,
-                pinLocationDataDictinoary[PinData.Lon]!
+                regionDataDictinoary[RegionData.Lat]!,
+                regionDataDictinoary[RegionData.Lon]!
             )
             
             let region = MKCoordinateRegion(center: center, span: span)
@@ -73,15 +75,19 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
             println("handleLongPressGesture called")
             
             // Create MKPointAnnotation
+            
             let touchPoint = recognizer.locationInView(mapView)
             let touchPointCoordinate = mapView.convertPoint(touchPoint, toCoordinateFromView: mapView)
             let annotation = MKPointAnnotation()
             annotation.coordinate = touchPointCoordinate
-            annotation.title = "Tap for Flickr images"
-            annotation.subtitle = "Drag to change location"
+            annotation.title = "Tap for Flickr images of this location!"
+            annotation.subtitle = "Drag to change location!"
             
             // Add the annotation to the map view
             mapView.addAnnotation(annotation)
+            
+            // TODO: Save context
+
         }
     }
     
@@ -120,12 +126,13 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
     func mapView(mapView: MKMapView!, regionDidChangeAnimated animated: Bool) {
         println("regionDidChangeAnimated called")
         
-        // Save pin location data dictionary to NSUserDefaults
-        pinLocationDataDictinoary = [
-            PinData.Lat        : mapView.region.center.latitude,
-            PinData.Lon        : mapView.region.center.longitude,
-            PinData.LatDelta   : mapView.region.span.latitudeDelta,
-            PinData.LonDelta   : mapView.region.span.longitudeDelta
+        // Save region data dictionary to NSUserDefaults
+        
+        regionDataDictinoary = [
+            RegionData.Lat        : mapView.region.center.latitude,
+            RegionData.Lon        : mapView.region.center.longitude,
+            RegionData.LatDelta   : mapView.region.span.latitudeDelta,
+            RegionData.LonDelta   : mapView.region.span.longitudeDelta
         ]
         saveValue()
     }
@@ -152,11 +159,11 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
     
     func saveValue() {
         let userDefaults = NSUserDefaults.standardUserDefaults()
-        userDefaults.setObject(pinLocationDataDictinoary, forKey: PinData.Key)
+        userDefaults.setObject(regionDataDictinoary, forKey: RegionData.Key)
     }
     
     func readValue() -> [String : CLLocationDegrees]? {
         let userDefaults = NSUserDefaults.standardUserDefaults()
-        return userDefaults.objectForKey(PinData.Key) as? [String : CLLocationDegrees]
+        return userDefaults.objectForKey(RegionData.Key) as? [String : CLLocationDegrees]
     }
 }

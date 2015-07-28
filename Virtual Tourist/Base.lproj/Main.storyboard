@@ -97,6 +97,9 @@
                         </variation>
                     </view>
                     <navigationItem key="navigationItem" id="wqP-vv-qAh"/>
+                    <connections>
+                        <outlet property="mapView" destination="RvG-ff-Que" id="D00-yc-IZa"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="oS5-w0-WD1" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

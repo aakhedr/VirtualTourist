@@ -7,16 +7,25 @@
 //
 
 import UIKit
+import MapKit
 
 class PhotoAlbumViewController: UIViewController {
 
+    @IBOutlet weak var mapView: MKMapView!
+    
     // MARK:- View lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Do any additional setup after loading the view.
+        // TODO: Set mapView region
+        
+        
+        // TODO: Add the pin to the mapView
+        
     }
 
+    // MARK:- Helpers
+    
 
 }

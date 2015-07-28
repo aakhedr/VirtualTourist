@@ -17,6 +17,7 @@
 		366D42AC1B676BCB0089EF36 /* Pin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 366D42AB1B676BCB0089EF36 /* Pin.swift */; };
 		366D42AE1B676BDF0089EF36 /* Photo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 366D42AD1B676BDF0089EF36 /* Photo.swift */; };
 		366D42B01B676D9F0089EF36 /* PhotoAlbumViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 366D42AF1B676D9F0089EF36 /* PhotoAlbumViewController.swift */; };
+		366D42B61B679A110089EF36 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 366D42B41B679A110089EF36 /* Model.xcdatamodeld */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,6 +45,7 @@
 		366D42AB1B676BCB0089EF36 /* Pin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Pin.swift; sourceTree = "<group>"; };
 		366D42AD1B676BDF0089EF36 /* Photo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Photo.swift; sourceTree = "<group>"; };
 		366D42AF1B676D9F0089EF36 /* PhotoAlbumViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoAlbumViewController.swift; sourceTree = "<group>"; };
+		366D42B51B679A110089EF36 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -142,6 +144,7 @@
 			isa = PBXGroup;
 			children = (
 				362EBCEA1B643EDB00A1320B /* CoreDataStackManager.swift */,
+				366D42B41B679A110089EF36 /* Model.xcdatamodeld */,
 				366D42AB1B676BCB0089EF36 /* Pin.swift */,
 				366D42AD1B676BDF0089EF36 /* Photo.swift */,
 			);
@@ -251,6 +254,7 @@
 				366D42AE1B676BDF0089EF36 /* Photo.swift in Sources */,
 				362EBCCB1B643EBD00A1320B /* AppDelegate.swift in Sources */,
 				362EBCED1B66616000A1320B /* TravelLocationsMapView.swift in Sources */,
+				366D42B61B679A110089EF36 /* Model.xcdatamodeld in Sources */,
 				362EBCEB1B643EDB00A1320B /* CoreDataStackManager.swift in Sources */,
 				366D42AC1B676BCB0089EF36 /* Pin.swift in Sources */,
 				366D42B01B676D9F0089EF36 /* PhotoAlbumViewController.swift in Sources */,
@@ -463,6 +467,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		366D42B41B679A110089EF36 /* Model.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				366D42B51B679A110089EF36 /* Model.xcdatamodel */,
+			);
+			currentVersion = 366D42B51B679A110089EF36 /* Model.xcdatamodel */;
+			path = Model.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 362EBCBD1B643EBD00A1320B /* Project object */;
 }
