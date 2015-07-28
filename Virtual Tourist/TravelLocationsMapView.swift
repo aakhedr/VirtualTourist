@@ -25,7 +25,7 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
     private var longPressGestureRecognizer: UILongPressGestureRecognizer!
     private var pinLocationDataDictinoary: [String : CLLocationDegrees]!
     
-    // MARK: - View lifecycle
+    // MARK:- View lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -66,7 +66,7 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
         }
     }
     
-    // MARK: - Gesture Recognizer Delegate
+    // MARK:- Gesture Recognizer Delegate
     
     func handleLongPressGesture(recognizer: UILongPressGestureRecognizer) {
         if recognizer.state == .Ended {
@@ -85,7 +85,7 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
         }
     }
     
-    // MARK: - Map View Delegate
+    // MARK:- Map View Delegate
     
     func mapView(mapView: MKMapView!, viewForAnnotation annotation: MKAnnotation!) -> MKAnnotationView! {
         if let annotation = annotation as? MKPointAnnotation {
@@ -104,7 +104,7 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
                 println("annotation could not be dequeued")
             
                 view = MKPinAnnotationView(annotation: annotation, reuseIdentifier: identifier)
-                view.canShowCallout = true
+                view.canShowCallout = true          // default value is already true!
                 view.calloutOffset = CGPoint(x: -5, y: 5)
                 view.rightCalloutAccessoryView = UIButton.buttonWithType(.DetailDisclosure) as! UIView
                 
@@ -132,14 +132,23 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
     
     func mapView(mapView: MKMapView!, annotationView view: MKAnnotationView!, calloutAccessoryControlTapped control: UIControl!) {
         println("calloutAccessoryControlTapped called")
+
+        performSegueWithIdentifier("photosAlbumSegue", sender: self)
     }
     
     func mapView(mapView: MKMapView!, annotationView view: MKAnnotationView!, didChangeDragState newState: MKAnnotationViewDragState, fromOldState oldState: MKAnnotationViewDragState) {
         println("didChangeDragState called")
         
+        println("newState")
+        println(view.annotation.coordinate.latitude)
+        println(view.annotation.coordinate.longitude)
+    
+        println("oldState")
+        println(view.annotation.coordinate.latitude)
+        println(view.annotation.coordinate.longitude)
     }
     
-    //MARK: - Helpers
+    //MARK:- Helpers
     
     func saveValue() {
         let userDefaults = NSUserDefaults.standardUserDefaults()
@@ -150,7 +159,4 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
         let userDefaults = NSUserDefaults.standardUserDefaults()
         return userDefaults.objectForKey(PinData.Key) as? [String : CLLocationDegrees]
     }
-    
-
-
 }

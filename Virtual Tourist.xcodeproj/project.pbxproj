@@ -14,6 +14,9 @@
 		362EBCE11B643EBD00A1320B /* Virtual_TouristTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 362EBCE01B643EBD00A1320B /* Virtual_TouristTests.swift */; };
 		362EBCEB1B643EDB00A1320B /* CoreDataStackManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 362EBCEA1B643EDB00A1320B /* CoreDataStackManager.swift */; };
 		362EBCED1B66616000A1320B /* TravelLocationsMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 362EBCEC1B66616000A1320B /* TravelLocationsMapView.swift */; };
+		366D42AC1B676BCB0089EF36 /* Pin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 366D42AB1B676BCB0089EF36 /* Pin.swift */; };
+		366D42AE1B676BDF0089EF36 /* Photo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 366D42AD1B676BDF0089EF36 /* Photo.swift */; };
+		366D42B01B676D9F0089EF36 /* PhotoAlbumViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 366D42AF1B676D9F0089EF36 /* PhotoAlbumViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,6 +41,9 @@
 		362EBCE01B643EBD00A1320B /* Virtual_TouristTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Virtual_TouristTests.swift; sourceTree = "<group>"; };
 		362EBCEA1B643EDB00A1320B /* CoreDataStackManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataStackManager.swift; sourceTree = "<group>"; };
 		362EBCEC1B66616000A1320B /* TravelLocationsMapView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TravelLocationsMapView.swift; sourceTree = "<group>"; };
+		366D42AB1B676BCB0089EF36 /* Pin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Pin.swift; sourceTree = "<group>"; };
+		366D42AD1B676BDF0089EF36 /* Photo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Photo.swift; sourceTree = "<group>"; };
+		366D42AF1B676D9F0089EF36 /* PhotoAlbumViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoAlbumViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -119,6 +125,7 @@
 			isa = PBXGroup;
 			children = (
 				362EBCEC1B66616000A1320B /* TravelLocationsMapView.swift */,
+				366D42AF1B676D9F0089EF36 /* PhotoAlbumViewController.swift */,
 			);
 			name = Controller;
 			sourceTree = "<group>";
@@ -135,6 +142,8 @@
 			isa = PBXGroup;
 			children = (
 				362EBCEA1B643EDB00A1320B /* CoreDataStackManager.swift */,
+				366D42AB1B676BCB0089EF36 /* Pin.swift */,
+				366D42AD1B676BDF0089EF36 /* Photo.swift */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -239,9 +248,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				366D42AE1B676BDF0089EF36 /* Photo.swift in Sources */,
 				362EBCCB1B643EBD00A1320B /* AppDelegate.swift in Sources */,
 				362EBCED1B66616000A1320B /* TravelLocationsMapView.swift in Sources */,
 				362EBCEB1B643EDB00A1320B /* CoreDataStackManager.swift in Sources */,
+				366D42AC1B676BCB0089EF36 /* Pin.swift in Sources */,
+				366D42B01B676D9F0089EF36 /* PhotoAlbumViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -439,6 +451,7 @@
 				362EBCE61B643EBD00A1320B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		362EBCE71B643EBD00A1320B /* Build configuration list for PBXNativeTarget "Virtual TouristTests" */ = {
 			isa = XCConfigurationList;
@@ -447,6 +460,7 @@
 				362EBCE91B643EBD00A1320B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
