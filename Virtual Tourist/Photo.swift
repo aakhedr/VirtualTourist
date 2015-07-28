@@ -6,7 +6,6 @@
 //  Copyright (c) 2015 Ahmed Khedr. All rights reserved.
 //
 
-import UIKit
 import CoreData
 
 @objc(Photo)
@@ -14,6 +13,7 @@ import CoreData
 class Photo: NSManagedObject {
     
     @NSManaged private var image: String!
+    
     @NSManaged private var pin: Pin!
     
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {

@@ -6,15 +6,20 @@
 //  Copyright (c) 2015 Ahmed Khedr. All rights reserved.
 //
 
-import MapKit
 import CoreData
 
 @objc(Pin)
 
 class Pin: NSManagedObject {
     
+    struct Keys {
+        static let Lat = "lat"
+        static let Lon = "lon"
+    }
+    
     @NSManaged private var lat: NSNumber!
     @NSManaged private var lon: NSNumber!
+    
     @NSManaged private var photos: [Photo]!
     
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
@@ -25,7 +30,7 @@ class Pin: NSManagedObject {
         let entity = NSEntityDescription.entityForName("Pin", inManagedObjectContext: context)!
         super.init(entity: entity, insertIntoManagedObjectContext: context)
         
-        lat = dictionary["lat"] as! NSNumber
-        lon = dictionary["lon"] as! NSNumber
+        lat = dictionary[Pin.Keys.Lat] as! Double
+        lon = dictionary[Pin.Keys.Lon] as! Double
     }
 }

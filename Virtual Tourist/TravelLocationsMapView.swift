@@ -6,8 +6,8 @@
 //  Copyright (c) 2015 Ahmed Khedr. All rights reserved.
 //
 
-import UIKit
 import MapKit
+import CoreData
 
 private struct RegionData {
     static let Lat = "lat"
@@ -18,12 +18,29 @@ private struct RegionData {
     static let Key = "regionData"
 }
 
-class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureRecognizerDelegate {
+class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureRecognizerDelegate, NSFetchedResultsControllerDelegate {
 
     @IBOutlet weak var mapView: MKMapView!
     
     private var longPressGestureRecognizer: UILongPressGestureRecognizer!
     private var regionDataDictinoary: [String : CLLocationDegrees]!
+    
+    // MARK:- Shared Context
+    var sharedContext: NSManagedObjectContext {
+        return CoreDataStackManager.sharedInstance().managedObjectContext!
+    }
+    
+    lazy var fetchedResultsController: NSFetchedResultsController = {
+        let fetchRequest = NSFetchRequest(entityName: "Pin")
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: Pin.Keys.Lat, ascending: true)]
+        
+        let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest,
+            managedObjectContext: self.sharedContext,
+            sectionNameKeyPath: nil,
+            cacheName: nil)
+        
+        return fetchedResultsController
+        }()
     
     // MARK:- View lifecycle
     
@@ -62,10 +79,23 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
                 regionDataDictinoary[RegionData.Lat]!,
                 regionDataDictinoary[RegionData.Lon]!
             )
-            
             let region = MKCoordinateRegion(center: center, span: span)
             mapView.setRegion(region, animated: true)
         }
+        
+        // Set fetchResultsController delegate
+        fetchedResultsController.delegate = self
+        
+        // Perform the fetch
+        
+        var error: NSErrorPointer = nil
+        fetchedResultsController.performFetch(error)
+        
+        if error != nil {
+            println("error in performFetch: \(error)")
+        }
+
+        println(fetchedResultsController.fetchedObjects?.count)
     }
     
     // MARK:- Gesture Recognizer Delegate
@@ -86,8 +116,14 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
             // Add the annotation to the map view
             mapView.addAnnotation(annotation)
             
-            // TODO: Save context
-
+            // MARK:- Save context
+            
+            var dictionary = [
+                Pin.Keys.Lat   : annotation.coordinate.latitude,
+                Pin.Keys.Lon   : annotation.coordinate.longitude
+            ]
+            let pinToBeAdded = Pin(dictionary: dictionary, context: sharedContext)
+            CoreDataStackManager.sharedInstance().saveContext()
         }
     }
     
@@ -155,7 +191,33 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
         println(view.annotation.coordinate.longitude)
     }
     
-    //MARK:- Helpers
+    // MARK:- Fetched Results Controller Delegate
+    
+    func controllerWillChangeContent(controller: NSFetchedResultsController) {
+    }
+    
+    func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
+//        switch type {
+//        case NSFetchedResultsChangeType.Insert:
+//            mapView.addAnnotation()
+//        case NSFetchedResultsChangeType.Delete:
+//            //
+//        case NSFetchedResultsChangeType.Move:
+//            //
+//        case NSFetchedResultsChangeType.Update:
+//            //
+//        default:
+//            break
+//        }
+    }
+    
+    func controller(controller: NSFetchedResultsController, didChangeSection sectionInfo: NSFetchedResultsSectionInfo, atIndex sectionIndex: Int, forChangeType type: NSFetchedResultsChangeType) {
+    }
+    
+    func controllerDidChangeContent(controller: NSFetchedResultsController) {
+    }
+    
+    // MARK:- Helpers
     
     func saveValue() {
         let userDefaults = NSUserDefaults.standardUserDefaults()
