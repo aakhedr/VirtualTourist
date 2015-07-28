@@ -25,11 +25,12 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
     private var longPressGestureRecognizer: UILongPressGestureRecognizer!
     private var regionDataDictinoary: [String : CLLocationDegrees]!
     
-    // MARK:- Shared Context
+    // Shared Context
     var sharedContext: NSManagedObjectContext {
         return CoreDataStackManager.sharedInstance().managedObjectContext!
     }
     
+    // Fetched Results Controller
     lazy var fetchedResultsController: NSFetchedResultsController = {
         let fetchRequest = NSFetchRequest(entityName: "Pin")
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: Pin.Keys.Lat, ascending: true)]
@@ -95,7 +96,25 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
             println("error in performFetch: \(error)")
         }
 
-        println(fetchedResultsController.fetchedObjects?.count)
+        // Add the fetched pins to the map view
+        
+        mapView.removeAnnotations(mapView.annotations)
+        
+        if let pins = fetchedResultsController.fetchedObjects as? [Pin] {
+            println("pins.count: \(pins.count)")
+            
+            for pin in pins {
+                let annotation = MKPointAnnotation()
+                annotation.coordinate = CLLocationCoordinate2DMake(
+                    pin.lat as! CLLocationDegrees,
+                    pin.lon as! CLLocationDegrees
+                )
+                annotation.title = "Tap for Flickr images of this location!"
+                annotation.subtitle = "Drag to change location!"
+
+                mapView.addAnnotation(annotation)
+            }
+        }
     }
     
     // MARK:- Gesture Recognizer Delegate
@@ -119,8 +138,8 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
             // MARK:- Save context
             
             var dictionary = [
-                Pin.Keys.Lat   : annotation.coordinate.latitude,
-                Pin.Keys.Lon   : annotation.coordinate.longitude
+                Pin.Keys.Lat   : annotation.coordinate.latitude as NSNumber,
+                Pin.Keys.Lon   : annotation.coordinate.longitude as NSNumber
             ]
             let pinToBeAdded = Pin(dictionary: dictionary, context: sharedContext)
             CoreDataStackManager.sharedInstance().saveContext()
@@ -136,13 +155,13 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
             let identifier = "pin"
             var view: MKPinAnnotationView
             
-            if let dequeuedView = mapView.dequeueReusableAnnotationViewWithIdentifier(identifier)
-                as? MKPinAnnotationView {
-                    println("annotation was dequeued")
-                    
-                    dequeuedView.annotation = annotation
-                    view = dequeuedView
-            } else {
+//            if let dequeuedView = mapView.dequeueReusableAnnotationViewWithIdentifier(identifier)
+//                as? MKPinAnnotationView {
+//                    println("annotation was dequeued")
+//                    
+//                    dequeuedView.annotation = annotation
+//                    view = dequeuedView
+//            } else {
                 println("annotation could not be dequeued")
             
                 view = MKPinAnnotationView(annotation: annotation, reuseIdentifier: identifier)
@@ -153,7 +172,7 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
                 view.pinColor = MKPinAnnotationColor.Purple
                 view.animatesDrop = true
                 view.draggable = true
-            }
+//            }
             return view
         }
         return nil
@@ -197,15 +216,26 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
     }
     
     func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
+//
+//        let pin = anObject as! Pin
+//        let annotation = MKPointAnnotation()
+//        annotation.coordinate = CLLocationCoordinate2DMake(
+//            pin.lat as CLLocationDegrees,
+//            pin.lon as CLLocationDegrees
+//        )
+//
 //        switch type {
+//
 //        case NSFetchedResultsChangeType.Insert:
-//            mapView.addAnnotation()
+//            mapView.addAnnotation(annotation)
+//
 //        case NSFetchedResultsChangeType.Delete:
-//            //
-//        case NSFetchedResultsChangeType.Move:
-//            //
+//            mapView.removeAnnotation(annotation)
+//        
 //        case NSFetchedResultsChangeType.Update:
-//            //
+//            mapView.removeAnnotation(annotation)
+//            mapView.addAnnotation(annotation)
+//        
 //        default:
 //            break
 //        }

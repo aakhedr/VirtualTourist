@@ -12,9 +12,13 @@ import CoreData
 
 class Photo: NSManagedObject {
     
+    struct Keys {
+        static let Image = "image"
+    }
+    
     @NSManaged private var image: String!
     
-    @NSManaged private var pin: Pin!
+    @NSManaged private var pin: Pin
     
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
         super.init(entity: entity, insertIntoManagedObjectContext: context)
@@ -24,6 +28,6 @@ class Photo: NSManagedObject {
         let entity = NSEntityDescription.entityForName("Photo", inManagedObjectContext: context)!
         super.init(entity: entity, insertIntoManagedObjectContext: context)
         
-        image = dictionary["image"] as! String
+        image = dictionary[Photo.Keys.Image] as! String
     }
 }

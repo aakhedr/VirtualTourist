@@ -17,10 +17,9 @@ class Pin: NSManagedObject {
         static let Lon = "lon"
     }
     
-    @NSManaged private var lat: NSNumber!
-    @NSManaged private var lon: NSNumber!
-    
-    @NSManaged private var photos: [Photo]!
+    @NSManaged var lat: NSNumber
+    @NSManaged var lon: NSNumber
+    @NSManaged var photos: [Photo]
     
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
         super.init(entity: entity, insertIntoManagedObjectContext: context)
@@ -29,8 +28,10 @@ class Pin: NSManagedObject {
     init(dictionary: [String : AnyObject], context: NSManagedObjectContext) {
         let entity = NSEntityDescription.entityForName("Pin", inManagedObjectContext: context)!
         super.init(entity: entity, insertIntoManagedObjectContext: context)
+
+        lat = dictionary[Pin.Keys.Lat] as! NSNumber
+        lon = dictionary[Pin.Keys.Lon] as! NSNumber
         
-        lat = dictionary[Pin.Keys.Lat] as! Double
-        lon = dictionary[Pin.Keys.Lon] as! Double
+        // TODO: Get photos from Flickr
     }
 }
