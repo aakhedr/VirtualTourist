@@ -14,12 +14,19 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
     @IBOutlet weak var mapView: MKMapView!
     
     var longPressGestureRecognizer: UILongPressGestureRecognizer!
+    var lat: CLLocationDegrees!
+    var lon: CLLocationDegrees!
+    var latDelta: CLLocationDegrees!
+    var lonDelta: CLLocationDegrees!
     
     // MARK: - View lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
+        // Set mapView delegate
+        mapView.delegate = self
+
         // Long press gesture recognizer
         longPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: "handleLongPressGesture:")
         longPressGestureRecognizer.minimumPressDuration = 1
@@ -27,24 +34,21 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
         longPressGestureRecognizer.delegate = self
         mapView.addGestureRecognizer(longPressGestureRecognizer)
         
-        // Set mapView delegate
-        mapView.delegate = self
-        
-        // Map region
-        if readValue(key: "lat") == 0 && readValue(key: "lon") == 0 && readValue(key: "latDelta") == 0 && readValue(key: "lonDelta") == 0 {
+        // Set the mapView region
+        lat = readValue(key: "lat")
+        lon = readValue(key: "lon")
+        latDelta = readValue(key: "latDelta")
+        lonDelta = readValue(key: "lonDelta")
+
+        if lat == 0.0 && lon == 0.0 && latDelta == 0.0 && lonDelta == 0.0 {
             println("First time app is used")
             
             let initialRegion = MKCoordinateRegionForMapRect(MKMapRectWorld)
             mapView.setRegion(initialRegion, animated: true)
         } else {
             
-            // In case there's a previous region saved
-            // Get it and set the mapView region to the last region
-            let lat = readValue(key: "lat")
-            let lon = readValue(key: "lon")
-            let latDelta = readValue(key: "latDelta")
-            let lonDelta = readValue(key: "lonDelta")
-            
+            // In case there's a previous region saved.
+            // Set the mapView region to the last region.
             let span = MKCoordinateSpanMake(latDelta, lonDelta)
             let center = CLLocationCoordinate2DMake(lat, lon)
             let region = MKCoordinateRegion(center: center, span: span)
@@ -95,6 +99,7 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
     func mapView(mapView: MKMapView!, regionDidChangeAnimated animated: Bool) {
         println("regionDidChangeAnimated called")
         
+        // Save region params to NSUserDefaults
         saveValue(value: mapView.region.center.latitude, key: "lat")
         saveValue(value: mapView.region.center.longitude, key: "lon")
         saveValue(value: mapView.region.span.latitudeDelta, key: "latDelta")
@@ -110,7 +115,7 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
     
     func readValue(#key: String) -> Double {
         let userDefaults = NSUserDefaults.standardUserDefaults()
-        return userDefaults.doubleForKey(key)
+        return userDefaults.doubleForKey(key) as CLLocationDegrees
     }
 
 }
