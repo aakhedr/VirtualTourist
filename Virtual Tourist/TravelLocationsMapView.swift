@@ -9,15 +9,21 @@
 import UIKit
 import MapKit
 
+private struct PinData {
+    static let Lat = "lat"
+    static let Lon = "lon"
+    static let LatDelta = "latDelta"
+    static let LonDelta = "lonDelta"
+    
+    static let Key = "pinLocationData"
+}
+
 class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureRecognizerDelegate {
 
     @IBOutlet weak var mapView: MKMapView!
     
-    var longPressGestureRecognizer: UILongPressGestureRecognizer!
-    var lat: CLLocationDegrees!
-    var lon: CLLocationDegrees!
-    var latDelta: CLLocationDegrees!
-    var lonDelta: CLLocationDegrees!
+    private var longPressGestureRecognizer: UILongPressGestureRecognizer!
+    private var pinLocationDataDictinoary: [String : CLLocationDegrees]!
     
     // MARK: - View lifecycle
     
@@ -35,12 +41,9 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
         mapView.addGestureRecognizer(longPressGestureRecognizer)
         
         // Set the mapView region
-        lat = readValue(key: "lat")
-        lon = readValue(key: "lon")
-        latDelta = readValue(key: "latDelta")
-        lonDelta = readValue(key: "lonDelta")
+        pinLocationDataDictinoary = readValue()
 
-        if lat == 0.0 && lon == 0.0 && latDelta == 0.0 && lonDelta == 0.0 {
+        if pinLocationDataDictinoary == nil {
             println("First time app is used")
             
             let initialRegion = MKCoordinateRegionForMapRect(MKMapRectWorld)
@@ -49,10 +52,16 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
             
             // In case there's a previous region saved.
             // Set the mapView region to the last region.
-            let span = MKCoordinateSpanMake(latDelta, lonDelta)
-            let center = CLLocationCoordinate2DMake(lat, lon)
-            let region = MKCoordinateRegion(center: center, span: span)
+            let span = MKCoordinateSpanMake(
+                pinLocationDataDictinoary[PinData.LatDelta]!,
+                pinLocationDataDictinoary[PinData.LonDelta]!
+            )
+            let center = CLLocationCoordinate2DMake(
+                pinLocationDataDictinoary[PinData.Lat]!,
+                pinLocationDataDictinoary[PinData.Lon]!
+            )
             
+            let region = MKCoordinateRegion(center: center, span: span)
             mapView.setRegion(region, animated: true)
         }
     }
@@ -68,6 +77,8 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
             let touchPointCoordinate = mapView.convertPoint(touchPoint, toCoordinateFromView: mapView)
             let annotation = MKPointAnnotation()
             annotation.coordinate = touchPointCoordinate
+            annotation.title = "Tap for Flickr images"
+            annotation.subtitle = "Drag to change location"
             
             // Add the annotation to the map view
             mapView.addAnnotation(annotation)
@@ -78,18 +89,28 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
     
     func mapView(mapView: MKMapView!, viewForAnnotation annotation: MKAnnotation!) -> MKAnnotationView! {
         if let annotation = annotation as? MKPointAnnotation {
+            println("annotation is MKPointAnnoration")
+            
             let identifier = "pin"
             var view: MKPinAnnotationView
             
             if let dequeuedView = mapView.dequeueReusableAnnotationViewWithIdentifier(identifier)
                 as? MKPinAnnotationView {
+                    println("annotation was dequeued")
+                    
                     dequeuedView.annotation = annotation
                     view = dequeuedView
             } else {
+                println("annotation could not be dequeued")
+            
                 view = MKPinAnnotationView(annotation: annotation, reuseIdentifier: identifier)
                 view.canShowCallout = true
                 view.calloutOffset = CGPoint(x: -5, y: 5)
                 view.rightCalloutAccessoryView = UIButton.buttonWithType(.DetailDisclosure) as! UIView
+                
+                view.pinColor = MKPinAnnotationColor.Purple
+                view.animatesDrop = true
+                view.draggable = true
             }
             return view
         }
@@ -99,23 +120,37 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
     func mapView(mapView: MKMapView!, regionDidChangeAnimated animated: Bool) {
         println("regionDidChangeAnimated called")
         
-        // Save region params to NSUserDefaults
-        saveValue(value: mapView.region.center.latitude, key: "lat")
-        saveValue(value: mapView.region.center.longitude, key: "lon")
-        saveValue(value: mapView.region.span.latitudeDelta, key: "latDelta")
-        saveValue(value: mapView.region.span.longitudeDelta, key: "lonDelta")
+        // Save pin location data dictionary to NSUserDefaults
+        pinLocationDataDictinoary = [
+            PinData.Lat        : mapView.region.center.latitude,
+            PinData.Lon        : mapView.region.center.longitude,
+            PinData.LatDelta   : mapView.region.span.latitudeDelta,
+            PinData.LonDelta   : mapView.region.span.longitudeDelta
+        ]
+        saveValue()
+    }
+    
+    func mapView(mapView: MKMapView!, annotationView view: MKAnnotationView!, calloutAccessoryControlTapped control: UIControl!) {
+        println("calloutAccessoryControlTapped called")
+    }
+    
+    func mapView(mapView: MKMapView!, annotationView view: MKAnnotationView!, didChangeDragState newState: MKAnnotationViewDragState, fromOldState oldState: MKAnnotationViewDragState) {
+        println("didChangeDragState called")
+        
     }
     
     //MARK: - Helpers
     
-    func saveValue(#value: Double, key: String) {
+    func saveValue() {
         let userDefaults = NSUserDefaults.standardUserDefaults()
-        userDefaults.setDouble(value, forKey: key)
+        userDefaults.setObject(pinLocationDataDictinoary, forKey: PinData.Key)
     }
     
-    func readValue(#key: String) -> Double {
+    func readValue() -> [String : CLLocationDegrees]? {
         let userDefaults = NSUserDefaults.standardUserDefaults()
-        return userDefaults.doubleForKey(key) as CLLocationDegrees
+        return userDefaults.objectForKey(PinData.Key) as? [String : CLLocationDegrees]
     }
+    
+
 
 }
