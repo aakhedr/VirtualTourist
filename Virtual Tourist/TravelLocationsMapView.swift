@@ -37,11 +37,12 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
         let fetchRequest = NSFetchRequest(entityName: "Pin")
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: Pin.Keys.Lat, ascending: true)]
         
-        let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest,
+        let fetchedResultsController = NSFetchedResultsController(
+            fetchRequest: fetchRequest,
             managedObjectContext: self.sharedContext,
             sectionNameKeyPath: nil,
-            cacheName: nil)
-        
+            cacheName: nil
+        )
         return fetchedResultsController
         }()
     
@@ -88,13 +89,13 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
             
             // In case there's a previous region saved.
             // Set the mapView region to the last region.
-            let span = MKCoordinateSpanMake(
-                regionDataDictinoary[RegionData.LatDelta]!,
-                regionDataDictinoary[RegionData.LonDelta]!
-            )
             let center = CLLocationCoordinate2DMake(
                 regionDataDictinoary[RegionData.Lat]!,
                 regionDataDictinoary[RegionData.Lon]!
+            )
+            let span = MKCoordinateSpanMake(
+                regionDataDictinoary[RegionData.LatDelta]!,
+                regionDataDictinoary[RegionData.LonDelta]!
             )
             let region = MKCoordinateRegionMake(center, span)
             mapView.setRegion(region, animated: true)
@@ -287,13 +288,15 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
             sender.title = "Edit"
         }
         
-        // Animates sliding up/ down
+        // Animate sliding up/ down
         UIView.animateWithDuration(0.2) {
             self.mapView.frame = CGRectMake(
                 self.mapView.frame.origin.x,
-                newY, self.mapView.frame.width,
+                newY,
+                self.mapView.frame.width,
                 self.mapView.frame.height
-            )}
+            )
+        }
     }
     
     // MARK:- Fetched Results Controller Delegate
