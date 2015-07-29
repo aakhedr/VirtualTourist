@@ -9,7 +9,7 @@
 import MapKit
 import CoreData
 
-class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureRecognizerDelegate, NSFetchedResultsControllerDelegate {
+class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureRecognizerDelegate {
 
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var tabPinToDeleteLabel: UILabel!
@@ -59,9 +59,6 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
 
         // Long press gesture recognizer
         configureLongPressGestureRecognizer()
-        
-        // Set fetchResultsController delegate
-        fetchedResultsController.delegate = self
         
         // Perform the fetch
         performFetch()
