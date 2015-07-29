@@ -58,21 +58,16 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
         mapView.delegate = self
 
         // Long press gesture recognizer
-        longPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: "handleLongPressGesture:")
-        longPressGestureRecognizer.minimumPressDuration = 1
-        longPressGestureRecognizer.numberOfTouchesRequired = 1
-        longPressGestureRecognizer.delegate = self
-        mapView.addGestureRecognizer(longPressGestureRecognizer)
+        configureLongPressGestureRecognizer()
         
         // Set fetchResultsController delegate
         fetchedResultsController.delegate = self
         
         // Perform the fetch
-        var error: NSErrorPointer = nil
-        fetchedResultsController.performFetch(error)
-        if error != nil {
-            println("error in performFetch: \(error)")
-        }
+        performFetch()
+        
+        // Fetch and show pins in the map view
+        fetchAndShowPinAnnotations()
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -81,40 +76,16 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
         // Set the mapView region
         regionDataDictinoary = readValue()
         if regionDataDictinoary == nil {
-            println("First time app is used")
             
+            // First time app is used show worldmap
             let initialRegion = MKCoordinateRegionForMapRect(MKMapRectWorld)
             mapView.setRegion(initialRegion, animated: true)
         } else {
             
             // In case there's a previous region saved.
             // Set the mapView region to the last region.
-            let center = CLLocationCoordinate2DMake(
-                regionDataDictinoary[RegionData.Lat]!,
-                regionDataDictinoary[RegionData.Lon]!
-            )
-            let span = MKCoordinateSpanMake(
-                regionDataDictinoary[RegionData.LatDelta]!,
-                regionDataDictinoary[RegionData.LonDelta]!
-            )
-            let region = MKCoordinateRegionMake(center, span)
+            let region = setRegionData()
             mapView.setRegion(region, animated: true)
-        }
-        
-        // Add the fetched pins to the map view
-        mapView.removeAnnotations(mapView.annotations)
-        if let pins = fetchedResultsController.fetchedObjects as? [Pin] {
-            for pin in pins {
-                let annotation = MKPointAnnotation()
-                annotation.coordinate = CLLocationCoordinate2DMake(
-                    pin.lat as! CLLocationDegrees,
-                    pin.lon as! CLLocationDegrees
-                )
-                annotation.title = "Tap for Flickr images of this location!"
-                annotation.subtitle = "Drag to change location!"
-                
-                mapView.addAnnotation(annotation)
-            }
         }
     }
     
@@ -127,13 +98,7 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
             // Create MKPointAnnotation
             let touchPoint = recognizer.locationInView(mapView)
             let touchPointCoordinate = mapView.convertPoint(touchPoint, toCoordinateFromView: mapView)
-            let annotation = MKPointAnnotation()
-            annotation.coordinate = touchPointCoordinate
-            annotation.title = "Tap for Flickr images of this location!"
-            annotation.subtitle = "Drag to change location!"
-            
-            // Add the annotation to the map view
-            mapView.addAnnotation(annotation)
+            let annotation = MKPointAnnotationMake(coordinate: touchPointCoordinate)
             
             // TODO: Get flickr images associated with the coordinate
             
@@ -172,15 +137,8 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
             sender.title = "Edit"
         }
         
-        // Animate sliding up/ down
-        UIView.animateWithDuration(0.2) {
-            self.mapView.frame = CGRectMake(
-                self.mapView.frame.origin.x,
-                newY,
-                self.mapView.frame.width,
-                self.mapView.frame.height
-            )
-        }
+        // Animate sliding the map view up/ down
+        animateMapViewSliding(newY: newY)
     }
     
     // MARK:- Fetched Results Controller Delegate
@@ -220,7 +178,7 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
 //    func controllerDidChangeContent(controller: NSFetchedResultsController) {
 //    }
     
-    // MARK:- Helpers (NSUserDefaults)
+    // MARK:- Helpers
     
     func saveValue() {
         let userDefaults = NSUserDefaults.standardUserDefaults()
@@ -230,5 +188,68 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
     func readValue() -> [String : CLLocationDegrees]? {
         let userDefaults = NSUserDefaults.standardUserDefaults()
         return userDefaults.objectForKey(RegionData.Key) as? [String : CLLocationDegrees]
+    }
+    
+    func setRegionData() -> MKCoordinateRegion {
+        let center = CLLocationCoordinate2DMake(
+            regionDataDictinoary[RegionData.Lat]!,
+            regionDataDictinoary[RegionData.Lon]!
+        )
+        let span = MKCoordinateSpanMake(
+            regionDataDictinoary[RegionData.LatDelta]!,
+            regionDataDictinoary[RegionData.LonDelta]!
+        )
+        return MKCoordinateRegionMake(center, span)
+    }
+    
+    func fetchAndShowPinAnnotations() {
+        mapView.removeAnnotations(mapView.annotations)
+        if let pins = fetchedResultsController.fetchedObjects as? [Pin] {
+            for pin in pins {
+                MKPointAnnotationMake(coordinate:
+                    CLLocationCoordinate2DMake(
+                        pin.lat as! CLLocationDegrees,
+                        pin.lon as! CLLocationDegrees
+                    )
+                )
+            }
+        }
+    }
+    
+    func configureLongPressGestureRecognizer() {
+        longPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: "handleLongPressGesture:")
+        longPressGestureRecognizer.minimumPressDuration = 1
+        longPressGestureRecognizer.numberOfTouchesRequired = 1
+        longPressGestureRecognizer.delegate = self
+        mapView.addGestureRecognizer(longPressGestureRecognizer)
+    }
+
+    func performFetch() {
+        var error: NSErrorPointer = nil
+        fetchedResultsController.performFetch(error)
+        if error != nil {
+            println("error in performFetch: \(error)")
+        }
+    }
+    
+    func animateMapViewSliding(#newY: CGFloat) {
+        UIView.animateWithDuration(0.2) {
+            self.mapView.frame = CGRectMake(
+                self.mapView.frame.origin.x,
+                newY,
+                self.mapView.frame.width,
+                self.mapView.frame.height
+            )
+        }
+    }
+
+    func MKPointAnnotationMake(#coordinate: CLLocationCoordinate2D) -> MKPointAnnotation {
+        let annotation = MKPointAnnotation()
+        annotation.coordinate = coordinate
+        annotation.title = "Tap for Flickr images of this location!"
+        annotation.subtitle = "Drag to change location!"
+        mapView.addAnnotation(annotation)
+        
+        return annotation
     }
 }

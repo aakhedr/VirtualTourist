@@ -100,7 +100,6 @@
 				362EBCEE1B66617B00A1320B /* Controller */,
 				362EBCD11B643EBD00A1320B /* Images.xcassets */,
 				362EBCD31B643EBD00A1320B /* LaunchScreen.xib */,
-				362EBCCA1B643EBD00A1320B /* AppDelegate.swift */,
 				362EBCC81B643EBD00A1320B /* Supporting Files */,
 			);
 			path = "Virtual Tourist";
@@ -109,6 +108,7 @@
 		362EBCC81B643EBD00A1320B /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				362EBCCA1B643EBD00A1320B /* AppDelegate.swift */,
 				362EBCC91B643EBD00A1320B /* Info.plist */,
 			);
 			name = "Supporting Files";
