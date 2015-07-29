@@ -13,23 +13,33 @@ class PhotoAlbumViewController: UIViewController {
     @IBOutlet weak var mapView: MKMapView!
     
     var tabbedPin: Pin!
-    var region: MKCoordinateRegion!
     
     // MARK:- View lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        println(tabbedPin.lat)
-        println(tabbedPin.lon)
-        
-        // TODO: Set mapView region
-        
-        
-        // TODO: Add the pin to the mapView
-        
     }
 
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        // Add the tabbedPin to the mapView
+        let annotation = MKPointAnnotation()
+        annotation.coordinate = CLLocationCoordinate2DMake(
+            tabbedPin.lat as! CLLocationDegrees,
+            tabbedPin.lon as! CLLocationDegrees
+        )
+        mapView.addAnnotation(annotation)
+        
+        // Set mapView region
+        let center = CLLocationCoordinate2DMake(
+            tabbedPin.lat as! CLLocationDegrees,
+            tabbedPin.lon as! CLLocationDegrees
+        )
+        let span = MKCoordinateSpanMake(0.5, 0.5)
+        mapView.region = MKCoordinateRegionMake(center, span)
+    }
+    
     // MARK:- Helpers
     
 

@@ -27,12 +27,12 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
     private var tabbedPin: Pin!
     
     // Shared Context
-    var sharedContext: NSManagedObjectContext {
+    private var sharedContext: NSManagedObjectContext {
         return CoreDataStackManager.sharedInstance().managedObjectContext!
     }
     
     // Fetched Results Controller
-    lazy var fetchedResultsController: NSFetchedResultsController = {
+    lazy private var fetchedResultsController: NSFetchedResultsController = {
         let fetchRequest = NSFetchRequest(entityName: "Pin")
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: Pin.Keys.Lat, ascending: true)]
         
@@ -53,7 +53,6 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
         mapView.delegate = self
 
         // Long press gesture recognizer
-        
         longPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: "handleLongPressGesture:")
         longPressGestureRecognizer.minimumPressDuration = 1
         longPressGestureRecognizer.numberOfTouchesRequired = 1
@@ -64,10 +63,8 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
         fetchedResultsController.delegate = self
         
         // Perform the fetch
-        
         var error: NSErrorPointer = nil
         fetchedResultsController.performFetch(error)
-        
         if error != nil {
             println("error in performFetch: \(error)")
         }
@@ -77,9 +74,7 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
         super.viewWillAppear(animated)
         
         // Set the mapView region
-        
         regionDataDictinoary = readValue()
-        
         if regionDataDictinoary == nil {
             println("First time app is used")
             
@@ -97,17 +92,13 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
                 regionDataDictinoary[RegionData.Lat]!,
                 regionDataDictinoary[RegionData.Lon]!
             )
-            let region = MKCoordinateRegion(center: center, span: span)
+            let region = MKCoordinateRegionMake(center, span)
             mapView.setRegion(region, animated: true)
         }
         
         // Add the fetched pins to the map view
-        
         mapView.removeAnnotations(mapView.annotations)
-        
         if let pins = fetchedResultsController.fetchedObjects as? [Pin] {
-            println("pins.count: \(pins.count)")
-            
             for pin in pins {
                 let annotation = MKPointAnnotation()
                 annotation.coordinate = CLLocationCoordinate2DMake(
@@ -129,7 +120,6 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
             println("handleLongPressGesture called")
             
             // Create MKPointAnnotation
-            
             let touchPoint = recognizer.locationInView(mapView)
             let touchPointCoordinate = mapView.convertPoint(touchPoint, toCoordinateFromView: mapView)
             let annotation = MKPointAnnotation()
@@ -143,7 +133,6 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
             // TODO: Get flickr images associated with the coordinate
             
             // MARK:- Save context
-            
             let dictionary = [
                 Pin.Keys.Lat   : annotation.coordinate.latitude as NSNumber,
                 Pin.Keys.Lon   : annotation.coordinate.longitude as NSNumber
@@ -189,7 +178,6 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
         println("regionDidChangeAnimated called")
         
         // Save region data dictionary to NSUserDefaults
-        
         regionDataDictinoary = [
             RegionData.Lat        : mapView.region.center.latitude,
             RegionData.Lon        : mapView.region.center.longitude,
@@ -202,13 +190,13 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
     func mapView(mapView: MKMapView!, annotationView view: MKAnnotationView!, calloutAccessoryControlTapped control: UIControl!) {
         println("calloutAccessoryControlTapped called")
         
+        // Set the tabbedPin associated with the MKAnnotationView
         let pins = fetchedResultsController.fetchedObjects as! [Pin]
         let lat = view.annotation.coordinate.latitude as NSNumber
         let lon = view.annotation.coordinate.longitude as NSNumber
         tabbedPin = pins.filter { pin in
             pin.lat == lat && pin.lon == lon
         }.first
-        
         performSegueWithIdentifier("photoAlbumSegue", sender: self)
     }
     
@@ -254,8 +242,8 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
     // MARK:- Prepare for segue
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if segue == "photoAlbumSegue" {
-            
+        if segue.identifier == "photoAlbumSegue" {
+
             // set the photo album view controller properties
             (segue.destinationViewController as! PhotoAlbumViewController).tabbedPin = tabbedPin
         }
