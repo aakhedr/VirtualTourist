@@ -47,7 +47,7 @@ extension TravelLocationsMapView {
         println("regionDidChangeAnimated called")
         
         // Save region data dictionary to NSUserDefaults
-        regionDataDictinoary = [
+        regionDataDictionay = [
             RegionData.Lat        : mapView.region.center.latitude,
             RegionData.Lon        : mapView.region.center.longitude,
             RegionData.LatDelta   : mapView.region.span.latitudeDelta,
@@ -60,12 +60,10 @@ extension TravelLocationsMapView {
         println("calloutAccessoryControlTapped called")
         
         // Set the tabbedPin associated with the MKAnnotationView
-        let pins = fetchedResultsController.fetchedObjects as! [Pin]
-        let lat = view.annotation.coordinate.latitude as NSNumber
-        let lon = view.annotation.coordinate.longitude as NSNumber
-        tabbedPin = pins.filter { pin in
-            pin.lat == lat && pin.lon == lon
-            }.first
+        tabbedPin = searchForPinInCoreData(
+            latitude: view.annotation.coordinate.latitude,
+            longitude: view.annotation.coordinate.longitude
+        )
         performSegueWithIdentifier("photoAlbumSegue", sender: self)
     }
     
@@ -74,33 +72,24 @@ extension TravelLocationsMapView {
         
         switch oldState {
             
-            // Old coordinate
+        // Old coordinate
         case .Starting:
-            let pins = fetchedResultsController.fetchedObjects as! [Pin]
-            
-            let lat = view.annotation.coordinate.latitude as NSNumber
-            let lon = view.annotation.coordinate.longitude as NSNumber
-            let pinToBeDeleted = pins.filter { pin in
-                pin.lat == lat && pin.lon == lon
-                }.first!
-            println("old coordinate: \(pinToBeDeleted.lat) \(pinToBeDeleted.lon)")
+            let pinToBeDeleted = searchForPinInCoreData(
+                latitude: view.annotation.coordinate.latitude,
+                longitude: view.annotation.coordinate.longitude
+            )
             
             // Delete old object
             sharedContext.deleteObject(pinToBeDeleted)
             
-            // New coordinate
+        // New coordinate
         case .Ending:
             
+            // MARK: Save context after update
+            saveContext(annotation: view.annotation)
+
             // TODO: Get new set of flickr images
             
-            
-            // MARK: Save context after update
-            let dictionary = [
-                Pin.Keys.Lat   : view.annotation.coordinate.latitude as NSNumber,
-                Pin.Keys.Lon   : view.annotation.coordinate.longitude as NSNumber
-            ]
-            let pinToBeAdded = Pin(dictionary: dictionary, context: sharedContext)
-            CoreDataStackManager.sharedInstance().saveContext()
             
         default:
             break
@@ -111,12 +100,10 @@ extension TravelLocationsMapView {
         if !tabPinToDeleteLabel.hidden {
             
             // Delete the pin from core data
-            let pins = fetchedResultsController.fetchedObjects as! [Pin]
-            let lat = view.annotation.coordinate.latitude as NSNumber
-            let lon = view.annotation.coordinate.longitude as NSNumber
-            let pinToBeDeleted = pins.filter { pin in
-                pin.lat == lat && pin.lon == lon
-                }.first!
+            let pinToBeDeleted = searchForPinInCoreData(
+                latitude: view.annotation.coordinate.latitude,
+                longitude: view.annotation.coordinate.longitude
+            )
             sharedContext.deleteObject(pinToBeDeleted)
             
             // MARK:- Save context after deletion

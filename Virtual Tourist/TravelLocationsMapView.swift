@@ -15,7 +15,7 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
     @IBOutlet weak var tabPinToDeleteLabel: UILabel!
     
     private var longPressGestureRecognizer: UILongPressGestureRecognizer!
-    var regionDataDictinoary: [String : CLLocationDegrees]!
+    var regionDataDictionay: [String : CLLocationDegrees]!
     var tabbedPin: Pin!
 
     struct RegionData {
@@ -74,8 +74,8 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
         super.viewWillAppear(animated)
         
         // Set the mapView region
-        regionDataDictinoary = readValue()
-        if regionDataDictinoary == nil {
+        regionDataDictionay = readValue()
+        if regionDataDictionay == nil {
             
             // First time app is used show worldmap
             let initialRegion = MKCoordinateRegionForMapRect(MKMapRectWorld)
@@ -103,12 +103,7 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
             // TODO: Get flickr images associated with the coordinate
             
             // MARK:- Save context
-            let dictionary = [
-                Pin.Keys.Lat   : annotation.coordinate.latitude as NSNumber,
-                Pin.Keys.Lon   : annotation.coordinate.longitude as NSNumber
-            ]
-            let pinToBeAdded = Pin(dictionary: dictionary, context: sharedContext)
-            CoreDataStackManager.sharedInstance().saveContext()
+            saveContext(annotation: annotation)
         }
     }
     
@@ -182,7 +177,7 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
     
     func saveValue() {
         let userDefaults = NSUserDefaults.standardUserDefaults()
-        userDefaults.setObject(regionDataDictinoary, forKey: RegionData.Key)
+        userDefaults.setObject(regionDataDictionay, forKey: RegionData.Key)
     }
     
     func readValue() -> [String : CLLocationDegrees]? {
@@ -192,12 +187,12 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
     
     func setRegionData() -> MKCoordinateRegion {
         let center = CLLocationCoordinate2DMake(
-            regionDataDictinoary[RegionData.Lat]!,
-            regionDataDictinoary[RegionData.Lon]!
+            regionDataDictionay[RegionData.Lat]!,
+            regionDataDictionay[RegionData.Lon]!
         )
         let span = MKCoordinateSpanMake(
-            regionDataDictinoary[RegionData.LatDelta]!,
-            regionDataDictinoary[RegionData.LonDelta]!
+            regionDataDictionay[RegionData.LatDelta]!,
+            regionDataDictionay[RegionData.LonDelta]!
         )
         return MKCoordinateRegionMake(center, span)
     }
@@ -251,5 +246,24 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
         mapView.addAnnotation(annotation)
         
         return annotation
+    }
+    
+    func saveContext(#annotation: MKAnnotation) {
+        let dictionary = [
+            Pin.Keys.Lat   : annotation.coordinate.latitude as NSNumber,
+            Pin.Keys.Lon   : annotation.coordinate.longitude as NSNumber
+        ]
+        let pinToBeAdded = Pin(dictionary: dictionary, context: sharedContext)
+        CoreDataStackManager.sharedInstance().saveContext()
+    }
+    
+    func searchForPinInCoreData(#latitude: CLLocationDegrees, longitude: CLLocationDegrees) -> Pin {
+        let pins = fetchedResultsController.fetchedObjects as! [Pin]
+        let lat = latitude as NSNumber
+        let lon = longitude as NSNumber
+        
+        return pins.filter { pin in
+            pin.lat == lat && pin.lon == lon
+            }.first!
     }
 }
