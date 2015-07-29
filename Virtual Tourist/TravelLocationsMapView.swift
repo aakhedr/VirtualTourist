@@ -1,5 +1,5 @@
 //
-//  MapViewController.swift
+//  TravelLocationsMapView.swift
 //  Virtual Tourist
 //
 //  Created by Ahmed Khedr on 7/27/15.
@@ -59,10 +59,26 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
         longPressGestureRecognizer.delegate = self
         mapView.addGestureRecognizer(longPressGestureRecognizer)
         
+        // Set fetchResultsController delegate
+        fetchedResultsController.delegate = self
+        
+        // Perform the fetch
+        
+        var error: NSErrorPointer = nil
+        fetchedResultsController.performFetch(error)
+        
+        if error != nil {
+            println("error in performFetch: \(error)")
+        }
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        
         // Set the mapView region
         
         regionDataDictinoary = readValue()
-
+        
         if regionDataDictinoary == nil {
             println("First time app is used")
             
@@ -84,18 +100,6 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
             mapView.setRegion(region, animated: true)
         }
         
-        // Set fetchResultsController delegate
-        fetchedResultsController.delegate = self
-        
-        // Perform the fetch
-        
-        var error: NSErrorPointer = nil
-        fetchedResultsController.performFetch(error)
-        
-        if error != nil {
-            println("error in performFetch: \(error)")
-        }
-
         // Add the fetched pins to the map view
         
         mapView.removeAnnotations(mapView.annotations)
@@ -111,7 +115,7 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
                 )
                 annotation.title = "Tap for Flickr images of this location!"
                 annotation.subtitle = "Drag to change location!"
-
+                
                 mapView.addAnnotation(annotation)
             }
         }
@@ -137,7 +141,7 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
             
             // MARK:- Save context
             
-            var dictionary = [
+            let dictionary = [
                 Pin.Keys.Lat   : annotation.coordinate.latitude as NSNumber,
                 Pin.Keys.Lon   : annotation.coordinate.longitude as NSNumber
             ]
@@ -155,13 +159,13 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
             let identifier = "pin"
             var view: MKPinAnnotationView
             
-//            if let dequeuedView = mapView.dequeueReusableAnnotationViewWithIdentifier(identifier)
-//                as? MKPinAnnotationView {
-//                    println("annotation was dequeued")
-//                    
-//                    dequeuedView.annotation = annotation
-//                    view = dequeuedView
-//            } else {
+            if let dequeuedView = mapView.dequeueReusableAnnotationViewWithIdentifier(identifier)
+                as? MKPinAnnotationView {
+                    println("annotation was dequeued")
+                    
+                    dequeuedView.annotation = annotation
+                    view = dequeuedView
+            } else {
                 println("annotation could not be dequeued")
             
                 view = MKPinAnnotationView(annotation: annotation, reuseIdentifier: identifier)
@@ -172,7 +176,7 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
                 view.pinColor = MKPinAnnotationColor.Purple
                 view.animatesDrop = true
                 view.draggable = true
-//            }
+            }
             return view
         }
         return nil
@@ -201,13 +205,40 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
     func mapView(mapView: MKMapView!, annotationView view: MKAnnotationView!, didChangeDragState newState: MKAnnotationViewDragState, fromOldState oldState: MKAnnotationViewDragState) {
         println("didChangeDragState called")
         
-        println("newState")
-        println(view.annotation.coordinate.latitude)
-        println(view.annotation.coordinate.longitude)
-    
-        println("oldState")
-        println(view.annotation.coordinate.latitude)
-        println(view.annotation.coordinate.longitude)
+        switch oldState {
+            
+        // Old coordinate
+        case .Starting:
+            let pins = fetchedResultsController.fetchedObjects as! [Pin]
+            
+            let lat = view.annotation.coordinate.latitude as NSNumber
+            let lon = view.annotation.coordinate.longitude as NSNumber
+            let pinToBeDeleted = pins.filter { pin in
+                pin.lat == lat && pin.lon == lon
+            }.first!
+            println("old coordinate: \(pinToBeDeleted.lat) \(pinToBeDeleted.lon)")
+            
+            // Delete old object
+            sharedContext.deleteObject(pinToBeDeleted)
+
+        // New coordinate
+        case .Ending:
+            
+            // TODO: Get new set of flickr images
+
+            
+            // MARK:- Update context
+            
+            let dictionary = [
+                Pin.Keys.Lat   : view.annotation.coordinate.latitude as NSNumber,
+                Pin.Keys.Lon   : view.annotation.coordinate.longitude as NSNumber
+            ]
+            let pinToBeAdded = Pin(dictionary: dictionary, context: sharedContext)
+            CoreDataStackManager.sharedInstance().saveContext()
+            
+        default:
+            break
+        }
     }
     
     // MARK:- Fetched Results Controller Delegate

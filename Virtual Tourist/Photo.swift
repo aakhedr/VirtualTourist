@@ -1,5 +1,5 @@
 //
-//  FlickrImage.swift
+//  Photo.swift
 //  Virtual Tourist
 //
 //  Created by Ahmed Khedr on 7/28/15.
