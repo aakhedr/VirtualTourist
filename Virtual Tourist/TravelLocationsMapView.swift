@@ -135,43 +135,6 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
         animateMapViewSliding(newY: newY)
     }
     
-    // MARK:- Fetched Results Controller Delegate
-    
-//    func controllerWillChangeContent(controller: NSFetchedResultsController) {
-//    }
-//    
-//    func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
-//
-//        let pin = anObject as! Pin
-//        let annotation = MKPointAnnotation()
-//        annotation.coordinate = CLLocationCoordinate2DMake(
-//            pin.lat as CLLocationDegrees,
-//            pin.lon as CLLocationDegrees
-//        )
-//
-//        switch type {
-//
-//        case NSFetchedResultsChangeType.Insert:
-//            mapView.addAnnotation(annotation)
-//
-//        case NSFetchedResultsChangeType.Delete:
-//            mapView.removeAnnotation(annotation)
-//        
-//        case NSFetchedResultsChangeType.Update:
-//            mapView.removeAnnotation(annotation)
-//            mapView.addAnnotation(annotation)
-//        
-//        default:
-//            break
-//        }
-//    }
-//    
-//    func controller(controller: NSFetchedResultsController, didChangeSection sectionInfo: NSFetchedResultsSectionInfo, atIndex sectionIndex: Int, forChangeType type: NSFetchedResultsChangeType) {
-//    }
-//    
-//    func controllerDidChangeContent(controller: NSFetchedResultsController) {
-//    }
-    
     // MARK:- Helpers
     
     func saveValue() {
