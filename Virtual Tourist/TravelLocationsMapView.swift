@@ -18,13 +18,13 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
     var regionDataDictionay: [String : CLLocationDegrees]!
     var tabbedPin: Pin!
 
-    struct RegionData {
-        static let Lat = "lat"
-        static let Lon = "lon"
-        static let LatDelta = "latDelta"
-        static let LonDelta = "lonDelta"
+    struct regionDataDictionayKeys {
+        static let Lat = "latitude"
+        static let Lon = "longitude"
+        static let LatDelta = "latitudeDelta"
+        static let LonDelta = "longitudeDelta"
         
-        static let Key = "regionData"
+        static let NSUserDefaultsKey = "regionData"
     }
 
     // Shared Context
@@ -60,16 +60,6 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
         // Long press gesture recognizer
         configureLongPressGestureRecognizer()
         
-        // Perform the fetch
-        performFetch()
-        
-        // Fetch and show pins in the map view
-        fetchAndShowPinAnnotations()
-    }
-    
-    override func viewWillAppear(animated: Bool) {
-        super.viewWillAppear(animated)
-        
         // Set the mapView region
         regionDataDictionay = readValue()
         if regionDataDictionay == nil {
@@ -81,9 +71,15 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
             
             // In case there's a previous region saved.
             // Set the mapView region to the last region.
-            let region = setRegionData()
+            let region = setRegionCenterAndSpan()
             mapView.setRegion(region, animated: true)
         }
+        
+        // Perform the fetch
+        performFetch()
+        
+        // Fetch and show pins in the map view
+        fetchAndShowPinAnnotations()
     }
     
     // MARK:- Gesture Recognizer Delegate
@@ -136,29 +132,29 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
     
     func saveValue() {
         let userDefaults = NSUserDefaults.standardUserDefaults()
-        userDefaults.setObject(regionDataDictionay, forKey: RegionData.Key)
+        userDefaults.setObject(regionDataDictionay, forKey: regionDataDictionayKeys.NSUserDefaultsKey)
     }
     
     func readValue() -> [String : CLLocationDegrees]? {
         let userDefaults = NSUserDefaults.standardUserDefaults()
-        return userDefaults.objectForKey(RegionData.Key) as? [String : CLLocationDegrees]
+        return userDefaults.objectForKey(regionDataDictionayKeys.NSUserDefaultsKey) as? [String : CLLocationDegrees]
     }
     
-    func setRegionData() -> MKCoordinateRegion {
+    func setRegionCenterAndSpan() -> MKCoordinateRegion {
         let center = CLLocationCoordinate2DMake(
-            regionDataDictionay[RegionData.Lat]!,
-            regionDataDictionay[RegionData.Lon]!
+            regionDataDictionay[regionDataDictionayKeys.Lat]!,
+            regionDataDictionay[regionDataDictionayKeys.Lon]!
         )
         let span = MKCoordinateSpanMake(
-            regionDataDictionay[RegionData.LatDelta]!,
-            regionDataDictionay[RegionData.LonDelta]!
+            regionDataDictionay[regionDataDictionayKeys.LatDelta]!,
+            regionDataDictionay[regionDataDictionayKeys.LonDelta]!
         )
         return MKCoordinateRegionMake(center, span)
     }
     
     func fetchAndShowPinAnnotations() {
-        mapView.removeAnnotations(mapView.annotations)
         if let pins = fetchedResultsController.fetchedObjects as? [Pin] {
+            mapView.removeAnnotations(mapView.annotations)
             for pin in pins {
                 MKPointAnnotationMake(coordinate:
                     CLLocationCoordinate2DMake(

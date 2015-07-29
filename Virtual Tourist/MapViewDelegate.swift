@@ -41,10 +41,10 @@ extension TravelLocationsMapView {
         
         // Save region data dictionary to NSUserDefaults
         regionDataDictionay = [
-            RegionData.Lat        : mapView.region.center.latitude,
-            RegionData.Lon        : mapView.region.center.longitude,
-            RegionData.LatDelta   : mapView.region.span.latitudeDelta,
-            RegionData.LonDelta   : mapView.region.span.longitudeDelta
+            regionDataDictionayKeys.Lat        : mapView.region.center.latitude,
+            regionDataDictionayKeys.Lon        : mapView.region.center.longitude,
+            regionDataDictionayKeys.LatDelta   : mapView.region.span.latitudeDelta,
+            regionDataDictionayKeys.LonDelta   : mapView.region.span.longitudeDelta
         ]
         saveValue()
     }
