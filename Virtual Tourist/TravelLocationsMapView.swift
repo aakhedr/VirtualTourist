@@ -93,7 +93,6 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
     
     func handleLongPressGesture(recognizer: UILongPressGestureRecognizer) {
         if recognizer.state == .Ended {
-            println("handleLongPressGesture called")
             
             // Create MKPointAnnotation
             let touchPoint = recognizer.locationInView(mapView)
@@ -224,6 +223,7 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
         fetchedResultsController.performFetch(error)
         if error != nil {
             println("error in performFetch: \(error)")
+            abort()
         }
     }
     

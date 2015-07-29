@@ -15,20 +15,14 @@ extension TravelLocationsMapView {
     
     func mapView(mapView: MKMapView!, viewForAnnotation annotation: MKAnnotation!) -> MKAnnotationView! {
         if let annotation = annotation as? MKPointAnnotation {
-            println("annotation is MKPointAnnoration")
-            
             let identifier = "pin"
             var view: MKPinAnnotationView
             
             if let dequeuedView = mapView.dequeueReusableAnnotationViewWithIdentifier(identifier)
                 as? MKPinAnnotationView {
-                    println("annotation was dequeued")
-                    
                     dequeuedView.annotation = annotation
                     view = dequeuedView
             } else {
-                println("annotation could not be dequeued")
-                
                 view = MKPinAnnotationView(annotation: annotation, reuseIdentifier: identifier)
                 view.canShowCallout = true          // default value is already true!
                 view.calloutOffset = CGPoint(x: -5, y: 5)
@@ -44,7 +38,6 @@ extension TravelLocationsMapView {
     }
     
     func mapView(mapView: MKMapView!, regionDidChangeAnimated animated: Bool) {
-        println("regionDidChangeAnimated called")
         
         // Save region data dictionary to NSUserDefaults
         regionDataDictionay = [
@@ -57,7 +50,6 @@ extension TravelLocationsMapView {
     }
     
     func mapView(mapView: MKMapView!, annotationView view: MKAnnotationView!, calloutAccessoryControlTapped control: UIControl!) {
-        println("calloutAccessoryControlTapped called")
         
         // Set the tabbedPin associated with the MKAnnotationView
         tabbedPin = searchForPinInCoreData(
@@ -68,31 +60,29 @@ extension TravelLocationsMapView {
     }
     
     func mapView(mapView: MKMapView!, annotationView view: MKAnnotationView!, didChangeDragState newState: MKAnnotationViewDragState, fromOldState oldState: MKAnnotationViewDragState) {
-        println("didChangeDragState called")
-        
         switch oldState {
             
-        // Old coordinate
-        case .Starting:
-            let pinToBeDeleted = searchForPinInCoreData(
-                latitude: view.annotation.coordinate.latitude,
-                longitude: view.annotation.coordinate.longitude
-            )
-            
-            // Delete old object
-            sharedContext.deleteObject(pinToBeDeleted)
-            
-        // New coordinate
-        case .Ending:
-            
-            // MARK: Save context after update
-            saveContext(annotation: view.annotation)
+            // Old coordinate
+            case .Starting:
+                let pinToBeDeleted = searchForPinInCoreData(
+                    latitude: view.annotation.coordinate.latitude,
+                    longitude: view.annotation.coordinate.longitude
+                )
+                
+                // Delete old object
+                sharedContext.deleteObject(pinToBeDeleted)
+                
+            // New coordinate
+            case .Ending:
+                
+                // MARK: Save context after update
+                saveContext(annotation: view.annotation)
 
-            // TODO: Get new set of flickr images
-            
-            
-        default:
-            break
+                // TODO: Get new set of flickr images
+                
+                
+            default:
+                break
         }
     }
     
