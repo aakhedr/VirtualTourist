@@ -12,11 +12,17 @@ class PhotoAlbumViewController: UIViewController {
 
     @IBOutlet weak var mapView: MKMapView!
     
+    var tabbedPin: Pin!
+    var region: MKCoordinateRegion!
+    
     // MARK:- View lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        println(tabbedPin.lat)
+        println(tabbedPin.lon)
+        
         // TODO: Set mapView region
         
         

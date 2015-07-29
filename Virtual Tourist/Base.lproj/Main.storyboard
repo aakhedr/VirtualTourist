@@ -35,7 +35,7 @@
                     </navigationItem>
                     <connections>
                         <outlet property="mapView" destination="JGR-vs-4T6" id="IEp-OE-LUh"/>
-                        <segue destination="iUB-bG-kG1" kind="show" identifier="photosAlbumSegue" id="AS2-ZY-DRQ"/>
+                        <segue destination="iUB-bG-kG1" kind="show" identifier="photoAlbumSegue" id="AS2-ZY-DRQ"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="oAa-Lr-ECz" userLabel="First Responder" sceneMemberID="firstResponder"/>

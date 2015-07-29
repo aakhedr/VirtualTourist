@@ -24,6 +24,7 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
     
     private var longPressGestureRecognizer: UILongPressGestureRecognizer!
     private var regionDataDictinoary: [String : CLLocationDegrees]!
+    private var tabbedPin: Pin!
     
     // Shared Context
     var sharedContext: NSManagedObjectContext {
@@ -139,6 +140,8 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
             // Add the annotation to the map view
             mapView.addAnnotation(annotation)
             
+            // TODO: Get flickr images associated with the coordinate
+            
             // MARK:- Save context
             
             let dictionary = [
@@ -198,8 +201,15 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
     
     func mapView(mapView: MKMapView!, annotationView view: MKAnnotationView!, calloutAccessoryControlTapped control: UIControl!) {
         println("calloutAccessoryControlTapped called")
-
-        performSegueWithIdentifier("photosAlbumSegue", sender: self)
+        
+        let pins = fetchedResultsController.fetchedObjects as! [Pin]
+        let lat = view.annotation.coordinate.latitude as NSNumber
+        let lon = view.annotation.coordinate.longitude as NSNumber
+        tabbedPin = pins.filter { pin in
+            pin.lat == lat && pin.lon == lon
+        }.first
+        
+        performSegueWithIdentifier("photoAlbumSegue", sender: self)
     }
     
     func mapView(mapView: MKMapView!, annotationView view: MKAnnotationView!, didChangeDragState newState: MKAnnotationViewDragState, fromOldState oldState: MKAnnotationViewDragState) {
@@ -241,6 +251,16 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
         }
     }
     
+    // MARK:- Prepare for segue
+    
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if segue == "photoAlbumSegue" {
+            
+            // set the photo album view controller properties
+            (segue.destinationViewController as! PhotoAlbumViewController).tabbedPin = tabbedPin
+        }
+    }
+    
     // MARK:- Fetched Results Controller Delegate
     
     func controllerWillChangeContent(controller: NSFetchedResultsController) {
@@ -278,7 +298,7 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
     func controllerDidChangeContent(controller: NSFetchedResultsController) {
     }
     
-    // MARK:- Helpers
+    // MARK:- Helpers (NSUserDefaults)
     
     func saveValue() {
         let userDefaults = NSUserDefaults.standardUserDefaults()
