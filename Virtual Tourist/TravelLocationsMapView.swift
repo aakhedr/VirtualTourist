@@ -21,6 +21,7 @@ private struct RegionData {
 class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureRecognizerDelegate, NSFetchedResultsControllerDelegate {
 
     @IBOutlet weak var mapView: MKMapView!
+    @IBOutlet weak var tabPinToDeleteLabel: UILabel!
     
     private var longPressGestureRecognizer: UILongPressGestureRecognizer!
     private var regionDataDictinoary: [String : CLLocationDegrees]!
@@ -48,6 +49,9 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // tabPinToDeleteLabel
+        tabPinToDeleteLabel.hidden = true
 
         // Set mapView delegate
         mapView.delegate = self
@@ -225,8 +229,7 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
             // TODO: Get new set of flickr images
 
             
-            // MARK:- Update context
-            
+            // MARK: Save context after update
             let dictionary = [
                 Pin.Keys.Lat   : view.annotation.coordinate.latitude as NSNumber,
                 Pin.Keys.Lon   : view.annotation.coordinate.longitude as NSNumber
@@ -239,6 +242,26 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
         }
     }
     
+    func mapView(mapView: MKMapView!, didSelectAnnotationView view: MKAnnotationView!) {
+        if !tabPinToDeleteLabel.hidden {
+            
+            // Delete the pin from core data
+            let pins = fetchedResultsController.fetchedObjects as! [Pin]
+            let lat = view.annotation.coordinate.latitude as NSNumber
+            let lon = view.annotation.coordinate.longitude as NSNumber
+            let pinToBeDeleted = pins.filter { pin in
+                pin.lat == lat && pin.lon == lon
+                }.first!
+            sharedContext.deleteObject(pinToBeDeleted)
+            
+            // MARK:- Save context after deletion
+            CoreDataStackManager.sharedInstance().saveContext()
+
+            // Remove annotation from mapView
+            mapView.removeAnnotation(view.annotation)
+        }
+    }
+    
     // MARK:- Prepare for segue
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
@@ -247,6 +270,30 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
             // set the photo album view controller properties
             (segue.destinationViewController as! PhotoAlbumViewController).tabbedPin = tabbedPin
         }
+    }
+    
+    // MARK:- Actions
+    
+    @IBAction func deletePin(sender: UIBarButtonItem) {
+        var newY: CGFloat
+
+        if sender.title == "Edit" {
+            tabPinToDeleteLabel.hidden = false
+            sender.title = "Done"
+            newY = mapView.frame.origin.y - tabPinToDeleteLabel.frame.height
+        } else {
+            newY = mapView.frame.origin.y + tabPinToDeleteLabel.frame.height
+            tabPinToDeleteLabel.hidden = true
+            sender.title = "Edit"
+        }
+        
+        // Animates sliding up/ down
+        UIView.animateWithDuration(0.2) {
+            self.mapView.frame = CGRectMake(
+                self.mapView.frame.origin.x,
+                newY, self.mapView.frame.width,
+                self.mapView.frame.height
+            )}
     }
     
     // MARK:- Fetched Results Controller Delegate

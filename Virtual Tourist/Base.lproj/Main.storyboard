@@ -20,21 +20,43 @@
                             <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="JGR-vs-4T6">
                                 <rect key="frame" x="0.0" y="64" width="600" height="536"/>
                             </mapView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Tab Pins to Delete" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="L1N-fs-r5p">
+                                <rect key="frame" x="0.0" y="570" width="600" height="30"/>
+                                <color key="backgroundColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <fontDescription key="fontDescription" type="system" weight="heavy" pointSize="17"/>
+                                <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="JGR-vs-4T6" firstAttribute="bottom" secondItem="4Mr-wN-HK9" secondAttribute="top" id="2MH-O0-eYm"/>
+                            <constraint firstItem="L1N-fs-r5p" firstAttribute="leading" secondItem="JGR-vs-4T6" secondAttribute="leading" id="EAZ-U3-TlK"/>
                             <constraint firstItem="JGR-vs-4T6" firstAttribute="top" secondItem="Fxt-rh-PIr" secondAttribute="bottom" id="JIN-1D-0Vq"/>
+                            <constraint firstItem="L1N-fs-r5p" firstAttribute="bottom" secondItem="4Mr-wN-HK9" secondAttribute="top" id="L2d-Gq-i8p"/>
                             <constraint firstItem="JGR-vs-4T6" firstAttribute="leading" secondItem="9kb-Hc-DJG" secondAttribute="leading" id="UfB-Zi-h3k"/>
+                            <constraint firstItem="L1N-fs-r5p" firstAttribute="top" secondItem="JGR-vs-4T6" secondAttribute="bottom" constant="-30" id="WT3-MT-D5M"/>
+                            <constraint firstItem="L1N-fs-r5p" firstAttribute="top" secondItem="JGR-vs-4T6" secondAttribute="bottom" constant="-42" id="m5m-9l-Lru"/>
                             <constraint firstAttribute="trailing" secondItem="JGR-vs-4T6" secondAttribute="trailing" id="pYs-j2-CrZ"/>
+                            <constraint firstItem="L1N-fs-r5p" firstAttribute="trailing" secondItem="JGR-vs-4T6" secondAttribute="trailing" id="zZI-7o-Rvz"/>
                         </constraints>
+                        <variation key="default">
+                            <mask key="constraints">
+                                <exclude reference="m5m-9l-Lru"/>
+                            </mask>
+                        </variation>
                     </view>
                     <navigationItem key="navigationItem" title="Virtual Tourist" id="luR-cH-v4l">
                         <barButtonItem key="backBarButtonItem" title="OK" id="zG2-VU-yqp"/>
-                        <barButtonItem key="rightBarButtonItem" systemItem="edit" id="dXr-ND-6It"/>
+                        <barButtonItem key="rightBarButtonItem" title="Edit" id="dXr-ND-6It">
+                            <connections>
+                                <action selector="deletePin:" destination="uSi-VY-s4y" id="Kl5-XN-Gt7"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                     <connections>
                         <outlet property="mapView" destination="JGR-vs-4T6" id="IEp-OE-LUh"/>
+                        <outlet property="tabPinToDeleteLabel" destination="L1N-fs-r5p" id="abB-3s-d4i"/>
                         <segue destination="iUB-bG-kG1" kind="show" identifier="photoAlbumSegue" id="AS2-ZY-DRQ"/>
                     </connections>
                 </viewController>
