@@ -9,7 +9,7 @@
         <!--Virtual Tourist-->
         <scene sceneID="Udb-YJ-K8Z">
             <objects>
-                <viewController id="uSi-VY-s4y" customClass="TravelLocationsMapView" customModule="Virtual_Tourist" sceneMemberID="viewController">
+                <viewController id="uSi-VY-s4y" customClass="TravelLocationsMapViewController" customModule="Virtual_Tourist" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="Fxt-rh-PIr"/>
                         <viewControllerLayoutGuide type="bottom" id="4Mr-wN-HK9"/>
@@ -72,7 +72,7 @@
         <!--Photo Album View Controller-->
         <scene sceneID="d1g-oa-SMU">
             <objects>
-                <viewController storyboardIdentifier="PhotoAlbumViewController" id="iUB-bG-kG1" customClass="PhotoAlbumViewController" customModule="Virtual_Tourist" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="iUB-bG-kG1" customClass="PhotoAlbumViewController" customModule="Virtual_Tourist" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="n1V-CD-5Qb"/>
                         <viewControllerLayoutGuide type="bottom" id="Ocp-Sd-47b"/>

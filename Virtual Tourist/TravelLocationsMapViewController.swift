@@ -1,5 +1,5 @@
 //
-//  TravelLocationsMapView.swift
+//  TravelLocationsMapViewController.swift
 //  Virtual Tourist
 //
 //  Created by Ahmed Khedr on 7/27/15.
@@ -9,7 +9,7 @@
 import MapKit
 import CoreData
 
-class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureRecognizerDelegate {
+class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIGestureRecognizerDelegate {
 
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var tabPinToDeleteLabel: UILabel!
@@ -67,7 +67,7 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
             // First time app is used show worldmap
             let initialRegion = MKCoordinateRegionForMapRect(MKMapRectWorld)
             mapView.setRegion(initialRegion, animated: true)
-            
+
         } else {
             
             // In case there's a previous region saved.
