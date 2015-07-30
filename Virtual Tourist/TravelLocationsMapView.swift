@@ -15,10 +15,10 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
     @IBOutlet weak var tabPinToDeleteLabel: UILabel!
     
     private var longPressGestureRecognizer: UILongPressGestureRecognizer!
-    var regionDataDictionay: [String : CLLocationDegrees]!
-    var tabbedPin: Pin!
+    private var regionDataDictionay: [String : CLLocationDegrees]!
+    private var tabbedPin: Pin!
 
-    struct regionDataDictionayKeys {
+    private struct regionDataDictionayKeys {
         static let Lat = "latitude"
         static let Lon = "longitude"
         static let LatDelta = "latitudeDelta"
@@ -28,12 +28,12 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
     }
 
     // Shared Context
-    var sharedContext: NSManagedObjectContext {
+    private var sharedContext: NSManagedObjectContext {
         return CoreDataStackManager.sharedInstance().managedObjectContext!
     }
     
     // Fetched Results Controller
-    lazy var fetchedResultsController: NSFetchedResultsController = {
+    lazy private var fetchedResultsController: NSFetchedResultsController = {
         let fetchRequest = NSFetchRequest(entityName: "Pin")
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: Pin.Keys.Lat, ascending: true)]
         
