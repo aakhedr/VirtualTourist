@@ -93,6 +93,7 @@
 		362EBCC71B643EBD00A1320B /* Virtual Tourist */ = {
 			isa = PBXGroup;
 			children = (
+				36E2BF4A1B690A4A0060F219 /* FlickrClient */,
 				362EBCF21B66971800A1320B /* Model */,
 				362EBCEF1B66618B00A1320B /* View */,
 				362EBCEE1B66617B00A1320B /* Controller */,
@@ -149,7 +150,6 @@
 		362EBCF21B66971800A1320B /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				36E2BF4A1B690A4A0060F219 /* FlickrClient */,
 				362EBCEA1B643EDB00A1320B /* CoreDataStackManager.swift */,
 				366D42B41B679A110089EF36 /* Model.xcdatamodeld */,
 				366D42AB1B676BCB0089EF36 /* Pin.swift */,

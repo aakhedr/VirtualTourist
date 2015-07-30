@@ -180,6 +180,16 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
         performSegueWithIdentifier("photoAlbumSegue", sender: self)
     }
     
+    func mapViewDidFailLoadingMap(mapView: MKMapView!, withError error: NSError!) {
+        let alertController = UIAlertController(
+            title: "Network error!",
+            message: "Unable to load map. Check your Internet connection",
+            preferredStyle: UIAlertControllerStyle.Alert)
+        let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: nil)
+        alertController.addAction(okAction)
+        presentViewController(alertController, animated: true, completion: nil)
+    }
+    
     func mapView(mapView: MKMapView!, annotationView view: MKAnnotationView!, didChangeDragState newState: MKAnnotationViewDragState, fromOldState oldState: MKAnnotationViewDragState) {
         switch oldState {
             
@@ -225,22 +235,9 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
         }
     }
     
-    func mapViewDidFailLoadingMap(mapView: MKMapView!, withError error: NSError!) {
-        let alertController = UIAlertController(
-            title: "Network error!",
-            message: "Unable to load map. Check your Internet connection",
-            preferredStyle: UIAlertControllerStyle.ActionSheet)
-        let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: nil)
-        alertController.addAction(okAction)
-        presentViewController(alertController, animated: true, completion: nil)
-        
-        println("error failing to load map: \(error)")
-    }
-    
     // MARK: - Fetched Results Controller Delegate
     
-    func controllerDidChangeContent(controller: NSFetchedResultsController) {
-    }
+    func controllerDidChangeContent(controller: NSFetchedResultsController) {  }
     
     // MARK:- Helpers
     
