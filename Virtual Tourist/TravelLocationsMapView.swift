@@ -67,6 +67,7 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
             // First time app is used show worldmap
             let initialRegion = MKCoordinateRegionForMapRect(MKMapRectWorld)
             mapView.setRegion(initialRegion, animated: true)
+            
         } else {
             
             // In case there's a previous region saved.
@@ -180,26 +181,26 @@ class TravelLocationsMapView: UIViewController, MKMapViewDelegate, UIGestureReco
         switch oldState {
             
             // Old coordinate
-        case .Starting:
-            let pinToBeDeleted = searchForPinInCoreData(
-                latitude: view.annotation.coordinate.latitude,
-                longitude: view.annotation.coordinate.longitude
-            )
-            
-            // Delete old object
-            sharedContext.deleteObject(pinToBeDeleted)
-            
+            case .Starting:
+                let pinToBeDeleted = searchForPinInCoreData(
+                    latitude: view.annotation.coordinate.latitude,
+                    longitude: view.annotation.coordinate.longitude
+                )
+                
+                // Delete old object
+                sharedContext.deleteObject(pinToBeDeleted)
+                
             // New coordinate
-        case .Ending:
-            
-            // MARK: Save context after update
-            saveContext(annotation: view.annotation)
-            
-            // TODO: Get new set of flickr images
-            
-            
-        default:
-            break
+            case .Ending:
+                
+                // MARK: Save context after update
+                saveContext(annotation: view.annotation)
+                
+                // TODO: Get new set of flickr images
+                
+                
+            default:
+                break
         }
     }
     
