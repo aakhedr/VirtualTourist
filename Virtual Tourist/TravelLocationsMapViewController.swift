@@ -9,7 +9,7 @@
 import MapKit
 import CoreData
 
-class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIGestureRecognizerDelegate {
+class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIGestureRecognizerDelegate, NSFetchedResultsControllerDelegate {
 
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var tabPinToDeleteLabel: UILabel!
@@ -75,6 +75,9 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
             let region = setRegionCenterAndSpan()
             mapView.setRegion(region, animated: true)
         }
+        
+        // Set Fetched Results Controller delegate
+        fetchedResultsController.delegate = self
         
         // Perform the fetch
         performFetch()
@@ -220,6 +223,11 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
             // Remove annotation from mapView
             mapView.removeAnnotation(view.annotation)
         }
+    }
+    
+    // MARK: - Fetched Results Controller Delegate
+    
+    func controllerDidChangeContent(controller: NSFetchedResultsController) {
     }
     
     // MARK:- Helpers
