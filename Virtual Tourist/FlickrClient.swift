@@ -23,7 +23,7 @@ class FlickrClient: NSObject {
         // 1. Parameters set in call to taskForGETMethod
         
         // 2/3. Build the URL and intialize the request
-        let urlString = BaseURL.URL + FlickrClient.escapedParameters(parameters)
+        let urlString = BaseURL.URL + escapedParameters(parameters)
         let url = NSURL(string: urlString)!
         let request = NSURLRequest(URL: url)
 
@@ -32,10 +32,10 @@ class FlickrClient: NSObject {
             if let error = error {
                 
                 // 5/6. Parse the data and use the data
-                let newError = FlickrClient.errorForData(data, response: response, error: error)
+                let newError = self.errorForData(data, response: response, error: error)
                 completionHandler(result: nil, error: newError)
             } else {
-                FlickrClient.parseJSONWithCompletionHandler(data, completionHandler: completionHandler)
+                self.parseJSONWithCompletionHandler(data, completionHandler: completionHandler)
             }
         }
         
@@ -47,7 +47,7 @@ class FlickrClient: NSObject {
 
     // MARK: - Helpers
     
-    class func escapedParameters(parameters: [String : AnyObject]) -> String {
+    func escapedParameters(parameters: [String : AnyObject]) -> String {
         var urlVars = [String]()
         
         for (key, value) in parameters {
@@ -64,7 +64,7 @@ class FlickrClient: NSObject {
         return (!urlVars.isEmpty ? "?" : "") + join("&", urlVars)
     }
     
-    class func errorForData(data: NSData?, response: NSURLResponse?, error: NSError) -> NSError {
+    func errorForData(data: NSData?, response: NSURLResponse?, error: NSError) -> NSError {
         if let parsedResult = NSJSONSerialization.JSONObjectWithData(data!, options: NSJSONReadingOptions.AllowFragments, error: nil) as? [String : AnyObject] {
             
             if let errorMessage = parsedResult[FlickrClient.JSONResponseKeys.StatusMessage] as? String {
@@ -76,7 +76,7 @@ class FlickrClient: NSObject {
         return error
     }
     
-    class func parseJSONWithCompletionHandler(data: NSData, completionHandler: (result: AnyObject!, error: NSError?) -> Void) {
+    func parseJSONWithCompletionHandler(data: NSData, completionHandler: (result: AnyObject!, error: NSError?) -> Void) {
         var parsingError: NSError? = nil
         
         let parsedResult: AnyObject? = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.AllowFragments, error: &parsingError)
@@ -88,7 +88,7 @@ class FlickrClient: NSObject {
         }
     }
     
-    class func createBoundingBoxString(#latitude: Double, longitude: Double) -> String {
+    func createBoundingBoxString(#latitude: Double, longitude: Double) -> String {
         let bottom_left_lon = max(
             longitude - BoundingBox.BOUNDING_BOX_HALF_WIDTH,
             BoundingBox.LON_MIN

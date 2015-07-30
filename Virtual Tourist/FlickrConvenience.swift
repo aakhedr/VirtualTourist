@@ -16,7 +16,7 @@ extension FlickrClient {
         let parameters = [
             MethodArgumentKeys.METHOD           : Methods.SearchByLatLon,
             MethodArgumentKeys.API_KEY          : MethodArgumentValues.API_KEY,
-            MethodArgumentKeys.BBOX             : FlickrClient.createBoundingBoxString(
+            MethodArgumentKeys.BBOX             : createBoundingBoxString(
                                                     latitude: latitude,
                                                     longitude: longitude),
             MethodArgumentKeys.EXTRAS           : MethodArgumentValues.EXTRAS,
