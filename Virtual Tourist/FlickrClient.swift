@@ -18,22 +18,12 @@ class FlickrClient: NSObject {
         super.init()
     }
     
-    func taskForGETMethod(apiKey: String, method: String, latitude: Double, longitude: Double, completionHandler: (result: AnyObject?, error: NSError?) -> Void) -> NSURLSessionDataTask {
+    func taskForGETMethod(#parameters: [String : AnyObject], completionHandler: (result: AnyObject?, error: NSError?) -> Void) -> NSURLSessionDataTask {
         
-        // 1. Set the parameters
-        let methodArguments = [
-            MethodArgumentKeys.METHOD           : Methods.SearchByLatLon,
-            MethodArgumentKeys.API_KEY          : MethodArgumentValues.API_KEY,
-            MethodArgumentKeys.BBOX             : FlickrClient.createBoundingBoxString(
-                                                    latitude: latitude,
-                                                    longitude: longitude),
-            MethodArgumentKeys.EXTRAS           : MethodArgumentValues.EXTRAS,
-            MethodArgumentKeys.DATA_FORMAT      : MethodArgumentValues.DATA_FORMAT,
-            MethodArgumentKeys.NO_JSON_CALLBACK : MethodArgumentValues.NO_JSON_CALLBACK
-        ]
+        // 1. Parameters set in call to taskForGETMethod
         
         // 2/3. Build the URL and intialize the request
-        let urlString = BaseURL.URL + FlickrClient.escapedParameters(methodArguments)
+        let urlString = BaseURL.URL + FlickrClient.escapedParameters(parameters)
         let url = NSURL(string: urlString)!
         let request = NSURLRequest(URL: url)
 
