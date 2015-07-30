@@ -225,6 +225,18 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
         }
     }
     
+    func mapViewDidFailLoadingMap(mapView: MKMapView!, withError error: NSError!) {
+        let alertController = UIAlertController(
+            title: "Network error!",
+            message: "Unable to load map. Check your Internet connection",
+            preferredStyle: UIAlertControllerStyle.ActionSheet)
+        let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: nil)
+        alertController.addAction(okAction)
+        presentViewController(alertController, animated: true, completion: nil)
+        
+        println("error failing to load map: \(error)")
+    }
+    
     // MARK: - Fetched Results Controller Delegate
     
     func controllerDidChangeContent(controller: NSFetchedResultsController) {
