@@ -97,6 +97,15 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
             let annotation = MKPointAnnotationMake(coordinate: touchPointCoordinate)
             
             // TODO: Get flickr images associated with the coordinate
+            FlickrClient.sharedInstance().getPhotosForCoordinate(touchPointCoordinate.latitude, longitude: touchPointCoordinate.longitude) { imagePaths, error in
+                if let error = error {
+                    println("error.domain: \(error.domain)")
+                    println("error code: \(error.code)")
+                    println("error description: \(error.localizedDescription)")
+                } else {
+                    println("imagePaths parsed")
+                }
+            }
             
             // MARK:- Save context
             saveContext(annotation: annotation)

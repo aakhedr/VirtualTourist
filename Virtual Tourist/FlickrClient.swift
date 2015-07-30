@@ -18,7 +18,7 @@ class FlickrClient: NSObject {
         super.init()
     }
     
-    func taskForGETMethod(#parameters: [String : AnyObject], completionHandler: (result: AnyObject?, error: NSError?) -> Void) -> NSURLSessionDataTask {
+    func taskForGETMethod(#parameters: [String : AnyObject], completionHandler: (result: AnyObject!, error: NSError?) -> Void) -> NSURLSessionDataTask {
         
         // 1. Parameters set in call to taskForGETMethod
         
