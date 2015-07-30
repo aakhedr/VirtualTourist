@@ -18,10 +18,6 @@ class PhotoAlbumViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-    }
-
-    override func viewWillAppear(animated: Bool) {
-        super.viewWillAppear(animated)
         
         // Add the tabbedPin to the mapView
         let annotation = MKPointAnnotation()
