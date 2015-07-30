@@ -19,7 +19,7 @@ class Pin: NSManagedObject {
     
     @NSManaged var lat: NSNumber
     @NSManaged var lon: NSNumber
-    @NSManaged var photos: [Photo]
+    @NSManaged var photos: NSSet
     
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
         super.init(entity: entity, insertIntoManagedObjectContext: context)
