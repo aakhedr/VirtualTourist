@@ -38,7 +38,7 @@ extension FlickrClient {
                         userInfo: [NSLocalizedDescriptionKey: "network error"]))
             } else {
                 if let successMessage = JSONResult.valueForKey(JSONResponseKeys.SuccessMessage) as? String {
-                    if successMessage == "ok" {
+                    if successMessage == "ok" || successMessage == "fail" {
                         if let photosDictinoary = JSONResult.valueForKey(JSONResponseKeys.PhotosDictionary) as? [String : AnyObject] {
                             if let photosArray = photosDictinoary[JSONResponseKeys.PhotosArray] as? [[String : AnyObject]] {
                                 if photosArray.count == 0 {
@@ -50,7 +50,12 @@ extension FlickrClient {
                                     if let imagePath = dictionary[JSONResponseKeys.ImagePath] as? String {
                                         imagePaths.append(imagePath)
                                     } else {
-                                        completionHandler(data: nil, error: NSError(domain: "getPhotosForCoordinate", code: 6, userInfo: [NSLocalizedDescriptionKey : "Could not find imagePath"]))
+                                        completionHandler(
+                                            data: nil,
+                                            error: NSError(
+                                                domain: "getPhotosForCoordinate",
+                                                code: 6,
+                                                userInfo: [NSLocalizedDescriptionKey : "Could not find imagePath"]))
                                     }
                                 }
                                 completionHandler(
@@ -69,7 +74,7 @@ extension FlickrClient {
                                 error: NSError(
                                     domain: "getPhotosForCoordinate",
                                     code: 4,
-                                    userInfo: [NSLocalizedDescriptionKey : "Could not find phoots dictionary"]))
+                                    userInfo: [NSLocalizedDescriptionKey : "Could not find photos dictionary"]))
                         }
                     } else {
                         completionHandler(
@@ -78,7 +83,6 @@ extension FlickrClient {
                                 domain: "getPhotosForCoordinate",
                                 code: 3,
                                 userInfo: [NSLocalizedDescriptionKey : "success message is not ok!"]))
-                        println("successMessage: \(successMessage)")
                     }
                 } else {
                     completionHandler(
