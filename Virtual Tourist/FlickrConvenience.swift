@@ -38,7 +38,7 @@ extension FlickrClient {
                         userInfo: [NSLocalizedDescriptionKey: "network error"]))
             } else {
                 if let successMessage = JSONResult.valueForKey(JSONResponseKeys.SuccessMessage) as? String {
-                    if successMessage == "ok" || successMessage == "fail" {
+                    if successMessage == "ok" {
                         if let photosDictinoary = JSONResult.valueForKey(JSONResponseKeys.PhotosDictionary) as? [String : AnyObject] {
                             if let photosArray = photosDictinoary[JSONResponseKeys.PhotosArray] as? [[String : AnyObject]] {
                                 if photosArray.count == 0 {
