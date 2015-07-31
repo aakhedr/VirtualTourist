@@ -15,6 +15,7 @@ class Pin: NSManagedObject {
     struct Keys {
         static let Lat = "lat"
         static let Lon = "lon"
+        static let Photos = "photos"
     }
     
     @NSManaged var lat: NSNumber
@@ -31,7 +32,6 @@ class Pin: NSManagedObject {
 
         lat = dictionary[Pin.Keys.Lat] as! NSNumber
         lon = dictionary[Pin.Keys.Lon] as! NSNumber
-        
-        // TODO: Get photos from Flickr
+        photos = dictionary[Pin.Keys.Photos] as! NSSet
     }
 }

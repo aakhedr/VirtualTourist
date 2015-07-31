@@ -10,7 +10,7 @@ import Foundation
 
 extension FlickrClient {
     
-    func getPhotosForCoordinate(latitude: Double, longitude: Double, completionHandler: (data: AnyObject?, error: NSError?) -> Void) {
+    func getPhotosForCoordinate(#latitude: Double, longitude: Double, completionHandler: (data: AnyObject?, error: NSError?) -> Void) {
         
         // 1. Set the parameters
         let parameters = [

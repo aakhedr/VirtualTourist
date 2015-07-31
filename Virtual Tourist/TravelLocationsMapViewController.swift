@@ -91,16 +91,17 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
     func handleLongPressGesture(recognizer: UILongPressGestureRecognizer) {
         if recognizer.state == .Ended {
             
-            // Create MKPointAnnotation
+            // Create MKPointAnnotation and add it to the map view
             let touchPoint = recognizer.locationInView(mapView)
             let touchPointCoordinate = mapView.convertPoint(touchPoint, toCoordinateFromView: mapView)
             let annotation = MKPointAnnotationMake(coordinate: touchPointCoordinate)
 
-            // Init Pin
-            let pinToBeAdded = pinFromAnnotation(annotation: annotation)
+            // MARK: - Get Flickr images and Save context
+            let lat = annotation.coordinate.latitude
+            let lon = annotation.coordinate.longitude
             
-            // TODO: Get flickr images associated with the Pin
-            FlickrClient.sharedInstance().getPhotosForCoordinate(pinToBeAdded.lat as Double, longitude: pinToBeAdded.lon as Double) { imagePaths, error in
+            FlickrClient.sharedInstance().getPhotosForCoordinate(latitude: lat, longitude: lon) { imagePaths, error in
+                
                 if let error = error {
                     println("error domain: \(error.domain)")
                     println("error code: \(error.code)")
@@ -117,22 +118,21 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
                                 Photo.Keys.Image    : imagePath
                             ]
                             
-                            // Init the Photo object and set its pin @NSManaged property
+                            // Init the Photo object
                             let photoToBeAdded = Photo(dictionary: dictionary, context: self.sharedContext)
-                            photoToBeAdded.pin = pinToBeAdded
                             photos.append(photoToBeAdded)
                         }
                     } else {
-                        println("imagePaths could not casted into [String] in handleLongPressGesture")
+                        println("imagePaths could not be casted to [String] in handleLongPressGesture")
                     }
+
+                    // Init Pin
+                    let pinToBeAdded = self.pinFromAnnotation(annotation: annotation, photos: NSSet(array: photos))
                     
-                    // Set the Pin photos NSManaged property
-                    pinToBeAdded.photos = NSSet(array: photos)
+                    // Save context
+                    CoreDataStackManager.sharedInstance().saveContext()
                 }
             }
-            
-            // MARK:- Save context
-            CoreDataStackManager.sharedInstance().saveContext()
         }
     }
     
@@ -239,11 +239,12 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
             // New coordinate
             case .Ending:
                 
-                // Init a new Pin object
-                let pinToBeAdded = pinFromAnnotation(annotation: view.annotation)
-            
-                // TODO: Get new set of flickr images
-                FlickrClient.sharedInstance().getPhotosForCoordinate(pinToBeAdded.lat as Double, longitude: pinToBeAdded.lon as Double) { imagePaths, error in
+                // MARK: - Get Flickr images and Save context
+                let lat = view.annotation.coordinate.latitude
+                let lon = view.annotation.coordinate.longitude
+                
+                FlickrClient.sharedInstance().getPhotosForCoordinate(latitude: lat, longitude: lon) { imagePaths, error in
+                    
                     if let error = error {
                         println("error domain: \(error.domain)")
                         println("error code: \(error.code)")
@@ -262,20 +263,17 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
                                 
                                 // Init the Photo object and set its pin @NSManaged property
                                 let photoToBeAdded = Photo(dictionary: dictionary, context: self.sharedContext)
-                                photoToBeAdded.pin = pinToBeAdded
                                 photos.append(photoToBeAdded)
                             }
                         } else {
-                            println("imagePaths could not casted into [String] in didChangeDragState")
+                            println("imagePaths could not be casted to [String] in didChangeDragState")
                         }
                         
-                        // Set the Pin photos NSManaged property
-                        pinToBeAdded.photos = NSSet(array: photos)
+                        // Init Pin
+                        let pinToBeAdded = self.pinFromAnnotation(annotation: view.annotation, photos: NSSet(array: photos))
+                        CoreDataStackManager.sharedInstance().saveContext()
                     }
-                }
-
-                // MARK: Save context after update
-                CoreDataStackManager.sharedInstance().saveContext()
+            }
 
             default:
                 break
@@ -298,7 +296,6 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
             // Remove annotation from mapView
             mapView.removeAnnotation(view.annotation)
             
-        // TODO: - Delete after testing!
         } else {
             let pinSelected = searchForPinInCoreData(latitude: view.annotation.coordinate.latitude, longitude: view.annotation.coordinate.longitude)
             println(pinSelected.photos.count)
@@ -387,10 +384,11 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
         return annotation
     }
     
-    func pinFromAnnotation(#annotation: MKAnnotation) -> Pin {
+    func pinFromAnnotation(#annotation: MKAnnotation, photos: NSSet) -> Pin {
         let dictionary = [
-            Pin.Keys.Lat   : annotation.coordinate.latitude as NSNumber,
-            Pin.Keys.Lon   : annotation.coordinate.longitude as NSNumber
+            Pin.Keys.Lat    : annotation.coordinate.latitude as NSNumber,
+            Pin.Keys.Lon    : annotation.coordinate.longitude as NSNumber,
+            Pin.Keys.Photos : photos
         ]
         return Pin(dictionary: dictionary, context: sharedContext)
     }
