@@ -17,7 +17,7 @@ class Photo: NSManagedObject {
     }
     
     @NSManaged private var imagePath: String!
-    @NSManaged var pin: Pin
+    @NSManaged private var pin: Pin
     
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
         super.init(entity: entity, insertIntoManagedObjectContext: context)
