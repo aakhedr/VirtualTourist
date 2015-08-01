@@ -16,7 +16,7 @@ class Photo: NSManagedObject {
         static let ImageURL = "imageURL"
     }
     
-    @NSManaged var imageURL: String!
+    @NSManaged private var imageURL: String!
     @NSManaged var imageData: NSData!
     @NSManaged private var pin: Pin
     
