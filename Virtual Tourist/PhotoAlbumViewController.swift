@@ -62,12 +62,20 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDataSource, UI
         
         // Set fetchedResultsController delegate 
         fetchedResultsController.delegate = self
+        
+        // Perform the fetch
+        var error: NSErrorPointer = nil
+        fetchedResultsController.performFetch(error)
+        if error != nil {
+            println("error performing the fetch in PhotoAlbumViewController: \(error)")
+        }
     }
     
     // MARK: - Collection View Data Source
     
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         let sectionInfo = fetchedResultsController.sections![section] as! NSFetchedResultsSectionInfo
+        println("seciontInfor.numberOfObjects = \(sectionInfo.numberOfObjects)")
         return sectionInfo.numberOfObjects
     }
     
