@@ -85,7 +85,9 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDataSource, UI
         let photo = fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
         let identifier = "photoCell"
         
-        let cell = collectionView.dequeueReusableCellWithReuseIdentifier(identifier, forIndexPath: indexPath) as! UICollectionViewCell
+        let cell = collectionView.dequeueReusableCellWithReuseIdentifier(identifier, forIndexPath: indexPath) as! PhotoCollectionViewCell
+        
+        cell.image!.image = UIImage(data: photo.imageData)!
 
         return cell
     }

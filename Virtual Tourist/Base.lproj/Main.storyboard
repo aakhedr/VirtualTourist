@@ -116,7 +116,7 @@
                                         </constraints>
                                         <size key="customSize" width="50" height="50"/>
                                         <connections>
-                                            <outlet property="image" destination="8JF-t3-cBc" id="LTz-e5-joJ"/>
+                                            <outlet property="image" destination="8JF-t3-cBc" id="N0J-wl-6wO"/>
                                         </connections>
                                     </collectionViewCell>
                                 </cells>
