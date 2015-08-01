@@ -16,8 +16,7 @@ class Photo: NSManagedObject {
         static let ImageURL = "imageURL"
     }
     
-    @NSManaged private var imageURL: String!
-    @NSManaged var imageData: NSData!
+    @NSManaged var imageURL: String
     @NSManaged private var pin: Pin
     
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
@@ -29,11 +28,5 @@ class Photo: NSManagedObject {
         super.init(entity: entity, insertIntoManagedObjectContext: context)
         
         imageURL = dictionary[Photo.Keys.ImageURL] as! String
-        
-        // Set imageData property
-        let url = NSURL(string: imageURL)!
-        let imageData = NSData(contentsOfURL: url)!
-        
-        self.imageData = imageData
     }
 }
