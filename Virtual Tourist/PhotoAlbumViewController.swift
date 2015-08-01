@@ -62,7 +62,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDataSource, UI
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         let sectionInfo = fetchedResultsController.sections![section] as! NSFetchedResultsSectionInfo
 
-        println("seciontInfor.numberOfObjects = \(sectionInfo.numberOfObjects)")
+        println("seciontInfo.numberOfObjects = \(sectionInfo.numberOfObjects)")
         
         return sectionInfo.numberOfObjects
     }
@@ -72,8 +72,12 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDataSource, UI
         let identifier = "photoCell"
         
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier(identifier, forIndexPath: indexPath) as! PhotoCollectionViewCell
-        
-        cell.image!.image = UIImage(data: photo.imageData)!
+
+        // Set imageData property
+        let url = NSURL(string: photo.imageURL)!
+        let imageData = NSData(contentsOfURL: url)!
+
+        cell.image!.image = UIImage(data: imageData)!
 
         return cell
     }
