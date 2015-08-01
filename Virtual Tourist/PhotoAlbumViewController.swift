@@ -75,7 +75,9 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDataSource, UI
     
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         let sectionInfo = fetchedResultsController.sections![section] as! NSFetchedResultsSectionInfo
+
         println("seciontInfor.numberOfObjects = \(sectionInfo.numberOfObjects)")
+        
         return sectionInfo.numberOfObjects
     }
     
