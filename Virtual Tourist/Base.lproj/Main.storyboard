@@ -103,6 +103,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </view>
+                                        <size key="customSize" width="50" height="50"/>
                                     </collectionViewCell>
                                 </cells>
                             </collectionView>
@@ -128,6 +129,7 @@
                     <navigationItem key="navigationItem" id="wqP-vv-qAh"/>
                     <connections>
                         <outlet property="mapView" destination="RvG-ff-Que" id="D00-yc-IZa"/>
+                        <outlet property="photoCollectionView" destination="JSZ-IZ-G46" id="P2l-T0-53O"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="oS5-w0-WD1" userLabel="First Responder" sceneMemberID="firstResponder"/>
