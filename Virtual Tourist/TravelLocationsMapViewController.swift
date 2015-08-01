@@ -201,7 +201,7 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
                     longitude: view.annotation.coordinate.longitude)
                 
                 // Delete old object
-//                sharedContext.deleteObject(pinToBeDeleted)
+                sharedContext.deleteObject(pinToBeDeleted)
             
             // New coordinate
             case .Ending:
@@ -233,7 +233,9 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
             mapView.removeAnnotation(view.annotation)
             
         } else {
-            let pinSelected = searchForPinInCoreData(latitude: view.annotation.coordinate.latitude, longitude: view.annotation.coordinate.longitude)
+            let pinSelected = searchForPinInCoreData(
+                latitude: view.annotation.coordinate.latitude,
+                longitude: view.annotation.coordinate.longitude)
             println(pinSelected.photos.count)
         }
     }
@@ -348,28 +350,32 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
                 println("error code: \(error.code)")
                 println("error description: \(error.localizedDescription)")
             } else {
-                
-                println("\(imageURLs!.count) imagePaths parsed")
-                
-                var photos = [Photo]()
-                
-                if let imageURLs = imageURLs as? [String] {
-                    for imageURL in imageURLs {
-                        let dictionary = [
-                            Photo.Keys.ImageURL    : imageURL
-                        ]
-                        
-                        // Init the Photo object
-                        let photoToBeAdded = Photo(dictionary: dictionary, context: self.sharedContext)
-                        photos.append(photoToBeAdded)
+                dispatch_async(dispatch_get_main_queue()) {
+                    
+                    println("\(imageURLs!.count) imagePaths parsed")
+                    
+                    var photos = [Photo]()
+                    
+                    if let imageURLs = imageURLs as? [String] {
+                        for imageURL in imageURLs {
+                            let dictionary = [
+                                Photo.Keys.ImageURL    : imageURL
+                            ]
+                            
+                            // Init the Photo object
+                            let photoToBeAdded = Photo(dictionary: dictionary, context: self.sharedContext)
+                            photos.append(photoToBeAdded)
+                            
+                            // Init Pin
+                            let pinToBeAdded = self.pinFromAnnotation(annotation: annotation, photos: NSSet(array: photos))
+                        }
+
+                        CoreDataStackManager.sharedInstance().saveContext()
+
+                    } else {
+                        println("imagePaths could not be casted to [String] in didChangeDragState")
                     }
-                } else {
-                    println("imagePaths could not be casted to [String] in didChangeDragState")
                 }
-                
-                // Init Pin
-                let pinToBeAdded = self.pinFromAnnotation(annotation: annotation, photos: NSSet(array: photos))
-                CoreDataStackManager.sharedInstance().saveContext()
             }
         }
     }
