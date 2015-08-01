@@ -16,7 +16,8 @@ class Photo: NSManagedObject {
         static let ImageURL = "imageURL"
     }
     
-    @NSManaged private var imageURL: String!
+    @NSManaged var imageURL: String!
+    @NSManaged var imageData: NSData!
     @NSManaged private var pin: Pin
     
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
