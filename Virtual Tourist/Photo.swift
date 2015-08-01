@@ -29,5 +29,11 @@ class Photo: NSManagedObject {
         super.init(entity: entity, insertIntoManagedObjectContext: context)
         
         imageURL = dictionary[Photo.Keys.ImageURL] as! String
+        
+        // Set imageData property
+        let url = NSURL(string: imageURL)!
+        let imageData = NSData(contentsOfURL: url)!
+        
+        self.imageData = imageData
     }
 }
