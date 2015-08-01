@@ -7,6 +7,7 @@
 //
 
 import CoreData
+import UIKit
 
 @objc(Photo)
 
@@ -18,6 +19,16 @@ class Photo: NSManagedObject {
     
     @NSManaged var imageURL: String
     @NSManaged private var pin: Pin
+    
+    var image: UIImage? {
+        get {
+            return ImageCache.sharedCache().imageWithIdentifier(imageURL)
+        }
+        
+        set {
+            ImageCache.sharedCache().storeImage(newValue, withIdentifier: imageURL)
+        }
+    }
     
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
         super.init(entity: entity, insertIntoManagedObjectContext: context)

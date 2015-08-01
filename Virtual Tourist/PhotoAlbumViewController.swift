@@ -74,10 +74,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDataSource, UI
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier(identifier, forIndexPath: indexPath) as! PhotoCollectionViewCell
 
         // Set imageData property
-        let url = NSURL(string: photo.imageURL)!
-        let imageData = NSData(contentsOfURL: url)!
-
-        cell.image!.image = UIImage(data: imageData)!
+        cell.image!.image = photo.image
 
         return cell
     }
