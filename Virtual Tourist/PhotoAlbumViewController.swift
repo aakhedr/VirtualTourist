@@ -41,20 +41,10 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDataSource, UI
         super.viewDidLoad()
         
         // Add the tabbedPin to the mapView
-        let annotation = MKPointAnnotation()
-        annotation.coordinate = CLLocationCoordinate2DMake(
-            tabbedPin.lat as! CLLocationDegrees,
-            tabbedPin.lon as! CLLocationDegrees
-        )
-        mapView.addAnnotation(annotation)
+        addTabbedPinToMapView()
         
         // Set mapView region
-        let center = CLLocationCoordinate2DMake(
-            tabbedPin.lat as! CLLocationDegrees,
-            tabbedPin.lon as! CLLocationDegrees
-        )
-        let span = MKCoordinateSpanMake(1.0, 1.0)
-        mapView.region = MKCoordinateRegionMake(center, span)
+        setMapViewRegion()
         
         // Set photoCollectionView delegate and data srouce
         photoCollectionView.delegate = self
@@ -64,11 +54,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDataSource, UI
         fetchedResultsController.delegate = self
         
         // Perform the fetch
-        var error: NSErrorPointer = nil
-        fetchedResultsController.performFetch(error)
-        if error != nil {
-            println("error performing the fetch in PhotoAlbumViewController: \(error)")
-        }
+        performFetch()
     }
     
     // MARK: - Collection View Data Source
@@ -132,5 +118,31 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDataSource, UI
     
     // MARK: - Helpers
     
+    func addTabbedPinToMapView() {
+        let annotation = MKPointAnnotation()
+        annotation.coordinate = CLLocationCoordinate2DMake(
+            tabbedPin.lat as! CLLocationDegrees,
+            tabbedPin.lon as! CLLocationDegrees
+        )
+        mapView.addAnnotation(annotation)
+    }
+    
+    func setMapViewRegion() {
+        let center = CLLocationCoordinate2DMake(
+            tabbedPin.lat as! CLLocationDegrees,
+            tabbedPin.lon as! CLLocationDegrees
+        )
+        let span = MKCoordinateSpanMake(1.0, 1.0)
+        mapView.region = MKCoordinateRegionMake(center, span)
+    }
+    
+    func performFetch() {
+        var error: NSErrorPointer = nil
+        fetchedResultsController.performFetch(error)
+        if error != nil {
+            println("error performing the fetch in PhotoAlbumViewController: \(error)")
+            abort()
+        }
+    }
 
 }
