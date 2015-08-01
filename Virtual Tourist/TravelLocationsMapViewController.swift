@@ -231,12 +231,6 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
             
             // Remove annotation from mapView
             mapView.removeAnnotation(view.annotation)
-            
-        } else {
-            let pinSelected = searchForPinInCoreData(
-                latitude: view.annotation.coordinate.latitude,
-                longitude: view.annotation.coordinate.longitude)
-            println(pinSelected.photos.count)
         }
     }
     
