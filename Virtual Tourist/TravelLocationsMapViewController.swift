@@ -100,7 +100,7 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
             let lat = annotation.coordinate.latitude
             let lon = annotation.coordinate.longitude
             
-            FlickrClient.sharedInstance().getPhotosForCoordinate(latitude: lat, longitude: lon) { imagePaths, error in
+            FlickrClient.sharedInstance().getPhotosForCoordinate(latitude: lat, longitude: lon) { imageURLs, error in
                 
                 if let error = error {
                     println("error domain: \(error.domain)")
@@ -108,14 +108,14 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
                     println("error description: \(error.localizedDescription)")
                 } else {
                     
-                    println("\(imagePaths!.count) imagePaths parsed")
+                    println("\(imageURLs!.count) imagePaths parsed")
                     
                     var photos = [Photo]()
                     
-                    if let imagePaths = imagePaths as? [String] {
-                        for imagePath in imagePaths {
+                    if let imageURLs = imageURLs as? [String] {
+                        for imageURL in imageURLs {
                             let dictionary = [
-                                Photo.Keys.Image    : imagePath
+                                Photo.Keys.ImageURL    : imageURL
                             ]
                             
                             // Init the Photo object
@@ -243,7 +243,7 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
                 let lat = view.annotation.coordinate.latitude
                 let lon = view.annotation.coordinate.longitude
                 
-                FlickrClient.sharedInstance().getPhotosForCoordinate(latitude: lat, longitude: lon) { imagePaths, error in
+                FlickrClient.sharedInstance().getPhotosForCoordinate(latitude: lat, longitude: lon) { imageURLs, error in
                     
                     if let error = error {
                         println("error domain: \(error.domain)")
@@ -251,14 +251,14 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
                         println("error description: \(error.localizedDescription)")
                     } else {
                         
-                        println("\(imagePaths!.count) imagePaths parsed")
+                        println("\(imageURLs!.count) imagePaths parsed")
                         
                         var photos = [Photo]()
                         
-                        if let imagePaths = imagePaths as? [String] {
-                            for imagePath in imagePaths {
+                        if let imageURLs = imageURLs as? [String] {
+                            for imageURL in imageURLs {
                                 let dictionary = [
-                                    Photo.Keys.Image    : imagePath
+                                    Photo.Keys.ImageURL    : imageURL
                                 ]
                                 
                                 // Init the Photo object and set its pin @NSManaged property

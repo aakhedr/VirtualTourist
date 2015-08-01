@@ -13,10 +13,10 @@ import CoreData
 class Photo: NSManagedObject {
     
     struct Keys {
-        static let Image = "imagePath"
+        static let ImageURL = "imageURL"
     }
     
-    @NSManaged private var imagePath: String!
+    @NSManaged private var imageURL: String!
     @NSManaged private var pin: Pin
     
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
@@ -27,6 +27,6 @@ class Photo: NSManagedObject {
         let entity = NSEntityDescription.entityForName("Photo", inManagedObjectContext: context)!
         super.init(entity: entity, insertIntoManagedObjectContext: context)
         
-        imagePath = dictionary[Photo.Keys.Image] as! String
+        imageURL = dictionary[Photo.Keys.ImageURL] as! String
     }
 }
