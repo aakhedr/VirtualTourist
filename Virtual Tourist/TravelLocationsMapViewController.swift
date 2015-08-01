@@ -201,7 +201,7 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
                     longitude: view.annotation.coordinate.longitude)
                 
                 // Delete old object
-                sharedContext.deleteObject(pinToBeDeleted)
+//                sharedContext.deleteObject(pinToBeDeleted)
             
             // New coordinate
             case .Ending:
@@ -329,6 +329,7 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
         return Pin(dictionary: dictionary, context: sharedContext)
     }
     
+    // TODO: - Found nil while dragging a pin
     func searchForPinInCoreData(#latitude: CLLocationDegrees, longitude: CLLocationDegrees) -> Pin {
         let pins = fetchedResultsController.fetchedObjects as! [Pin]
         let lat = latitude as NSNumber
@@ -358,7 +359,7 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
                             Photo.Keys.ImageURL    : imageURL
                         ]
                         
-                        // Init the Photo object and set its pin @NSManaged property
+                        // Init the Photo object
                         let photoToBeAdded = Photo(dictionary: dictionary, context: self.sharedContext)
                         photos.append(photoToBeAdded)
                     }
