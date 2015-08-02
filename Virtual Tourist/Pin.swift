@@ -32,6 +32,5 @@ class Pin: NSManagedObject {
 
         lat = dictionary[Pin.Keys.Lat] as! NSNumber
         lon = dictionary[Pin.Keys.Lon] as! NSNumber
-        photos = dictionary[Pin.Keys.Photos] as! NSSet
     }
 }

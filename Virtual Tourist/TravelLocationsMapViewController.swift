@@ -6,6 +6,7 @@
 //  Copyright (c) 2015 Ahmed Khedr. All rights reserved.
 //
 
+import UIKit
 import MapKit
 import CoreData
 
@@ -100,7 +101,13 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
             let lat = annotation.coordinate.latitude
             let lon = annotation.coordinate.longitude
             
-            getFlickrImagesAndSaveContext(lat: lat, lon: lon, annotation: annotation)
+            
+            // Init Pin and save context
+            let pin = self.pinFromAnnotation(annotation: annotation)
+            CoreDataStackManager.sharedInstance().saveContext()
+            
+            // Start getting the photos
+            getFlickrImagesAndSaveContext(pin: pin, annotation: annotation)
         }
     }
     
@@ -206,10 +213,12 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
             // New coordinate
             case .Ending:
                 
-                // MARK: - Get Flickr images and Save context
-                let lat = view.annotation.coordinate.latitude
-                let lon = view.annotation.coordinate.longitude
-                getFlickrImagesAndSaveContext(lat: lat, lon: lon, annotation: view.annotation!)
+                // Init new pin and save context
+                let pinToBeAdded = pinFromAnnotation(annotation: view.annotation)
+                CoreDataStackManager.sharedInstance().saveContext()
+                
+                // Get Flickr images and Save context
+                getFlickrImagesAndSaveContext(pin: pinToBeAdded, annotation: view.annotation!)
 
             default:
                 break
@@ -316,16 +325,14 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
         return annotation
     }
     
-    func pinFromAnnotation(#annotation: MKAnnotation, photos: NSSet) -> Pin {
+    func pinFromAnnotation(#annotation: MKAnnotation) -> Pin {
         let dictionary = [
             Pin.Keys.Lat    : annotation.coordinate.latitude as NSNumber,
             Pin.Keys.Lon    : annotation.coordinate.longitude as NSNumber,
-            Pin.Keys.Photos : photos
         ]
         return Pin(dictionary: dictionary, context: sharedContext)
     }
     
-    // TODO: - Found nil while dragging a pin
     func searchForPinInCoreData(#latitude: CLLocationDegrees, longitude: CLLocationDegrees) -> Pin {
         let pins = fetchedResultsController.fetchedObjects as! [Pin]
         let lat = latitude as NSNumber
@@ -336,8 +343,8 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
             }.first!
     }
     
-    func getFlickrImagesAndSaveContext(#lat: CLLocationDegrees, lon: CLLocationDegrees, annotation: MKAnnotation) {
-        FlickrClient.sharedInstance().getPhotosForCoordinate(latitude: lat, longitude: lon) { imageURLs, error in
+    func getFlickrImagesAndSaveContext(#pin: Pin, annotation: MKAnnotation) {
+        FlickrClient.sharedInstance().getPhotosForCoordinate(latitude: pin.lat as Double, longitude: pin.lon as Double) { imageURLs, error in
             
             if let error = error {
                 println("error domain: \(error.domain)")
@@ -345,27 +352,30 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
                 println("error description: \(error.localizedDescription)")
             } else {
                 
-                println("\(imageURLs!.count) imagePaths parsed")
-
+                println("\(imageURLs?.count) imageURLs parsed")
+                
                 if let imageURLs = imageURLs as? [String] {
-                    let photosToBeAdded = imageURLs.map { (imageURL: String) -> Photo in
+                    let photos = imageURLs.map { (imageURL: String) -> Photo in
                         let dictionary = [
                             Photo.Keys.ImageURL    : imageURL
                         ]
                         
                         // Init the Photo object
-                        return Photo(dictionary: dictionary, context: self.sharedContext)
+                        let photo = Photo(dictionary: dictionary, context: self.sharedContext)
+                        photo.pin = pin
+                        
+                        // Set the image property
+                        let url = NSURL(string: imageURL)!
+                        let imageData = NSData(contentsOfURL: url)!
+                        photo.image = UIImage(data: imageData)
+                        
+                        // Save context on a per photo basis
+                        dispatch_async(dispatch_get_main_queue()) {
+                            CoreDataStackManager.sharedInstance().saveContext()
+                        }
+                        
+                        return photo
                     }
-                    
-                    // Init Pin
-                    let pinToBeAdded = self.pinFromAnnotation(annotation: annotation, photos: NSSet(array: photosToBeAdded))
-                    
-                    dispatch_async(dispatch_get_main_queue()) {
-                        CoreDataStackManager.sharedInstance().saveContext()
-                    }
-                } else {
-                    println("imagePaths could not be casted to [String] in didChangeDragState")
-                    println("no Pin nor Photo objects are persisted")
                 }
             }
         }

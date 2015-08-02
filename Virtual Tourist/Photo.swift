@@ -18,7 +18,7 @@ class Photo: NSManagedObject {
     }
     
     @NSManaged var imageURL: String
-    @NSManaged private var pin: Pin
+    @NSManaged var pin: Pin
     
     var image: UIImage? {
         get {

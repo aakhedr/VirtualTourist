@@ -72,9 +72,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDataSource, UI
         let identifier = "photoCell"
         
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier(identifier, forIndexPath: indexPath) as! PhotoCollectionViewCell
-
-        // Set imageData property
-        cell.image!.image = photo.image
+        cell.image.image = photo.image
 
         return cell
     }
