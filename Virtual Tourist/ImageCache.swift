@@ -21,11 +21,15 @@ class ImageCache {
         
         // First try the memory cache
         if let image = inMemoryCache.objectForKey(path) as? UIImage {
+            
+            println("image in cache")
             return image
         }
         
         // Next Try the hard drive
         if let data = NSData(contentsOfFile: path) {
+            
+            println("image in hard drive")
             return UIImage(data: data)
         }
         
@@ -49,7 +53,9 @@ class ImageCache {
         
         // And in documents directory
         let data = UIImagePNGRepresentation(image!)
-        data.writeToFile(path, atomically: true)
+        let success = data.writeToFile(path, atomically: true)
+        
+        println(success)
     }
     
     // MARK: - Helper
