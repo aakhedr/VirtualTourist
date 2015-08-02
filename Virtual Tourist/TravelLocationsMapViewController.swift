@@ -355,7 +355,7 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
                 println("\(imageURLs?.count) imageURLs parsed")
                 
                 if let imageURLs = imageURLs as? [String] {
-                    let photos = imageURLs.map { (imageURL: String) -> Photo in
+                    imageURLs.map { (imageURL: String) -> Photo in
                         let dictionary = [
                             Photo.Keys.ImageURL    : imageURL
                         ]
