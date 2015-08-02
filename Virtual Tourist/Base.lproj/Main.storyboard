@@ -105,17 +105,24 @@
                                                 <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="8JF-t3-cBc">
                                                     <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                                 </imageView>
+                                                <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="SeC-hK-dTh">
+                                                    <rect key="frame" x="15" y="15" width="20" height="20"/>
+                                                    <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                </activityIndicatorView>
                                             </subviews>
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </view>
                                         <constraints>
+                                            <constraint firstItem="SeC-hK-dTh" firstAttribute="centerX" secondItem="8JF-t3-cBc" secondAttribute="centerX" id="2Pd-XX-g5b"/>
                                             <constraint firstAttribute="bottom" secondItem="8JF-t3-cBc" secondAttribute="bottom" id="7Tb-f4-uvD"/>
                                             <constraint firstItem="8JF-t3-cBc" firstAttribute="top" secondItem="3u3-ON-gGL" secondAttribute="top" id="N37-yN-jVq"/>
                                             <constraint firstItem="8JF-t3-cBc" firstAttribute="leading" secondItem="3u3-ON-gGL" secondAttribute="leading" id="WmR-mv-s1Q"/>
                                             <constraint firstAttribute="trailing" secondItem="8JF-t3-cBc" secondAttribute="trailing" id="dRe-5I-4Rs"/>
+                                            <constraint firstItem="SeC-hK-dTh" firstAttribute="centerY" secondItem="8JF-t3-cBc" secondAttribute="centerY" id="f7h-cf-ZZ9"/>
                                         </constraints>
                                         <size key="customSize" width="50" height="50"/>
                                         <connections>
+                                            <outlet property="activityIndicator" destination="SeC-hK-dTh" id="dcY-AV-Jev"/>
                                             <outlet property="image" destination="8JF-t3-cBc" id="N0J-wl-6wO"/>
                                         </connections>
                                     </collectionViewCell>
