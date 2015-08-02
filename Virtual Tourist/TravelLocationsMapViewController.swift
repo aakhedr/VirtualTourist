@@ -358,12 +358,13 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
                             
                             // Init the Photo object
                             let photoToBeAdded = Photo(dictionary: dictionary, context: self.sharedContext)
+
                             photos.append(photoToBeAdded)
                         }
 
                         // Init Pin
                         let pinToBeAdded = self.pinFromAnnotation(annotation: annotation, photos: NSSet(array: photos))
-                        
+                    
                         println("num photos associated with the added pin = \(pinToBeAdded.photos.count)")
                         
                         CoreDataStackManager.sharedInstance().saveContext()
