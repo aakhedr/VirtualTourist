@@ -26,6 +26,7 @@ class Photo: NSManagedObject {
         }
         
         set {
+            println("setting Photo image property")
             ImageCache.sharedCache().storeImage(newValue, withIdentifier: imageURL)
         }
     }
