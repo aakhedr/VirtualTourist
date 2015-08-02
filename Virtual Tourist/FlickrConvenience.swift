@@ -44,11 +44,11 @@ extension FlickrClient {
                                 if photosArray.count == 0 {
                                     println("No photos for this location")      // TODO: No photos for this location
                                 }
-                                var imagePaths = [String]()
+                                var imageURLS = [String]()
                                 
                                 for dictionary in photosArray {
-                                    if let imagePath = dictionary[JSONResponseKeys.ImagePath] as? String {
-                                        imagePaths.append(imagePath)
+                                    if let imageURL = dictionary[JSONResponseKeys.ImagePath] as? String {
+                                        imageURLS.append(imageURL)
                                     } else {
                                         completionHandler(
                                             data: nil,
@@ -59,7 +59,7 @@ extension FlickrClient {
                                     }
                                 }
                                 completionHandler(
-                                    data: imagePaths,
+                                    data: imageURLS,
                                     error: nil)
                             } else {
                                 completionHandler(

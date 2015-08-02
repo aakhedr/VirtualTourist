@@ -15,10 +15,10 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
     @IBOutlet weak var tabPinToDeleteLabel: UILabel!
     
     private var longPressGestureRecognizer: UILongPressGestureRecognizer!
-    private var regionDataDictionay: [String : CLLocationDegrees]!
+    private var regionDataDictionary: [String : CLLocationDegrees]!
     private var tabbedPin: Pin!
 
-    private struct regionDataDictionayKeys {
+    private struct regionDataDictionaryKeys {
         static let Lat = "latitude"
         static let Lon = "longitude"
         static let LatDelta = "latitudeDelta"
@@ -61,8 +61,8 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
         configureLongPressGestureRecognizer()
         
         // Set the mapView region
-        regionDataDictionay = readValue()
-        if regionDataDictionay == nil {
+        regionDataDictionary = readValue()
+        if regionDataDictionary == nil {
             
             // First time app is used show worldmap
             let initialRegion = MKCoordinateRegionForMapRect(MKMapRectWorld)
@@ -162,11 +162,11 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
     func mapView(mapView: MKMapView!, regionDidChangeAnimated animated: Bool) {
         
         // Save region data dictionary to NSUserDefaults
-        regionDataDictionay = [
-            regionDataDictionayKeys.Lat        : mapView.region.center.latitude,
-            regionDataDictionayKeys.Lon        : mapView.region.center.longitude,
-            regionDataDictionayKeys.LatDelta   : mapView.region.span.latitudeDelta,
-            regionDataDictionayKeys.LonDelta   : mapView.region.span.longitudeDelta
+        regionDataDictionary = [
+            regionDataDictionaryKeys.Lat        : mapView.region.center.latitude,
+            regionDataDictionaryKeys.Lon        : mapView.region.center.longitude,
+            regionDataDictionaryKeys.LatDelta   : mapView.region.span.latitudeDelta,
+            regionDataDictionaryKeys.LonDelta   : mapView.region.span.longitudeDelta
         ]
         saveValue()
     }
@@ -244,22 +244,22 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
     
     func saveValue() {
         let userDefaults = NSUserDefaults.standardUserDefaults()
-        userDefaults.setObject(regionDataDictionay, forKey: regionDataDictionayKeys.NSUserDefaultsKey)
+        userDefaults.setObject(regionDataDictionary, forKey: regionDataDictionaryKeys.NSUserDefaultsKey)
     }
     
     func readValue() -> [String : CLLocationDegrees]? {
         let userDefaults = NSUserDefaults.standardUserDefaults()
-        return userDefaults.objectForKey(regionDataDictionayKeys.NSUserDefaultsKey) as? [String : CLLocationDegrees]
+        return userDefaults.objectForKey(regionDataDictionaryKeys.NSUserDefaultsKey) as? [String : CLLocationDegrees]
     }
     
     func setRegionCenterAndSpan() -> MKCoordinateRegion {
         let center = CLLocationCoordinate2DMake(
-            regionDataDictionay[regionDataDictionayKeys.Lat]!,
-            regionDataDictionay[regionDataDictionayKeys.Lon]!
+            regionDataDictionary[regionDataDictionaryKeys.Lat]!,
+            regionDataDictionary[regionDataDictionaryKeys.Lon]!
         )
         let span = MKCoordinateSpanMake(
-            regionDataDictionay[regionDataDictionayKeys.LatDelta]!,
-            regionDataDictionay[regionDataDictionayKeys.LonDelta]!
+            regionDataDictionary[regionDataDictionaryKeys.LatDelta]!,
+            regionDataDictionary[regionDataDictionaryKeys.LonDelta]!
         )
         return MKCoordinateRegionMake(center, span)
     }
@@ -358,7 +358,6 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
                             
                             // Init the Photo object
                             let photoToBeAdded = Photo(dictionary: dictionary, context: self.sharedContext)
-
                             photos.append(photoToBeAdded)
                         }
 

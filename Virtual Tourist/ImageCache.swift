@@ -19,6 +19,8 @@ class ImageCache {
         let path = pathForIdentifier(identifier)
         var data: NSData?
         
+        println("in imageWithIdentifier")
+        
         // First try the memory cache
         if let image = inMemoryCache.objectForKey(path) as? UIImage {
             
@@ -32,7 +34,6 @@ class ImageCache {
             println("image in hard drive")
             return UIImage(data: data)
         }
-        
         return nil
     }
     
@@ -41,8 +42,11 @@ class ImageCache {
     func storeImage(image: UIImage?, withIdentifier identifier: String) {
         let path = pathForIdentifier(identifier)
         
+        println("in storeImage")
         // If the image is nil, remove images from the cache
         if image == nil {
+            println("image is nil")
+            
             inMemoryCache.removeObjectForKey(path)
             NSFileManager.defaultManager().removeItemAtPath(path, error: nil)
             return
