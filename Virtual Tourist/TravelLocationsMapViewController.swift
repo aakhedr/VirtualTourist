@@ -344,34 +344,28 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
                 println("error code: \(error.code)")
                 println("error description: \(error.localizedDescription)")
             } else {
-                dispatch_async(dispatch_get_main_queue()) {
-                    
-                    println("\(imageURLs!.count) imagePaths parsed")
-                    
-                    var photos = [Photo]()
-                    
-                    if let imageURLs = imageURLs as? [String] {
-                        for imageURL in imageURLs {
-                            let dictionary = [
-                                Photo.Keys.ImageURL    : imageURL
-                            ]
-                            
-                            // Init the Photo object
-                            let photoToBeAdded = Photo(dictionary: dictionary, context: self.sharedContext)
-                            photos.append(photoToBeAdded)
-                        }
+                
+                println("\(imageURLs!.count) imagePaths parsed")
 
-                        // Init Pin
-                        let pinToBeAdded = self.pinFromAnnotation(annotation: annotation, photos: NSSet(array: photos))
-                    
-                        println("num photos associated with the added pin = \(pinToBeAdded.photos.count)")
+                if let imageURLs = imageURLs as? [String] {
+                    let photosToBeAdded = imageURLs.map { (imageURL: String) -> Photo in
+                        let dictionary = [
+                            Photo.Keys.ImageURL    : imageURL
+                        ]
                         
-                        CoreDataStackManager.sharedInstance().saveContext()
-
-                    } else {
-                        println("imagePaths could not be casted to [String] in didChangeDragState")
-                        println("no Pin nor Photo objects are persisted")
+                        // Init the Photo object
+                        return Photo(dictionary: dictionary, context: self.sharedContext)
                     }
+                    
+                    // Init Pin
+                    let pinToBeAdded = self.pinFromAnnotation(annotation: annotation, photos: NSSet(array: photosToBeAdded))
+                    
+                    dispatch_async(dispatch_get_main_queue()) {
+                        CoreDataStackManager.sharedInstance().saveContext()
+                    }
+                } else {
+                    println("imagePaths could not be casted to [String] in didChangeDragState")
+                    println("no Pin nor Photo objects are persisted")
                 }
             }
         }
