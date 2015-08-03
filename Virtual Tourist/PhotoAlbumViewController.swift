@@ -147,11 +147,14 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDataSource, UI
         
         // Image placeholder
         cell.image.image = UIImage(named: "placeholder")
+        cell.activityIndicator.hidden = false
         cell.activityIndicator.startAnimating()
-        
+
         // If image is saved to DocumentDirectory
         if let image = photo.image  {
             cell.image.image = image
+            cell.activityIndicator.hidden = true
+            cell.activityIndicator.stopAnimating()
         } else {
             
             // Get that image on background thread
@@ -169,9 +172,10 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDataSource, UI
                     // Show to user and save context asap
                     dispatch_async(dispatch_get_main_queue()) {
                         photo.image = image
-                        CoreDataStackManager.sharedInstance().saveContext()
                         cell.image.image = image
+                        cell.activityIndicator.hidden = true
                         cell.activityIndicator.stopAnimating()
+                        CoreDataStackManager.sharedInstance().saveContext()
                     }
                 }
             }
