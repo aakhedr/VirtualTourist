@@ -21,7 +21,7 @@
                             <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="JGR-vs-4T6">
                                 <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                             </mapView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Tab Pins to Delete" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="L1N-fs-r5p">
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Tap Pins to Delete" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="L1N-fs-r5p">
                                 <rect key="frame" x="0.0" y="546" width="600" height="54"/>
                                 <color key="backgroundColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                 <fontDescription key="fontDescription" type="system" weight="heavy" pointSize="17"/>
@@ -63,7 +63,7 @@
                     </navigationItem>
                     <connections>
                         <outlet property="mapView" destination="JGR-vs-4T6" id="IEp-OE-LUh"/>
-                        <outlet property="tabPinToDeleteLabel" destination="L1N-fs-r5p" id="abB-3s-d4i"/>
+                        <outlet property="tapPinToDeleteLabel" destination="L1N-fs-r5p" id="abB-3s-d4i"/>
                         <segue destination="iUB-bG-kG1" kind="show" identifier="photoAlbumSegue" id="AS2-ZY-DRQ"/>
                     </connections>
                 </viewController>

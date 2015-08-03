@@ -12,7 +12,7 @@ import CoreData
 class TravelLocationsMapViewController: UIViewController {
 
     @IBOutlet weak var mapView: MKMapView!
-    @IBOutlet weak var tabPinToDeleteLabel: UILabel!
+    @IBOutlet weak var tapPinToDeleteLabel: UILabel!
     
     private var longPressGestureRecognizer: UILongPressGestureRecognizer!
     private var regionDataDictionary: [String : CLLocationDegrees]!
@@ -52,8 +52,8 @@ class TravelLocationsMapViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // tabPinToDeleteLabel
-        tabPinToDeleteLabel.hidden = true
+        // tapPinToDeleteLabel
+        tapPinToDeleteLabel.hidden = true
 
         // Set mapView delegate
         mapView.delegate = self
@@ -109,12 +109,12 @@ class TravelLocationsMapViewController: UIViewController {
         var newY: CGFloat
 
         if sender.title == "Edit" {
-            tabPinToDeleteLabel.hidden = false
+            tapPinToDeleteLabel.hidden = false
             sender.title = "Done"
-            newY = mapView.frame.origin.y - tabPinToDeleteLabel.frame.height
+            newY = mapView.frame.origin.y - tapPinToDeleteLabel.frame.height
         } else {
-            newY = mapView.frame.origin.y + tabPinToDeleteLabel.frame.height
-            tabPinToDeleteLabel.hidden = true
+            newY = mapView.frame.origin.y + tapPinToDeleteLabel.frame.height
+            tapPinToDeleteLabel.hidden = true
             sender.title = "Edit"
         }
         
@@ -371,7 +371,7 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
     }
     
     func mapView(mapView: MKMapView!, didSelectAnnotationView view: MKAnnotationView!) {
-        if !tabPinToDeleteLabel.hidden {
+        if !tapPinToDeleteLabel.hidden {
             
             // Delete the pin from core data
             let pinToBeDeleted = searchForPinInCoreData(
