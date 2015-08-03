@@ -55,7 +55,7 @@ extension FlickrClient {
                                             error: NSError(
                                                 domain: "getPhotosForCoordinate",
                                                 code: 6,
-                                                userInfo: [NSLocalizedDescriptionKey : "Could not find imagePath"]))
+                                                userInfo: [NSLocalizedDescriptionKey : "Could not find iamgeURL"]))
                                     }
                                 }
                                 completionHandler(

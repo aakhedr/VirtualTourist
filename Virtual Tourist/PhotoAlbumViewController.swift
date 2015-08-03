@@ -153,8 +153,6 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDataSource, UI
             cell.image.image = image
         } else {
             
-            println("image is not cached")
-            
             // Get that image on background thread
             let session = FlickrClient.sharedInstance().session
             let url = NSURL(string: photo.imageURL)!
