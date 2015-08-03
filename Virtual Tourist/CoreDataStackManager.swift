@@ -27,16 +27,12 @@ class CoreDataStackManager {
     
     lazy var applicationDocumentsDirectory: NSURL = {
         
-        println("Instantiating the applicationDocumentsDirectory property")
-        
         let urls = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)
         return urls[urls.count-1] as! NSURL
         }()
     
     lazy var managedObjectModel: NSManagedObjectModel = {
 
-        println("Instantiating the managedObjectModel property")
-        
         let modelURL = NSBundle.mainBundle().URLForResource("Model", withExtension: "momd")!
         return NSManagedObjectModel(contentsOfURL: modelURL)!
         }()
@@ -45,12 +41,8 @@ class CoreDataStackManager {
         // The persistent store coordinator for the application. This implementation creates and return a coordinator, having added the store for the application to it. This property is optional since there are legitimate error conditions that could cause the creation of the store to fail.
         // Create the coordinator and store
         
-        println("Instantiating the persistentStoreCoordinator property")
-        
         var coordinator: NSPersistentStoreCoordinator? = NSPersistentStoreCoordinator(managedObjectModel: self.managedObjectModel)
         let url = self.applicationDocumentsDirectory.URLByAppendingPathComponent(SQLITE_FILE_NAME)
-        
-        println("sqlite path: \(url.path!)")
         
         var error: NSError? = nil
 
@@ -72,8 +64,6 @@ class CoreDataStackManager {
         }()
     
     lazy var managedObjectContext: NSManagedObjectContext? = {
-        
-        println("Instantiating the managedObjectContext property")
         
         let coordinator = self.persistentStoreCoordinator
         if coordinator == nil {

@@ -293,13 +293,6 @@ extension TravelLocationsMapViewController: UIGestureRecognizerDelegate {
     }
 }
 
-extension TravelLocationsMapViewController: NSFetchedResultsControllerDelegate {
-    
-    // MARK: - Fetched Results Controller Delegate
-    
-    func controllerDidChangeContent(controller: NSFetchedResultsController) {   }
-}
-
 extension TravelLocationsMapViewController: MKMapViewDelegate {
     
     // MARK:- Map View Delegate
@@ -350,16 +343,6 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
         performSegueWithIdentifier("photoAlbumSegue", sender: self)
     }
     
-    func mapViewDidFailLoadingMap(mapView: MKMapView!, withError error: NSError!) {
-        let alertController = UIAlertController(
-            title: "Network error!",
-            message: "Unable to load map. Check your Internet connection",
-            preferredStyle: UIAlertControllerStyle.Alert)
-        let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: nil)
-        alertController.addAction(okAction)
-        presentViewController(alertController, animated: true, completion: nil)
-    }
-    
     func mapView(mapView: MKMapView!, annotationView view: MKAnnotationView!, didChangeDragState newState: MKAnnotationViewDragState, fromOldState oldState: MKAnnotationViewDragState) {
         switch oldState {
             
@@ -404,4 +387,11 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
             mapView.removeAnnotation(view.annotation)
         }
     }
+}
+
+extension TravelLocationsMapViewController: NSFetchedResultsControllerDelegate {
+    
+    // MARK: - Fetched Results Controller Delegate
+    
+    func controllerDidChangeContent(controller: NSFetchedResultsController) {   }
 }

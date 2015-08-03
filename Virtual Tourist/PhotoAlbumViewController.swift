@@ -89,7 +89,6 @@ class PhotoAlbumViewController: UIViewController {
     func configureCell(cell: PhotoCollectionViewCell, photo: Photo) {
         
         // Image placeholder
-        cell.image.image = UIImage(named: "placeholder")
         cell.activityIndicator.hidden = false
         cell.activityIndicator.startAnimating()
 
@@ -147,29 +146,17 @@ extension PhotoAlbumViewController: UICollectionViewDataSource, UICollectionView
         
         return cell
     }
+    
+    func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+        let photo = fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
+        sharedContext.deleteObject(photo)
+        CoreDataStackManager.sharedInstance().saveContext()
+    }
 }
 
 extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
     
     // MARK: - Fetched Results Controller Delegate
-    
-    func controllerWillChangeContent(controller: NSFetchedResultsController) {
-        println("controllerWillChangeContent in PhotoAlbumViewController called")
-    }
-    
-    func controller(controller: NSFetchedResultsController, didChangeSection sectionInfo: NSFetchedResultsSectionInfo, atIndex sectionIndex: Int, forChangeType type: NSFetchedResultsChangeType) {
-        switch type {
-            
-        case .Insert:
-            photoCollectionView.insertSections(NSIndexSet(index: sectionIndex))
-            
-        case .Delete:
-            photoCollectionView.insertSections(NSIndexSet(index: sectionIndex))
-            
-        default:
-            return
-        }
-    }
     
     func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
         switch type {
@@ -185,7 +172,5 @@ extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
         }
     }
     
-    func controllerDidChangeContent(controller: NSFetchedResultsController) {
-        println("controllerDidChangeContent in PhotoAlbumViewController called")
-    }
+    func controllerDidChangeContent(controller: NSFetchedResultsController) {   }
 }

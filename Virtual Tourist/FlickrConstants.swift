@@ -6,8 +6,6 @@
 //  Copyright (c) 2015 Ahmed Khedr. All rights reserved.
 //
 
-import Foundation
-
 extension FlickrClient {
     
     struct BaseURL {
