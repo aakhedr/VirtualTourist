@@ -72,7 +72,9 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDataSource, UI
         let identifier = "photoCell"
         
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier(identifier, forIndexPath: indexPath) as! PhotoCollectionViewCell
-        cell.image.image = photo.image
+
+        // Configure the cell
+        configureCell(cell, photo: photo)
 
         return cell
     }
@@ -144,4 +146,34 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDataSource, UI
         }
     }
 
+    func configureCell(cell: PhotoCollectionViewCell, photo: Photo) {
+        
+        // If image is cached
+        if photo.image != nil {
+            cell.image.image = photo.image!
+        } else {
+            
+            // Get that image on background thread
+            let session = FlickrClient.sharedInstance().session
+            let url = NSURL(string: photo.imageURL)!
+            
+            let task = session.dataTaskWithURL(url) { data, response, error in
+                if let error = error {
+                    println("error code: \(error.code)")
+                    println("error domain: \(error.domain)")
+                    println("error description: \(error.localizedDescription)")
+                } else {
+                    let image = UIImage(data: data)
+                    
+                    // Show to user and save context asap
+                    dispatch_async(dispatch_get_main_queue()) {
+                        photo.image = image
+                        CoreDataStackManager.sharedInstance().saveContext()
+                        cell.image.image = image
+                    }
+                }
+            }
+            task.resume()
+        }
+    }
 }

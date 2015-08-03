@@ -23,15 +23,11 @@ class ImageCache {
         
         // First try the memory cache
         if let image = inMemoryCache.objectForKey(path) as? UIImage {
-            
-            println("image in cache")
             return image
         }
         
         // Next Try the hard drive
         if let data = NSData(contentsOfFile: path) {
-            
-            println("image in hard drive")
             return UIImage(data: data)
         }
         return nil
@@ -43,9 +39,9 @@ class ImageCache {
         let path = pathForIdentifier(identifier)
         
         println("in storeImage")
+        
         // If the image is nil, remove images from the cache
         if image == nil {
-            println("image is nil")
             
             inMemoryCache.removeObjectForKey(path)
             NSFileManager.defaultManager().removeItemAtPath(path, error: nil)
@@ -57,9 +53,7 @@ class ImageCache {
         
         // And in documents directory
         let data = UIImagePNGRepresentation(image!)
-        let success = data.writeToFile(path, atomically: true)
-        
-        println(success)
+        data.writeToFile(path, atomically: true)
     }
     
     // MARK: - Helper

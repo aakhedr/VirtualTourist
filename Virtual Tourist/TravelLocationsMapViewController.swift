@@ -96,11 +96,6 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
             let touchPoint = recognizer.locationInView(mapView)
             let touchPointCoordinate = mapView.convertPoint(touchPoint, toCoordinateFromView: mapView)
             let annotation = MKPointAnnotationMake(coordinate: touchPointCoordinate)
-
-            // MARK: - Get Flickr images and Save context
-            let lat = annotation.coordinate.latitude
-            let lon = annotation.coordinate.longitude
-            
             
             // Init Pin and save context
             let pin = self.pinFromAnnotation(annotation: annotation)
@@ -235,7 +230,7 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
             )
             sharedContext.deleteObject(pinToBeDeleted)
             
-            // MARK:- Save context after deletion
+            // Save context after deletion
             CoreDataStackManager.sharedInstance().saveContext()
             
             // Remove annotation from mapView
@@ -344,7 +339,7 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
     }
     
     func getFlickrImagesAndSaveContext(#pin: Pin, annotation: MKAnnotation) {
-        FlickrClient.sharedInstance().getPhotosForCoordinate(latitude: pin.lat as Double, longitude: pin.lon as Double) { imageURLs, error in
+        FlickrClient.sharedInstance().getPhotosForCoordinate(latitude: annotation.coordinate.latitude, longitude: annotation.coordinate.longitude) { imageURLs, error in
             
             if let error = error {
                 println("error domain: \(error.domain)")
@@ -364,17 +359,14 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
                         let photo = Photo(dictionary: dictionary, context: self.sharedContext)
                         photo.pin = pin
                         
-                        // Set the image property
-                        let url = NSURL(string: imageURL)!
-                        let imageData = NSData(contentsOfURL: url)!
-                        photo.image = UIImage(data: imageData)
-                        
-                        // Save context on a per photo basis
-                        dispatch_async(dispatch_get_main_queue()) {
-                            CoreDataStackManager.sharedInstance().saveContext()
-                        }
+                        // TODO: - Pre fetch image data
                         
                         return photo
+                    }
+                    
+                    // Save context on a per photo basis
+                    dispatch_async(dispatch_get_main_queue()) {
+                        CoreDataStackManager.sharedInstance().saveContext()
                     }
                 }
             }
