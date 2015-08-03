@@ -19,8 +19,6 @@ class ImageCache {
         let path = pathForIdentifier(identifier)
         var data: NSData?
         
-        println("in imageWithIdentifier")
-        
         // First try the memory cache
         if let image = inMemoryCache.objectForKey(path) as? UIImage {
             return image
@@ -37,8 +35,6 @@ class ImageCache {
     
     func storeImage(image: UIImage?, withIdentifier identifier: String) {
         let path = pathForIdentifier(identifier)
-        
-        println("in storeImage")
         
         // If the image is nil, remove images from the cache
         if image == nil {

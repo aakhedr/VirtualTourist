@@ -61,9 +61,6 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDataSource, UI
     
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         let sectionInfo = fetchedResultsController.sections![section] as! NSFetchedResultsSectionInfo
-
-        println("seciontInfo.numberOfObjects = \(sectionInfo.numberOfObjects)")
-        
         return sectionInfo.numberOfObjects
     }
     
@@ -148,7 +145,11 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDataSource, UI
 
     func configureCell(cell: PhotoCollectionViewCell, photo: Photo) {
         
-        // If image is cached
+        // Image placeholder
+        cell.image.image = UIImage(named: "placeholder")
+        cell.activityIndicator.startAnimating()
+        
+        // If image is saved to DocumentDirectory
         if let image = photo.image  {
             cell.image.image = image
         } else {
@@ -156,11 +157,8 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDataSource, UI
             // Get that image on background thread
             let session = FlickrClient.sharedInstance().session
             let url = NSURL(string: photo.imageURL)!
-            
-            let task = session.dataTaskWithURL(url) { data, response, error in
-                
-                println("*************** new task ongoing")
 
+            let task = session.dataTaskWithURL(url) { data, response, error in
                 if let error = error {
                     println("error code: \(error.code)")
                     println("error domain: \(error.domain)")
@@ -173,6 +171,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDataSource, UI
                         photo.image = image
                         CoreDataStackManager.sharedInstance().saveContext()
                         cell.image.image = image
+                        cell.activityIndicator.stopAnimating()
                     }
                 }
             }

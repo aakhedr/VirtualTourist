@@ -117,7 +117,9 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
 
             // Cancel current task 
             // as another will start in the next controller
-            task.cancel()
+            if let task = task {
+                task.cancel()
+            }
         }
     }
     
@@ -245,9 +247,7 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
     
     // MARK: - Fetched Results Controller Delegate
     
-    func controllerDidChangeContent(controller: NSFetchedResultsController) {
-        println("controllerDidChangeContent called")
-    }
+    func controllerDidChangeContent(controller: NSFetchedResultsController) {   }
     
     // MARK:- Helpers
     
@@ -352,7 +352,7 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
                 println("error description: \(error.localizedDescription)")
             } else {
                 
-                println("\(imageURLs?.count) imageURLs parsed")
+                println("\(imageURLs!.count) imageURLs parsed")
                 
                 if let imageURLs = imageURLs as? [String] {
                     imageURLs.map { (imageURL: String) -> Photo in
@@ -369,9 +369,6 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
                         let url = NSURL(string: photo.imageURL)!
                         
                         let task = session.dataTaskWithURL(url) { data, response, error in
-                            
-                            println("old task ongoin **************")
-                            
                             if let error = error {
                                 println("error code: \(error.code)")
                                 println("error domain: \(error.domain)")
