@@ -9,7 +9,7 @@
 import MapKit
 import CoreData
 
-class PhotoAlbumViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, NSFetchedResultsControllerDelegate {
+class PhotoAlbumViewController: UIViewController {
 
     @IBOutlet private weak var mapView: MKMapView!
     @IBOutlet private weak var photoCollectionView: UICollectionView!
@@ -55,63 +55,6 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDataSource, UI
         
         // Perform the fetch
         performFetch()
-    }
-    
-    // MARK: - Collection View Data Source
-    
-    func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        let sectionInfo = fetchedResultsController.sections![section] as! NSFetchedResultsSectionInfo
-        return sectionInfo.numberOfObjects
-    }
-    
-    func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-        let photo = fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
-        let identifier = "photoCell"
-        
-        let cell = collectionView.dequeueReusableCellWithReuseIdentifier(identifier, forIndexPath: indexPath) as! PhotoCollectionViewCell
-
-        // Configure the cell
-        configureCell(cell, photo: photo)
-
-        return cell
-    }
-    
-    // MARK: - Fetched Results Controller Delegate
-    
-    func controllerWillChangeContent(controller: NSFetchedResultsController) {
-        println("controllerWillChangeContent in PhotoAlbumViewController called")
-    }
-    
-    func controller(controller: NSFetchedResultsController, didChangeSection sectionInfo: NSFetchedResultsSectionInfo, atIndex sectionIndex: Int, forChangeType type: NSFetchedResultsChangeType) {
-        switch type {
-
-        case .Insert:
-            photoCollectionView.insertSections(NSIndexSet(index: sectionIndex))
-            
-        case .Delete:
-            photoCollectionView.insertSections(NSIndexSet(index: sectionIndex))
-
-        default:
-            return
-        }
-    }
-    
-    func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
-        switch type {
-
-        case .Insert:
-            photoCollectionView.insertItemsAtIndexPaths([newIndexPath!])
-            
-        case .Delete:
-            photoCollectionView.deleteItemsAtIndexPaths([indexPath!])
-            
-        default:
-            return
-        }
-    }
-    
-    func controllerDidChangeContent(controller: NSFetchedResultsController) {
-        println("controllerDidChangeContent in PhotoAlbumViewController called")
     }
     
     // MARK: - Helpers
@@ -181,5 +124,68 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDataSource, UI
             }
             task.resume()
         }
+    }
+}
+
+extension PhotoAlbumViewController: UICollectionViewDataSource, UICollectionViewDelegate {
+    
+    // MARK: - Collection View Data Source
+    
+    func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        let sectionInfo = fetchedResultsController.sections![section] as! NSFetchedResultsSectionInfo
+        return sectionInfo.numberOfObjects
+    }
+    
+    func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
+        let photo = fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
+        let identifier = "photoCell"
+        
+        let cell = collectionView.dequeueReusableCellWithReuseIdentifier(identifier, forIndexPath: indexPath) as! PhotoCollectionViewCell
+        
+        // Configure the cell
+        configureCell(cell, photo: photo)
+        
+        return cell
+    }
+}
+
+extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
+    
+    // MARK: - Fetched Results Controller Delegate
+    
+    func controllerWillChangeContent(controller: NSFetchedResultsController) {
+        println("controllerWillChangeContent in PhotoAlbumViewController called")
+    }
+    
+    func controller(controller: NSFetchedResultsController, didChangeSection sectionInfo: NSFetchedResultsSectionInfo, atIndex sectionIndex: Int, forChangeType type: NSFetchedResultsChangeType) {
+        switch type {
+            
+        case .Insert:
+            photoCollectionView.insertSections(NSIndexSet(index: sectionIndex))
+            
+        case .Delete:
+            photoCollectionView.insertSections(NSIndexSet(index: sectionIndex))
+            
+        default:
+            return
+        }
+    }
+    
+    func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
+        switch type {
+            
+        case .Insert:
+            photoCollectionView.insertItemsAtIndexPaths([newIndexPath!])
+            
+        case .Delete:
+            photoCollectionView.deleteItemsAtIndexPaths([indexPath!])
+            
+        default:
+            return
+        }
+    }
+    
+    func controllerDidChangeContent(controller: NSFetchedResultsController) {
+        println("controllerDidChangeContent in PhotoAlbumViewController called")
     }
 }

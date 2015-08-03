@@ -6,11 +6,10 @@
 //  Copyright (c) 2015 Ahmed Khedr. All rights reserved.
 //
 
-import UIKit
 import MapKit
 import CoreData
 
-class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIGestureRecognizerDelegate, NSFetchedResultsControllerDelegate {
+class TravelLocationsMapViewController: UIViewController {
 
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var tabPinToDeleteLabel: UILabel!
@@ -88,25 +87,6 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
         fetchAndShowPinAnnotations()
     }
     
-    // MARK:- Gesture Recognizer Delegate
-    
-    func handleLongPressGesture(recognizer: UILongPressGestureRecognizer) {
-        if recognizer.state == .Ended {
-            
-            // Create MKPointAnnotation and add it to the map view
-            let touchPoint = recognizer.locationInView(mapView)
-            let touchPointCoordinate = mapView.convertPoint(touchPoint, toCoordinateFromView: mapView)
-            let annotation = MKPointAnnotationMake(coordinate: touchPointCoordinate)
-            
-            // Init Pin and save context
-            let pin = self.pinFromAnnotation(annotation: annotation)
-            CoreDataStackManager.sharedInstance().saveContext()
-            
-            // Start getting the photos
-            getFlickrImagesAndSaveContext(pin: pin, annotation: annotation)
-        }
-    }
-    
     // MARK:- Prepare for segue
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
@@ -141,113 +121,6 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
         // Animate sliding the map view up/ down
         animateMapViewSliding(newY: newY)
     }
-    
-    // MARK:- Map View Delegate
-    
-    func mapView(mapView: MKMapView!, viewForAnnotation annotation: MKAnnotation!) -> MKAnnotationView! {
-        if let annotation = annotation as? MKPointAnnotation {
-            let identifier = "pin"
-            var view: MKPinAnnotationView
-            
-            if let dequeuedView = mapView.dequeueReusableAnnotationViewWithIdentifier(identifier)
-                as? MKPinAnnotationView {
-                    dequeuedView.annotation = annotation
-                    view = dequeuedView
-            } else {
-                view = MKPinAnnotationView(annotation: annotation, reuseIdentifier: identifier)
-                view.canShowCallout = true          // default value is already true!
-                view.calloutOffset = CGPoint(x: -5, y: 5)
-                view.rightCalloutAccessoryView = UIButton.buttonWithType(.DetailDisclosure) as! UIView
-                
-                view.pinColor = MKPinAnnotationColor.Purple
-                view.animatesDrop = true
-                view.draggable = true
-            }
-            return view
-        }
-        return nil
-    }
-    
-    func mapView(mapView: MKMapView!, regionDidChangeAnimated animated: Bool) {
-        
-        // Save region data dictionary to NSUserDefaults
-        regionDataDictionary = [
-            regionDataDictionaryKeys.Lat        : mapView.region.center.latitude,
-            regionDataDictionaryKeys.Lon        : mapView.region.center.longitude,
-            regionDataDictionaryKeys.LatDelta   : mapView.region.span.latitudeDelta,
-            regionDataDictionaryKeys.LonDelta   : mapView.region.span.longitudeDelta
-        ]
-        saveValue()
-    }
-    
-    func mapView(mapView: MKMapView!, annotationView view: MKAnnotationView!, calloutAccessoryControlTapped control: UIControl!) {
-        
-        // Set the tabbedPin associated with the MKAnnotationView
-        tabbedPin = searchForPinInCoreData(
-            latitude: view.annotation.coordinate.latitude,
-            longitude: view.annotation.coordinate.longitude
-        )
-        performSegueWithIdentifier("photoAlbumSegue", sender: self)
-    }
-    
-    func mapViewDidFailLoadingMap(mapView: MKMapView!, withError error: NSError!) {
-        let alertController = UIAlertController(
-            title: "Network error!",
-            message: "Unable to load map. Check your Internet connection",
-            preferredStyle: UIAlertControllerStyle.Alert)
-        let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: nil)
-        alertController.addAction(okAction)
-        presentViewController(alertController, animated: true, completion: nil)
-    }
-    
-    func mapView(mapView: MKMapView!, annotationView view: MKAnnotationView!, didChangeDragState newState: MKAnnotationViewDragState, fromOldState oldState: MKAnnotationViewDragState) {
-        switch oldState {
-            
-            // Old coordinate
-            case .Starting:
-                let pinToBeDeleted = searchForPinInCoreData(
-                    latitude: view.annotation.coordinate.latitude,
-                    longitude: view.annotation.coordinate.longitude)
-                
-                // Delete old object
-                sharedContext.deleteObject(pinToBeDeleted)
-            
-            // New coordinate
-            case .Ending:
-                
-                // Init new pin and save context
-                let pinToBeAdded = pinFromAnnotation(annotation: view.annotation)
-                CoreDataStackManager.sharedInstance().saveContext()
-                
-                // Get Flickr images and Save context
-                getFlickrImagesAndSaveContext(pin: pinToBeAdded, annotation: view.annotation!)
-
-            default:
-                break
-        }
-    }
-    
-    func mapView(mapView: MKMapView!, didSelectAnnotationView view: MKAnnotationView!) {
-        if !tabPinToDeleteLabel.hidden {
-            
-            // Delete the pin from core data
-            let pinToBeDeleted = searchForPinInCoreData(
-                latitude: view.annotation.coordinate.latitude,
-                longitude: view.annotation.coordinate.longitude
-            )
-            sharedContext.deleteObject(pinToBeDeleted)
-            
-            // Save context after deletion
-            CoreDataStackManager.sharedInstance().saveContext()
-            
-            // Remove annotation from mapView
-            mapView.removeAnnotation(view.annotation)
-        }
-    }
-    
-    // MARK: - Fetched Results Controller Delegate
-    
-    func controllerDidChangeContent(controller: NSFetchedResultsController) {   }
     
     // MARK:- Helpers
     
@@ -394,6 +267,141 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
                     }
                 }
             }
+        }
+    }
+}
+
+extension TravelLocationsMapViewController: UIGestureRecognizerDelegate {
+    
+    // MARK:- Gesture Recognizer Delegate
+    
+    func handleLongPressGesture(recognizer: UILongPressGestureRecognizer) {
+        if recognizer.state == .Ended {
+            
+            // Create MKPointAnnotation and add it to the map view
+            let touchPoint = recognizer.locationInView(mapView)
+            let touchPointCoordinate = mapView.convertPoint(touchPoint, toCoordinateFromView: mapView)
+            let annotation = MKPointAnnotationMake(coordinate: touchPointCoordinate)
+            
+            // Init Pin and save context
+            let pin = self.pinFromAnnotation(annotation: annotation)
+            CoreDataStackManager.sharedInstance().saveContext()
+            
+            // Start getting the photos
+            getFlickrImagesAndSaveContext(pin: pin, annotation: annotation)
+        }
+    }
+}
+
+extension TravelLocationsMapViewController: NSFetchedResultsControllerDelegate {
+    
+    // MARK: - Fetched Results Controller Delegate
+    
+    func controllerDidChangeContent(controller: NSFetchedResultsController) {   }
+}
+
+extension TravelLocationsMapViewController: MKMapViewDelegate {
+    
+    // MARK:- Map View Delegate
+    
+    func mapView(mapView: MKMapView!, viewForAnnotation annotation: MKAnnotation!) -> MKAnnotationView! {
+        if let annotation = annotation as? MKPointAnnotation {
+            let identifier = "pin"
+            var view: MKPinAnnotationView
+            
+            if let dequeuedView = mapView.dequeueReusableAnnotationViewWithIdentifier(identifier)
+                as? MKPinAnnotationView {
+                    dequeuedView.annotation = annotation
+                    view = dequeuedView
+            } else {
+                view = MKPinAnnotationView(annotation: annotation, reuseIdentifier: identifier)
+                view.canShowCallout = true          // default value is already true!
+                view.calloutOffset = CGPoint(x: -5, y: 5)
+                view.rightCalloutAccessoryView = UIButton.buttonWithType(.DetailDisclosure) as! UIView
+                
+                view.pinColor = MKPinAnnotationColor.Purple
+                view.animatesDrop = true
+                view.draggable = true
+            }
+            return view
+        }
+        return nil
+    }
+    
+    func mapView(mapView: MKMapView!, regionDidChangeAnimated animated: Bool) {
+        
+        // Save region data dictionary to NSUserDefaults
+        regionDataDictionary = [
+            regionDataDictionaryKeys.Lat        : mapView.region.center.latitude,
+            regionDataDictionaryKeys.Lon        : mapView.region.center.longitude,
+            regionDataDictionaryKeys.LatDelta   : mapView.region.span.latitudeDelta,
+            regionDataDictionaryKeys.LonDelta   : mapView.region.span.longitudeDelta
+        ]
+        saveValue()
+    }
+    
+    func mapView(mapView: MKMapView!, annotationView view: MKAnnotationView!, calloutAccessoryControlTapped control: UIControl!) {
+        
+        // Set the tabbedPin associated with the MKAnnotationView
+        tabbedPin = searchForPinInCoreData(
+            latitude: view.annotation.coordinate.latitude,
+            longitude: view.annotation.coordinate.longitude
+        )
+        performSegueWithIdentifier("photoAlbumSegue", sender: self)
+    }
+    
+    func mapViewDidFailLoadingMap(mapView: MKMapView!, withError error: NSError!) {
+        let alertController = UIAlertController(
+            title: "Network error!",
+            message: "Unable to load map. Check your Internet connection",
+            preferredStyle: UIAlertControllerStyle.Alert)
+        let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: nil)
+        alertController.addAction(okAction)
+        presentViewController(alertController, animated: true, completion: nil)
+    }
+    
+    func mapView(mapView: MKMapView!, annotationView view: MKAnnotationView!, didChangeDragState newState: MKAnnotationViewDragState, fromOldState oldState: MKAnnotationViewDragState) {
+        switch oldState {
+            
+            // Old coordinate
+        case .Starting:
+            let pinToBeDeleted = searchForPinInCoreData(
+                latitude: view.annotation.coordinate.latitude,
+                longitude: view.annotation.coordinate.longitude)
+            
+            // Delete old object
+            sharedContext.deleteObject(pinToBeDeleted)
+            
+            // New coordinate
+        case .Ending:
+            
+            // Init new pin and save context
+            let pinToBeAdded = pinFromAnnotation(annotation: view.annotation)
+            CoreDataStackManager.sharedInstance().saveContext()
+            
+            // Get Flickr images and Save context
+            getFlickrImagesAndSaveContext(pin: pinToBeAdded, annotation: view.annotation!)
+            
+        default:
+            break
+        }
+    }
+    
+    func mapView(mapView: MKMapView!, didSelectAnnotationView view: MKAnnotationView!) {
+        if !tabPinToDeleteLabel.hidden {
+            
+            // Delete the pin from core data
+            let pinToBeDeleted = searchForPinInCoreData(
+                latitude: view.annotation.coordinate.latitude,
+                longitude: view.annotation.coordinate.longitude
+            )
+            sharedContext.deleteObject(pinToBeDeleted)
+            
+            // Save context after deletion
+            CoreDataStackManager.sharedInstance().saveContext()
+            
+            // Remove annotation from mapView
+            mapView.removeAnnotation(view.annotation)
         }
     }
 }
