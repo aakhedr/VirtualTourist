@@ -18,6 +18,7 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
     private var longPressGestureRecognizer: UILongPressGestureRecognizer!
     private var regionDataDictionary: [String : CLLocationDegrees]!
     private var tabbedPin: Pin!
+    private var task: NSURLSessionDataTask!
 
     private struct regionDataDictionaryKeys {
         static let Lat = "latitude"
@@ -113,6 +114,10 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
 
             // set the photo album view controller properties
             (segue.destinationViewController as! PhotoAlbumViewController).tabbedPin = tabbedPin
+
+            // Cancel current task 
+            // as another will start in the next controller
+            task.cancel()
         }
     }
     
@@ -359,12 +364,34 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, UIG
                         let photo = Photo(dictionary: dictionary, context: self.sharedContext)
                         photo.pin = pin
                         
-                        // TODO: - Pre fetch image data
+                        // Get that image on a background thread
+                        let session = FlickrClient.sharedInstance().session
+                        let url = NSURL(string: photo.imageURL)!
+                        
+                        let task = session.dataTaskWithURL(url) { data, response, error in
+                            
+                            println("old task ongoin **************")
+                            
+                            if let error = error {
+                                println("error code: \(error.code)")
+                                println("error domain: \(error.domain)")
+                                println("error description: \(error.localizedDescription)")
+                            } else {
+                                let image = UIImage(data: data)
+                                
+                                // Show to user and save context asap
+                                dispatch_async(dispatch_get_main_queue()) {
+                                    photo.image = image
+                                    CoreDataStackManager.sharedInstance().saveContext()
+                                }
+                            }
+                        }
+                        task.resume()
+                        self.task = task
                         
                         return photo
                     }
                     
-                    // Save context on a per photo basis
                     dispatch_async(dispatch_get_main_queue()) {
                         CoreDataStackManager.sharedInstance().saveContext()
                     }

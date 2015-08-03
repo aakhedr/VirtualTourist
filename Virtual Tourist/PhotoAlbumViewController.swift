@@ -149,15 +149,20 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDataSource, UI
     func configureCell(cell: PhotoCollectionViewCell, photo: Photo) {
         
         // If image is cached
-        if photo.image != nil {
-            cell.image.image = photo.image!
+        if let image = photo.image  {
+            cell.image.image = image
         } else {
+            
+            println("image is not cached")
             
             // Get that image on background thread
             let session = FlickrClient.sharedInstance().session
             let url = NSURL(string: photo.imageURL)!
             
             let task = session.dataTaskWithURL(url) { data, response, error in
+                
+                println("*************** new task ongoing")
+
                 if let error = error {
                     println("error code: \(error.code)")
                     println("error domain: \(error.domain)")
