@@ -381,10 +381,9 @@ extension TravelLocationsMapViewController {
                             } else {
                                 let image = UIImage(data: data)
                                 
-                                // Show to user and save context asap
+                                // Show to user asap
                                 dispatch_async(dispatch_get_main_queue()) {
                                     photo.image = image
-                                    CoreDataStackManager.sharedInstance().saveContext()
                                 }
                             }
                         }
@@ -399,6 +398,7 @@ extension TravelLocationsMapViewController {
                         return photo
                     }
                     
+                    // Save context asap
                     dispatch_async(dispatch_get_main_queue()) {
                         CoreDataStackManager.sharedInstance().saveContext()
                     }
