@@ -367,13 +367,16 @@ extension TravelLocationsMapViewController {
                         let session = FlickrClient.sharedInstance().session
                         let url = NSURL(string: photo.imageURL)!
                         
-                        let task = session.dataTaskWithURL(url) { data, response, error in
+                        self.task = session.dataTaskWithURL(url) { data, response, error in
                             if let error = error {
                                 
                                 // Task is cancelled
                                 if error.code == -999 {
-                                    return
+                                    dispatch_async(dispatch_get_main_queue()) {
+                                        return
+                                    }
                                 } else {
+                                    println("********* TravelLocationsViewController")
                                     println("error code: \(error.code)")
                                     println("error domain: \(error.domain)")
                                     println("error description: \(error.localizedDescription)")
@@ -387,13 +390,7 @@ extension TravelLocationsMapViewController {
                                 }
                             }
                         }
-                        task.resume()
-                        
-                        // Set the task property asap
-                        // To be cancelled on segue
-                        dispatch_async(dispatch_get_main_queue()) {
-                            self.task = task
-                        }
+                        self.task.resume()
                         
                         return photo
                     }

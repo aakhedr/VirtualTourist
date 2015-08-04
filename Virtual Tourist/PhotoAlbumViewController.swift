@@ -162,36 +162,25 @@ extension PhotoAlbumViewController {
                     if error.code == -1001 {
                         
                         // TODO: - Replace with a UILabel
-                        let alertController = UIAlertController(title: nil, message: "It's taking too long to download the photos from Flickr.\nCheck your Internet connection", preferredStyle: .Alert)
-                        let okAction = UIAlertAction(title: "OK", style: .Default, handler: nil)
-                        alertController.addAction(okAction)
-                        
-                        dispatch_async(dispatch_get_main_queue()) {
-                            self.presentViewController(alertController, animated: true, completion: nil)
-                        }
+
                         
                     // Internet connection lost
                     } else if error.code == -1005 {
                         
                         // TODO: - Replace with a UILabel
-                        let alertController = UIAlertController(title: nil, message: "Internet connection lost!", preferredStyle: .Alert)
-                        let okAction = UIAlertAction(title: "OK", style: .Default, handler: nil)
-                        alertController.addAction(okAction)
-                        
-                        dispatch_async(dispatch_get_main_queue()) {
-                            self.presentViewController(alertController, animated: true, completion: nil)
-                        }
+
                     } else {
+                        println("PhotoAlbumViewController *******")
                         println("error code: \(error.code)")
                         println("error domain: \(error.domain)")
                         println("error description: \(error.localizedDescription)")
                     }
                 } else {
                     let image = UIImage(data: data)
-                    
+                    photo.image = image
+
                     // Show to user asap
                     dispatch_async(dispatch_get_main_queue()) {
-                        photo.image = image
                         cell.image.image = image
                         cell.activityIndicator.hidden = true
                         cell.activityIndicator.stopAnimating()
