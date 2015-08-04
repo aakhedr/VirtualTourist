@@ -121,154 +121,6 @@ class TravelLocationsMapViewController: UIViewController {
         // Animate sliding the map view up/ down
         animateMapViewSliding(newY: newY)
     }
-    
-    // MARK:- Helpers
-    
-    func saveValue() {
-        let userDefaults = NSUserDefaults.standardUserDefaults()
-        userDefaults.setObject(regionDataDictionary, forKey: regionDataDictionaryKeys.NSUserDefaultsKey)
-    }
-    
-    func readValue() -> [String : CLLocationDegrees]? {
-        let userDefaults = NSUserDefaults.standardUserDefaults()
-        return userDefaults.objectForKey(regionDataDictionaryKeys.NSUserDefaultsKey) as? [String : CLLocationDegrees]
-    }
-    
-    func setRegionCenterAndSpan() -> MKCoordinateRegion {
-        let center = CLLocationCoordinate2DMake(
-            regionDataDictionary[regionDataDictionaryKeys.Lat]!,
-            regionDataDictionary[regionDataDictionaryKeys.Lon]!
-        )
-        let span = MKCoordinateSpanMake(
-            regionDataDictionary[regionDataDictionaryKeys.LatDelta]!,
-            regionDataDictionary[regionDataDictionaryKeys.LonDelta]!
-        )
-        return MKCoordinateRegionMake(center, span)
-    }
-    
-    func fetchAndShowPinAnnotations() {
-        if let pins = fetchedResultsController.fetchedObjects as? [Pin] {
-            mapView.removeAnnotations(mapView.annotations)
-            for pin in pins {
-                MKPointAnnotationMake(coordinate:
-                    CLLocationCoordinate2DMake(
-                        pin.lat as! CLLocationDegrees,
-                        pin.lon as! CLLocationDegrees
-                    )
-                )
-            }
-        }
-    }
-    
-    func configureLongPressGestureRecognizer() {
-        longPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: "handleLongPressGesture:")
-        longPressGestureRecognizer.minimumPressDuration = 1
-        longPressGestureRecognizer.numberOfTouchesRequired = 1
-        longPressGestureRecognizer.delegate = self
-        mapView.addGestureRecognizer(longPressGestureRecognizer)
-    }
-
-    func performFetch() {
-        var error: NSErrorPointer = nil
-        fetchedResultsController.performFetch(error)
-        if error != nil {
-            println("error in performFetch: \(error)")
-            abort()
-        }
-    }
-    
-    func animateMapViewSliding(#newY: CGFloat) {
-        UIView.animateWithDuration(0.2) {
-            self.mapView.frame = CGRectMake(
-                self.mapView.frame.origin.x,
-                newY,
-                self.mapView.frame.width,
-                self.mapView.frame.height
-            )
-        }
-    }
-
-    func MKPointAnnotationMake(#coordinate: CLLocationCoordinate2D) -> MKPointAnnotation {
-        let annotation = MKPointAnnotation()
-        annotation.coordinate = coordinate
-        annotation.title = "Tap for Flickr images of this location!"
-        annotation.subtitle = "Drag to change location!"
-        mapView.addAnnotation(annotation)
-        
-        return annotation
-    }
-    
-    func pinFromAnnotation(#annotation: MKAnnotation) -> Pin {
-        let dictionary = [
-            Pin.Keys.Lat    : annotation.coordinate.latitude as NSNumber,
-            Pin.Keys.Lon    : annotation.coordinate.longitude as NSNumber,
-        ]
-        return Pin(dictionary: dictionary, context: sharedContext)
-    }
-    
-    func searchForPinInCoreData(#latitude: CLLocationDegrees, longitude: CLLocationDegrees) -> Pin {
-        let pins = fetchedResultsController.fetchedObjects as! [Pin]
-        let lat = latitude as NSNumber
-        let lon = longitude as NSNumber
-        
-        return pins.filter { pin in
-            pin.lat == lat && pin.lon == lon
-            }.first!
-    }
-    
-    func getFlickrImagesAndSaveContext(#pin: Pin, annotation: MKAnnotation) {
-        FlickrClient.sharedInstance().getPhotosForCoordinate(latitude: annotation.coordinate.latitude, longitude: annotation.coordinate.longitude) { imageURLs, error in
-            
-            if let error = error {
-                println("error domain: \(error.domain)")
-                println("error code: \(error.code)")
-                println("error description: \(error.localizedDescription)")
-            } else {
-                
-                println("\(imageURLs!.count) imageURLs parsed")
-                
-                if let imageURLs = imageURLs as? [String] {
-                    imageURLs.map { (imageURL: String) -> Photo in
-                        let dictionary = [
-                            Photo.Keys.ImageURL    : imageURL
-                        ]
-                        
-                        // Init the Photo object
-                        let photo = Photo(dictionary: dictionary, context: self.sharedContext)
-                        photo.pin = pin
-                        
-                        // Get that image on a background thread
-                        let session = FlickrClient.sharedInstance().session
-                        let url = NSURL(string: photo.imageURL)!
-                        
-                        let task = session.dataTaskWithURL(url) { data, response, error in
-                            if let error = error {
-                                println("error code: \(error.code)")
-                                println("error domain: \(error.domain)")
-                                println("error description: \(error.localizedDescription)")
-                            } else {
-                                let image = UIImage(data: data)
-                                
-                                // Show to user and save context asap
-                                dispatch_async(dispatch_get_main_queue()) {
-                                    photo.image = image
-                                    CoreDataStackManager.sharedInstance().saveContext()
-                                }
-                            }
-                        }
-                        task.resume()
-                        self.task = task
-                        
-                        return photo
-                    }
-                    
-                    dispatch_async(dispatch_get_main_queue()) {
-                        CoreDataStackManager.sharedInstance().saveContext()
-                    }
-                }
-            }
-        }
-    }
 }
 
 extension TravelLocationsMapViewController: UIGestureRecognizerDelegate {
@@ -394,4 +246,164 @@ extension TravelLocationsMapViewController: NSFetchedResultsControllerDelegate {
     // MARK: - Fetched Results Controller Delegate
     
     func controllerDidChangeContent(controller: NSFetchedResultsController) {   }
+}
+
+extension TravelLocationsMapViewController {
+    
+    // MARK:- Helpers
+    
+    func saveValue() {
+        let userDefaults = NSUserDefaults.standardUserDefaults()
+        userDefaults.setObject(regionDataDictionary, forKey: regionDataDictionaryKeys.NSUserDefaultsKey)
+    }
+    
+    func readValue() -> [String : CLLocationDegrees]? {
+        let userDefaults = NSUserDefaults.standardUserDefaults()
+        return userDefaults.objectForKey(regionDataDictionaryKeys.NSUserDefaultsKey) as? [String : CLLocationDegrees]
+    }
+    
+    func setRegionCenterAndSpan() -> MKCoordinateRegion {
+        let center = CLLocationCoordinate2DMake(
+            regionDataDictionary[regionDataDictionaryKeys.Lat]!,
+            regionDataDictionary[regionDataDictionaryKeys.Lon]!
+        )
+        let span = MKCoordinateSpanMake(
+            regionDataDictionary[regionDataDictionaryKeys.LatDelta]!,
+            regionDataDictionary[regionDataDictionaryKeys.LonDelta]!
+        )
+        return MKCoordinateRegionMake(center, span)
+    }
+    
+    func fetchAndShowPinAnnotations() {
+        if let pins = fetchedResultsController.fetchedObjects as? [Pin] {
+            mapView.removeAnnotations(mapView.annotations)
+            for pin in pins {
+                MKPointAnnotationMake(coordinate:
+                    CLLocationCoordinate2DMake(
+                        pin.lat as! CLLocationDegrees,
+                        pin.lon as! CLLocationDegrees
+                    )
+                )
+            }
+        }
+    }
+    
+    func configureLongPressGestureRecognizer() {
+        longPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: "handleLongPressGesture:")
+        longPressGestureRecognizer.minimumPressDuration = 1
+        longPressGestureRecognizer.numberOfTouchesRequired = 1
+        longPressGestureRecognizer.delegate = self
+        mapView.addGestureRecognizer(longPressGestureRecognizer)
+    }
+    
+    func performFetch() {
+        var error: NSErrorPointer = nil
+        fetchedResultsController.performFetch(error)
+        if error != nil {
+            println("error in performFetch: \(error)")
+            abort()
+        }
+    }
+    
+    func animateMapViewSliding(#newY: CGFloat) {
+        UIView.animateWithDuration(0.2) {
+            self.mapView.frame = CGRectMake(
+                self.mapView.frame.origin.x,
+                newY,
+                self.mapView.frame.width,
+                self.mapView.frame.height
+            )
+        }
+    }
+    
+    func MKPointAnnotationMake(#coordinate: CLLocationCoordinate2D) -> MKPointAnnotation {
+        let annotation = MKPointAnnotation()
+        annotation.coordinate = coordinate
+        annotation.title = "Tap for Flickr images of this location!"
+        annotation.subtitle = "Drag to change location!"
+        mapView.addAnnotation(annotation)
+        
+        return annotation
+    }
+    
+    func pinFromAnnotation(#annotation: MKAnnotation) -> Pin {
+        let dictionary = [
+            Pin.Keys.Lat    : annotation.coordinate.latitude as NSNumber,
+            Pin.Keys.Lon    : annotation.coordinate.longitude as NSNumber,
+        ]
+        return Pin(dictionary: dictionary, context: sharedContext)
+    }
+    
+    func searchForPinInCoreData(#latitude: CLLocationDegrees, longitude: CLLocationDegrees) -> Pin {
+        let pins = fetchedResultsController.fetchedObjects as! [Pin]
+        let lat = latitude as NSNumber
+        let lon = longitude as NSNumber
+        
+        return pins.filter { pin in
+            pin.lat == lat && pin.lon == lon
+            }.first!
+    }
+    
+    func getFlickrImagesAndSaveContext(#pin: Pin, annotation: MKAnnotation) {
+        FlickrClient.sharedInstance().getPhotosForCoordinate(latitude: annotation.coordinate.latitude, longitude: annotation.coordinate.longitude) { imageURLs, error in
+            
+            if let error = error {
+                println("error code: \(error.code)")
+                println("error domain: \(error.domain)")
+                println("error description: \(error.localizedDescription)")
+            } else {
+                
+                if let imageURLs = imageURLs as? [String] {
+                    imageURLs.map { (imageURL: String) -> Photo in
+                        let dictionary = [
+                            Photo.Keys.ImageURL    : imageURL
+                        ]
+                        
+                        // Init the Photo object
+                        let photo = Photo(dictionary: dictionary, context: self.sharedContext)
+                        photo.pin = pin
+                        
+                        // Get that image on a background thread
+                        let session = FlickrClient.sharedInstance().session
+                        let url = NSURL(string: photo.imageURL)!
+                        
+                        let task = session.dataTaskWithURL(url) { data, response, error in
+                            if let error = error {
+                                
+                                // Task is cancelled
+                                if error.code == -999 {
+                                    return
+                                } else {
+                                    println("error code: \(error.code)")
+                                    println("error domain: \(error.domain)")
+                                    println("error description: \(error.localizedDescription)")
+                                }
+                            } else {
+                                let image = UIImage(data: data)
+                                
+                                // Show to user and save context asap
+                                dispatch_async(dispatch_get_main_queue()) {
+                                    photo.image = image
+                                    CoreDataStackManager.sharedInstance().saveContext()
+                                }
+                            }
+                        }
+                        task.resume()
+                        
+                        // Set the task property asap
+                        // To be cancelled on segue
+                        dispatch_async(dispatch_get_main_queue()) {
+                            self.task = task
+                        }
+                        
+                        return photo
+                    }
+                    
+                    dispatch_async(dispatch_get_main_queue()) {
+                        CoreDataStackManager.sharedInstance().saveContext()
+                    }
+                }
+            }
+        }
+    }
 }

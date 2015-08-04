@@ -56,74 +56,6 @@ class PhotoAlbumViewController: UIViewController {
         // Perform the fetch
         performFetch()
     }
-    
-    // MARK: - Helpers
-    
-    func addTabbedPinToMapView() {
-        let annotation = MKPointAnnotation()
-        annotation.coordinate = CLLocationCoordinate2DMake(
-            tabbedPin.lat as! CLLocationDegrees,
-            tabbedPin.lon as! CLLocationDegrees
-        )
-        mapView.addAnnotation(annotation)
-    }
-    
-    func setMapViewRegion() {
-        let center = CLLocationCoordinate2DMake(
-            tabbedPin.lat as! CLLocationDegrees,
-            tabbedPin.lon as! CLLocationDegrees
-        )
-        let span = MKCoordinateSpanMake(1.0, 1.0)
-        mapView.region = MKCoordinateRegionMake(center, span)
-    }
-    
-    func performFetch() {
-        var error: NSErrorPointer = nil
-        fetchedResultsController.performFetch(error)
-        if error != nil {
-            println("error performing the fetch in PhotoAlbumViewController: \(error)")
-            abort()
-        }
-    }
-
-    func configureCell(cell: PhotoCollectionViewCell, photo: Photo) {
-        
-        // Image placeholder
-        cell.activityIndicator.hidden = false
-        cell.activityIndicator.startAnimating()
-
-        // If image is saved to DocumentDirectory
-        if let image = photo.image  {
-            cell.image.image = image
-            cell.activityIndicator.hidden = true
-            cell.activityIndicator.stopAnimating()
-        } else {
-            
-            // Get that image on background thread
-            let session = FlickrClient.sharedInstance().session
-            let url = NSURL(string: photo.imageURL)!
-
-            let task = session.dataTaskWithURL(url) { data, response, error in
-                if let error = error {
-                    println("error code: \(error.code)")
-                    println("error domain: \(error.domain)")
-                    println("error description: \(error.localizedDescription)")
-                } else {
-                    let image = UIImage(data: data)
-                    
-                    // Show to user and save context asap
-                    dispatch_async(dispatch_get_main_queue()) {
-                        photo.image = image
-                        cell.image.image = image
-                        cell.activityIndicator.hidden = true
-                        cell.activityIndicator.stopAnimating()
-                        CoreDataStackManager.sharedInstance().saveContext()
-                    }
-                }
-            }
-            task.resume()
-        }
-    }
 }
 
 extension PhotoAlbumViewController: UICollectionViewDataSource, UICollectionViewDelegate {
@@ -173,4 +105,100 @@ extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
     }
     
     func controllerDidChangeContent(controller: NSFetchedResultsController) {   }
+}
+
+extension PhotoAlbumViewController {
+    
+    // MARK: - Helpers
+    
+    func addTabbedPinToMapView() {
+        let annotation = MKPointAnnotation()
+        annotation.coordinate = CLLocationCoordinate2DMake(
+            tabbedPin.lat as! CLLocationDegrees,
+            tabbedPin.lon as! CLLocationDegrees
+        )
+        mapView.addAnnotation(annotation)
+    }
+    
+    func setMapViewRegion() {
+        let center = CLLocationCoordinate2DMake(
+            tabbedPin.lat as! CLLocationDegrees,
+            tabbedPin.lon as! CLLocationDegrees
+        )
+        let span = MKCoordinateSpanMake(1.0, 1.0)
+        mapView.region = MKCoordinateRegionMake(center, span)
+    }
+    
+    func performFetch() {
+        var error: NSErrorPointer = nil
+        fetchedResultsController.performFetch(error)
+        if error != nil {
+            println("error performing the fetch in PhotoAlbumViewController: \(error)")
+            abort()
+        }
+    }
+    
+    func configureCell(cell: PhotoCollectionViewCell, photo: Photo) {
+        
+        // Setup the activity indicator
+        cell.activityIndicator.hidden = false
+        cell.activityIndicator.startAnimating()
+        
+        // If image is saved to DocumentDirectory
+        if let image = photo.image  {
+            cell.image.image = image
+            cell.activityIndicator.hidden = true
+            cell.activityIndicator.stopAnimating()
+        } else {
+            
+            // Get that image on background thread
+            let session = FlickrClient.sharedInstance().session
+            let url = NSURL(string: photo.imageURL)!
+            
+            let task = session.dataTaskWithURL(url) { data, response, error in
+                if let error = error {
+                    
+                    // Request timed out
+                    if error.code == -1001 {
+                        
+                        // TODO: - Replace with a UILabel
+                        let alertController = UIAlertController(title: nil, message: "It's taking too long to download the photos from Flickr.\nCheck your Internet connection", preferredStyle: .Alert)
+                        let okAction = UIAlertAction(title: "OK", style: .Default, handler: nil)
+                        alertController.addAction(okAction)
+                        
+                        dispatch_async(dispatch_get_main_queue()) {
+                            self.presentViewController(alertController, animated: true, completion: nil)
+                        }
+                        
+                    // Internet connection lost
+                    } else if error.code == -1005 {
+                        
+                        // TODO: - Replace with a UILabel
+                        let alertController = UIAlertController(title: nil, message: "Internet connection lost!", preferredStyle: .Alert)
+                        let okAction = UIAlertAction(title: "OK", style: .Default, handler: nil)
+                        alertController.addAction(okAction)
+                        
+                        dispatch_async(dispatch_get_main_queue()) {
+                            self.presentViewController(alertController, animated: true, completion: nil)
+                        }
+                    } else {
+                        println("error code: \(error.code)")
+                        println("error domain: \(error.domain)")
+                        println("error description: \(error.localizedDescription)")
+                    }
+                } else {
+                    let image = UIImage(data: data)
+                    
+                    // Show to user asap
+                    dispatch_async(dispatch_get_main_queue()) {
+                        photo.image = image
+                        cell.image.image = image
+                        cell.activityIndicator.hidden = true
+                        cell.activityIndicator.stopAnimating()
+                    }
+                }
+            }
+            task.resume()
+        }
+    }
 }
