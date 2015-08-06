@@ -16,7 +16,7 @@ class TravelLocationsMapViewController: UIViewController {
     
     private var longPressGestureRecognizer: UILongPressGestureRecognizer!
     private var regionDataDictionary: [String : CLLocationDegrees]!
-    private var tabbedPin: Pin!
+    private var tappedPin: Pin!
     private var task: NSURLSessionDataTask!
 
     private struct regionDataDictionaryKeys {
@@ -84,6 +84,7 @@ class TravelLocationsMapViewController: UIViewController {
         performFetch()
         
         // Fetch and show pins in the map view
+        // And set pinIsDraggable
         fetchAndShowPinAnnotations()
     }
     
@@ -93,7 +94,7 @@ class TravelLocationsMapViewController: UIViewController {
         if segue.identifier == "photoAlbumSegue" {
 
             // set the photo album view controller properties
-            (segue.destinationViewController as! PhotoAlbumViewController).tabbedPin = tabbedPin
+            (segue.destinationViewController as! PhotoAlbumViewController).tappedPin = tappedPin
 
             // Cancel current task 
             // as another will start in the next controller
@@ -134,13 +135,14 @@ extension TravelLocationsMapViewController: UIGestureRecognizerDelegate {
             let touchPoint = recognizer.locationInView(mapView)
             let touchPointCoordinate = mapView.convertPoint(touchPoint, toCoordinateFromView: mapView)
             let annotation = MKPointAnnotationMake(coordinate: touchPointCoordinate)
+            let annotationView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: "pin")
             
             // Init Pin and save context
             let pin = self.pinFromAnnotation(annotation: annotation)
             CoreDataStackManager.sharedInstance().saveContext()
             
             // Start getting the photos
-            getFlickrImagesAndSaveContext(pin: pin, annotation: annotation)
+            getFlickrImagesAndSaveContext(pin: pin, annotationView: annotationView)
         }
     }
 }
@@ -160,13 +162,11 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
                     view = dequeuedView
             } else {
                 view = MKPinAnnotationView(annotation: annotation, reuseIdentifier: identifier)
-                view.canShowCallout = true          // default value is already true!
-                view.calloutOffset = CGPoint(x: -5, y: 5)
-                view.rightCalloutAccessoryView = UIButton.buttonWithType(.DetailDisclosure) as! UIView
                 
                 view.pinColor = MKPinAnnotationColor.Purple
                 view.animatesDrop = true
-                view.draggable = true
+                view.canShowCallout = false             // default is true!
+                view.draggable = true                   // default is false
             }
             return view
         }
@@ -185,20 +185,10 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
         saveValue()
     }
     
-    func mapView(mapView: MKMapView!, annotationView view: MKAnnotationView!, calloutAccessoryControlTapped control: UIControl!) {
-        
-        // Set the tabbedPin associated with the MKAnnotationView
-        tabbedPin = searchForPinInCoreData(
-            latitude: view.annotation.coordinate.latitude,
-            longitude: view.annotation.coordinate.longitude
-        )
-        performSegueWithIdentifier("photoAlbumSegue", sender: self)
-    }
-    
     func mapView(mapView: MKMapView!, annotationView view: MKAnnotationView!, didChangeDragState newState: MKAnnotationViewDragState, fromOldState oldState: MKAnnotationViewDragState) {
         switch oldState {
             
-            // Old coordinate
+        // Old coordinate
         case .Starting:
             let pinToBeDeleted = searchForPinInCoreData(
                 latitude: view.annotation.coordinate.latitude,
@@ -207,15 +197,15 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
             // Delete old object
             sharedContext.deleteObject(pinToBeDeleted)
             
-            // New coordinate
+        // New coordinate
         case .Ending:
             
             // Init new pin and save context
             let pinToBeAdded = pinFromAnnotation(annotation: view.annotation)
             CoreDataStackManager.sharedInstance().saveContext()
-            
+
             // Get Flickr images and Save context
-            getFlickrImagesAndSaveContext(pin: pinToBeAdded, annotation: view.annotation!)
+            getFlickrImagesAndSaveContext(pin: pinToBeAdded, annotationView: view!)
             
         default:
             break
@@ -223,6 +213,16 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
     }
     
     func mapView(mapView: MKMapView!, didSelectAnnotationView view: MKAnnotationView!) {
+        if tapPinToDeleteLabel.hidden {
+            
+            // Set the tappedPin associated with the MKAnnotationView
+            tappedPin = searchForPinInCoreData(
+                latitude: view.annotation.coordinate.latitude,
+                longitude: view.annotation.coordinate.longitude
+            )
+            performSegueWithIdentifier("photoAlbumSegue", sender: self)
+        }
+        
         if !tapPinToDeleteLabel.hidden {
             
             // Delete the pin from core data
@@ -319,8 +319,6 @@ extension TravelLocationsMapViewController {
     func MKPointAnnotationMake(#coordinate: CLLocationCoordinate2D) -> MKPointAnnotation {
         let annotation = MKPointAnnotation()
         annotation.coordinate = coordinate
-        annotation.title = "Tap for Flickr images of this location!"
-        annotation.subtitle = "Drag to change location!"
         mapView.addAnnotation(annotation)
         
         return annotation
@@ -344,14 +342,23 @@ extension TravelLocationsMapViewController {
             }.first!
     }
     
-    func getFlickrImagesAndSaveContext(#pin: Pin, annotation: MKAnnotation) {
-        FlickrClient.sharedInstance().getPhotosForCoordinate(latitude: annotation.coordinate.latitude, longitude: annotation.coordinate.longitude) { imageURLs, error in
+    func getFlickrImagesAndSaveContext(#pin: Pin, annotationView: MKAnnotationView) {
+        FlickrClient.sharedInstance().getPhotosForCoordinate(latitude: annotationView.annotation.coordinate.latitude, longitude: annotationView.annotation.coordinate.longitude) { imageURLs, error in
             
             if let error = error {
-                println("error code: \(error.code)")
-                println("error domain: \(error.domain)")
-                println("error description: \(error.localizedDescription)")
+                if error.code == -1001 || error.code == -1005 || error.code == -1009 {
+                    
+                    // TODO: - Internet connection problem
+                    
+                    
+                } else {
+                    println("error code: \(error.code)")
+                    println("error domain: \(error.domain)")
+                    println("error description: \(error.localizedDescription)")
+                }
             } else {
+                
+                println("photos = \(imageURLs!.count)")
                 
                 if let imageURLs = imageURLs as? [String] {
                     imageURLs.map { (imageURL: String) -> Photo in
@@ -361,7 +368,9 @@ extension TravelLocationsMapViewController {
                         
                         // Init the Photo object
                         let photo = Photo(dictionary: dictionary, context: self.sharedContext)
-                        photo.pin = pin
+                        dispatch_async(dispatch_get_main_queue()) {
+                            photo.pin = pin
+                        }
                         
                         // Get that image on a background thread
                         let session = FlickrClient.sharedInstance().session
@@ -375,8 +384,12 @@ extension TravelLocationsMapViewController {
                                     dispatch_async(dispatch_get_main_queue()) {
                                         return
                                     }
+                                } else if error.code == -1001 || error.code == -1005 || error.code == -1009 {
+                                    
+                                    // TODO: - Internet connection problem
+                                    
                                 } else {
-                                    println("********* TravelLocationsViewController")
+                                    println("************* TravelLocationsMapViewController")
                                     println("error code: \(error.code)")
                                     println("error domain: \(error.domain)")
                                     println("error description: \(error.localizedDescription)")

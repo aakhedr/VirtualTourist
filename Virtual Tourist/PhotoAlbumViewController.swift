@@ -14,7 +14,7 @@ class PhotoAlbumViewController: UIViewController {
     @IBOutlet private weak var mapView: MKMapView!
     @IBOutlet private weak var photoCollectionView: UICollectionView!
     
-    var tabbedPin: Pin!
+    var tappedPin: Pin!
     
     private var sharedContext : NSManagedObjectContext {
         return CoreDataStackManager.sharedInstance().managedObjectContext!
@@ -25,7 +25,7 @@ class PhotoAlbumViewController: UIViewController {
         
         // TODO: Change key as you add new properties to Photo
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: "imageURL", ascending: true)]
-        fetchRequest.predicate = NSPredicate(format: "pin == %@", self.tabbedPin);
+        fetchRequest.predicate = NSPredicate(format: "pin == %@", self.tappedPin);
         
         let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest,
             managedObjectContext: self.sharedContext,
@@ -40,7 +40,7 @@ class PhotoAlbumViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // Add the tabbedPin to the mapView
+        // Add the tappedPin to the mapView
         addTabbedPinToMapView()
         
         // Set mapView region
@@ -86,6 +86,13 @@ extension PhotoAlbumViewController: UICollectionViewDataSource, UICollectionView
     }
 }
 
+extension PhotoAlbumViewController: UICollectionViewDelegateFlowLayout {
+    
+    // MARK: - Collection View Delegate Flow Layout
+    
+    
+}
+
 extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
     
     // MARK: - Fetched Results Controller Delegate
@@ -114,16 +121,16 @@ extension PhotoAlbumViewController {
     func addTabbedPinToMapView() {
         let annotation = MKPointAnnotation()
         annotation.coordinate = CLLocationCoordinate2DMake(
-            tabbedPin.lat as! CLLocationDegrees,
-            tabbedPin.lon as! CLLocationDegrees
+            tappedPin.lat as! CLLocationDegrees,
+            tappedPin.lon as! CLLocationDegrees
         )
         mapView.addAnnotation(annotation)
     }
     
     func setMapViewRegion() {
         let center = CLLocationCoordinate2DMake(
-            tabbedPin.lat as! CLLocationDegrees,
-            tabbedPin.lon as! CLLocationDegrees
+            tappedPin.lat as! CLLocationDegrees,
+            tappedPin.lon as! CLLocationDegrees
         )
         let span = MKCoordinateSpanMake(1.0, 1.0)
         mapView.region = MKCoordinateRegionMake(center, span)
@@ -158,16 +165,11 @@ extension PhotoAlbumViewController {
             let task = session.dataTaskWithURL(url) { data, response, error in
                 if let error = error {
                     
-                    // Request timed out
-                    if error.code == -1001 {
+                    // Request timed out, Internet connection lost, Internet connection offline
+                    if error.code == -1001 || error.code == -1005 || error.code == -1009 {
                         
-                        // TODO: - Replace with a UILabel
-
+                        // TODO: - Internet connection problem
                         
-                    // Internet connection lost
-                    } else if error.code == -1005 {
-                        
-                        // TODO: - Replace with a UILabel
 
                     } else {
                         println("PhotoAlbumViewController *******")
