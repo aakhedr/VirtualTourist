@@ -142,7 +142,7 @@ extension TravelLocationsMapViewController: UIGestureRecognizerDelegate {
             CoreDataStackManager.sharedInstance().saveContext()
             
             // Start getting the photos
-//            getFlickrImagesAndSaveContext(pin: pin, annotationView: annotationView)
+            getFlickrImagesAndSaveContext(pin: pin, annotationView: annotationView)
         }
     }
 }

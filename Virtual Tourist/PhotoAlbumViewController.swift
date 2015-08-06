@@ -115,6 +115,20 @@ extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
     
     // MARK: - Fetched Results Controller Delegate
     
+    func controller(controller: NSFetchedResultsController, didChangeSection sectionInfo: NSFetchedResultsSectionInfo, atIndex sectionIndex: Int, forChangeType type: NSFetchedResultsChangeType) {
+        switch type {
+            
+        case .Insert:
+            photoCollectionView.insertSections(NSIndexSet(index: sectionIndex))
+            
+        case .Delete:
+            photoCollectionView.deleteSections(NSIndexSet(index: sectionIndex))
+            
+        default:
+            return
+        }
+    }
+    
     func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
         switch type {
             
