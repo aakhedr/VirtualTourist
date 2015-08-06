@@ -142,7 +142,7 @@ extension TravelLocationsMapViewController: UIGestureRecognizerDelegate {
             CoreDataStackManager.sharedInstance().saveContext()
             
             // Start getting the photos
-            getFlickrImagesAndSaveContext(pin: pin, annotationView: annotationView)
+//            getFlickrImagesAndSaveContext(pin: pin, annotationView: annotationView)
         }
     }
 }
@@ -381,9 +381,7 @@ extension TravelLocationsMapViewController {
                                 
                                 // Task is cancelled
                                 if error.code == -999 {
-                                    dispatch_async(dispatch_get_main_queue()) {
-                                        return
-                                    }
+                                    return
                                 } else if error.code == -1001 || error.code == -1005 || error.code == -1009 {
                                     
                                     // TODO: - Internet connection problem
