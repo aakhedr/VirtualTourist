@@ -58,7 +58,7 @@ class PhotoAlbumViewController: UIViewController {
     }
 }
 
-extension PhotoAlbumViewController: UICollectionViewDataSource, UICollectionViewDelegate {
+extension PhotoAlbumViewController: UICollectionViewDataSource {
     
     // MARK: - Collection View Data Source
     
@@ -84,13 +84,31 @@ extension PhotoAlbumViewController: UICollectionViewDataSource, UICollectionView
         sharedContext.deleteObject(photo)
         CoreDataStackManager.sharedInstance().saveContext()
     }
+    
+    func collectionView(collectionView: UICollectionView, willDisplayCell cell: UICollectionViewCell, forItemAtIndexPath indexPath: NSIndexPath) {
+
+        // Resize the cell accordig to the size of the image from Flickr
+        collectionView.collectionViewLayout.invalidateLayout()
+    }
 }
 
 extension PhotoAlbumViewController: UICollectionViewDelegateFlowLayout {
     
     // MARK: - Collection View Delegate Flow Layout
     
-    
+    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
+        
+        let photo = fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
+        if var size = photo.image?.size {
+            if size.width > collectionView.frame.width {
+                size.width = collectionView.frame.width - 1
+            }
+            return size
+        }
+        
+        // Default cell size
+        return CGSize(width: 100, height: 100)
+    }
 }
 
 extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
