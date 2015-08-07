@@ -228,6 +228,7 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
                 latitude: view.annotation.coordinate.latitude,
                 longitude: view.annotation.coordinate.longitude
             )
+            mapView.deselectAnnotation(view.annotation, animated: false)
             performSegueWithIdentifier("photoAlbumSegue", sender: self)
         }
         
@@ -376,31 +377,31 @@ extension TravelLocationsMapViewController {
                         let photo = Photo(dictionary: dictionary, context: self.sharedContext)
                         photo.pin = pin
                         
-//                        // Get that image on a background thread
-//                        let session = FlickrClient.sharedInstance().session
-//                        let url = NSURL(string: photo.imageURL)!
-//                        
-//                        self.task = session.dataTaskWithURL(url) { data, response, error in
-//                            if let error = error {
-//                                
-//                                // Task is cancelled
-//                                if error.code == -999 {
-//                                    return
-//                                } else if error.code == -1001 || error.code == -1005 || error.code == -1009 {
-//                                    
-//                                    // TODO: - Internet connection problem
-//                                    
-//                                } else {
-//                                    println("************* TravelLocationsMapViewController")
-//                                    println("error code: \(error.code)")
-//                                    println("error domain: \(error.domain)")
-//                                    println("error description: \(error.localizedDescription)")
-//                                }
-//                            } else {
-//                                photo.image = UIImage(data: data)
-//                            }
-//                        }
-//                        self.task.resume()
+                        // Get that image on a background thread
+                        let session = FlickrClient.sharedInstance().session
+                        let url = NSURL(string: photo.imageURL)!
+                        
+                        self.task = session.dataTaskWithURL(url) { data, response, error in
+                            if let error = error {
+                                
+                                // Task is cancelled
+                                if error.code == -999 {
+                                    return
+                                } else if error.code == -1001 || error.code == -1005 || error.code == -1009 {
+                                    
+                                    // TODO: - Internet connection problem
+                                    
+                                } else {
+                                    println("************* TravelLocationsMapViewController")
+                                    println("error code: \(error.code)")
+                                    println("error domain: \(error.domain)")
+                                    println("error description: \(error.localizedDescription)")
+                                }
+                            } else {
+                                photo.image = UIImage(data: data)
+                            }
+                        }
+                        self.task.resume()
                         
                         return photo
                     }
