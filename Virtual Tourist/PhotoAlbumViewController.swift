@@ -64,6 +64,9 @@ extension PhotoAlbumViewController: UICollectionViewDataSource {
     
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         let sectionInfo = fetchedResultsController.sections![section] as! NSFetchedResultsSectionInfo
+        
+        println("sectionInfo.numberOfObjects: \(sectionInfo.numberOfObjects)")
+        
         return sectionInfo.numberOfObjects
     }
     
@@ -120,9 +123,11 @@ extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
             
         case .Insert:
             photoCollectionView.insertSections(NSIndexSet(index: sectionIndex))
+            println("inserted section")
             
         case .Delete:
             photoCollectionView.deleteSections(NSIndexSet(index: sectionIndex))
+            println("deleted section")
             
         default:
             return
@@ -134,16 +139,23 @@ extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
             
         case .Insert:
             photoCollectionView.insertItemsAtIndexPaths([newIndexPath!])
+            println("inserted object")
+            
+        case .Update:
+            println("updating object")
             
         case .Delete:
             photoCollectionView.deleteItemsAtIndexPaths([indexPath!])
+            println("deleted object")
             
         default:
             return
         }
     }
     
-    func controllerDidChangeContent(controller: NSFetchedResultsController) {   }
+    func controllerDidChangeContent(controller: NSFetchedResultsController) {
+        println("fetchedResultsController.fetchedObjects!.count \(fetchedResultsController.fetchedObjects!.count)")
+    }
 }
 
 extension PhotoAlbumViewController {

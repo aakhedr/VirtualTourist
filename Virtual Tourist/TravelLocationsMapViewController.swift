@@ -187,18 +187,26 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
     
     func mapView(mapView: MKMapView!, annotationView view: MKAnnotationView!, didChangeDragState newState: MKAnnotationViewDragState, fromOldState oldState: MKAnnotationViewDragState) {
         switch oldState {
-            
+        
         // Old coordinate
         case .Starting:
+            
+            println("changDragState starting")
+            
             let pinToBeDeleted = searchForPinInCoreData(
                 latitude: view.annotation.coordinate.latitude,
                 longitude: view.annotation.coordinate.longitude)
             
             // Delete old object
             sharedContext.deleteObject(pinToBeDeleted)
+            CoreDataStackManager.sharedInstance().saveContext()
+
+            println(pinToBeDeleted.photos.count)
             
         // New coordinate
         case .Ending:
+
+            println("changDragState ending")
             
             // Init new pin and save context
             let pinToBeAdded = pinFromAnnotation(annotation: view.annotation)
@@ -362,53 +370,39 @@ extension TravelLocationsMapViewController {
                 
                 if let imageURLs = imageURLs as? [String] {
                     imageURLs.map { (imageURL: String) -> Photo in
-                        let dictionary = [
-                            Photo.Keys.ImageURL    : imageURL
-                        ]
+                        let dictionary = [ Photo.Keys.ImageURL    : imageURL ]
                         
                         // Init the Photo object
                         let photo = Photo(dictionary: dictionary, context: self.sharedContext)
-                        dispatch_async(dispatch_get_main_queue()) {
-                            photo.pin = pin
-                        }
+                        photo.pin = pin
                         
-                        // Get that image on a background thread
-                        let session = FlickrClient.sharedInstance().session
-                        let url = NSURL(string: photo.imageURL)!
-                        
-                        self.task = session.dataTaskWithURL(url) { data, response, error in
-                            if let error = error {
-                                
-                                // Task is cancelled
-                                if error.code == -999 {
-                                    return
-                                } else if error.code == -1001 || error.code == -1005 || error.code == -1009 {
-                                    
-                                    // TODO: - Internet connection problem
-                                    
-                                } else {
-                                    println("************* TravelLocationsMapViewController")
-                                    println("error code: \(error.code)")
-                                    println("error domain: \(error.domain)")
-                                    println("error description: \(error.localizedDescription)")
-                                }
-                            } else {
-                                let image = UIImage(data: data)
-                                
-                                // Show to user asap
-                                dispatch_async(dispatch_get_main_queue()) {
-                                    photo.image = image
-                                }
-                            }
-                        }
-                        self.task.resume()
+//                        // Get that image on a background thread
+//                        let session = FlickrClient.sharedInstance().session
+//                        let url = NSURL(string: photo.imageURL)!
+//                        
+//                        self.task = session.dataTaskWithURL(url) { data, response, error in
+//                            if let error = error {
+//                                
+//                                // Task is cancelled
+//                                if error.code == -999 {
+//                                    return
+//                                } else if error.code == -1001 || error.code == -1005 || error.code == -1009 {
+//                                    
+//                                    // TODO: - Internet connection problem
+//                                    
+//                                } else {
+//                                    println("************* TravelLocationsMapViewController")
+//                                    println("error code: \(error.code)")
+//                                    println("error domain: \(error.domain)")
+//                                    println("error description: \(error.localizedDescription)")
+//                                }
+//                            } else {
+//                                photo.image = UIImage(data: data)
+//                            }
+//                        }
+//                        self.task.resume()
                         
                         return photo
-                    }
-                    
-                    // Save context asap
-                    dispatch_async(dispatch_get_main_queue()) {
-                        CoreDataStackManager.sharedInstance().saveContext()
                     }
                 }
             }
