@@ -163,7 +163,7 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
             } else {
                 view = MKPinAnnotationView(annotation: annotation, reuseIdentifier: identifier)
                 
-                view.pinColor = MKPinAnnotationColor.Purple
+                view.pinColor = .Purple
                 view.animatesDrop = true
                 view.canShowCallout = false             // default is true!
                 view.draggable = true                   // default is false
@@ -228,12 +228,17 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
                 latitude: view.annotation.coordinate.latitude,
                 longitude: view.annotation.coordinate.longitude
             )
-            mapView.deselectAnnotation(view.annotation, animated: false)
+            mapView.deselectAnnotation(view.annotation, animated: false)        // Important to be reselected
             performSegueWithIdentifier("photoAlbumSegue", sender: self)
         }
         
         if !tapPinToDeleteLabel.hidden {
-            
+            if ImageCache.sharedCache().isDownloading {
+                println("Cannot delete pin while images are downloading!")
+                mapView.deselectAnnotation(view.annotation, animated: false)    // Important to be reselected
+                return
+            }
+
             // Delete the pin from core data
             let pinToBeDeleted = searchForPinInCoreData(
                 latitude: view.annotation.coordinate.latitude,
@@ -354,11 +359,15 @@ extension TravelLocationsMapViewController {
     func getFlickrImagesAndSaveContext(#pin: Pin, annotationView: MKAnnotationView) {
         FlickrClient.sharedInstance().getPhotosForCoordinate(latitude: annotationView.annotation.coordinate.latitude, longitude: annotationView.annotation.coordinate.longitude) { imageURLs, error in
             
+            println("isDownloading images")
+            ImageCache.sharedCache().isDownloading = true
+            ImageCache.sharedCache().counter = 0
+            
             if let error = error {
                 if error.code == -1001 || error.code == -1005 || error.code == -1009 {
                     
                     // TODO: - Internet connection problem
-                    
+                    println("error code in getPhotosForCoordinate TravelLocations: \(error.code)")
                     
                 } else {
                     println("error code: \(error.code)")
@@ -386,19 +395,34 @@ extension TravelLocationsMapViewController {
                                 
                                 // Task is cancelled
                                 if error.code == -999 {
+                                    
+                                    println("task in dataTaskWithURL in TravelLocations cancelled")
+                                    
                                     return
+                                    
                                 } else if error.code == -1001 || error.code == -1005 || error.code == -1009 {
                                     
                                     // TODO: - Internet connection problem
+                                    println("error code in dataTaskWithURL TravelLocations: \(error.code)")
                                     
                                 } else {
-                                    println("************* TravelLocationsMapViewController")
-                                    println("error code: \(error.code)")
+                                    println("error code in dataTaskWithURL TravelLocations: \(error.code)")
                                     println("error domain: \(error.domain)")
                                     println("error description: \(error.localizedDescription)")
                                 }
                             } else {
-                                photo.image = UIImage(data: data)
+                                let image = UIImage(data: data)
+                                
+                                dispatch_async(dispatch_get_main_queue()) {
+                                    photo.image = UIImage(data: data)
+                                    CoreDataStackManager.sharedInstance().saveContext()
+                                    
+                                    ImageCache.sharedCache().counter += 1
+                                    if ImageCache.sharedCache().counter == imageURLs.count {
+                                        println("Done Downloading")
+                                        ImageCache.sharedCache().isDownloading = false
+                                    }
+                                }
                             }
                         }
                         self.task.resume()

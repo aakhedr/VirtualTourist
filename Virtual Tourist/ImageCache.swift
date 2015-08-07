@@ -11,6 +11,8 @@ import UIKit
 class ImageCache {
     
     private var inMemoryCache = NSCache()
+    var isDownloading: Bool = false
+    var counter: Int = 0
     
     // MARK: - Retreiving images
     
