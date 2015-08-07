@@ -213,11 +213,10 @@ extension PhotoAlbumViewController {
                     if error.code == -1001 || error.code == -1005 || error.code == -1009 {
                         
                         // TODO: - Internet connection problem
-                        
+                        println("error code in dataTaskWithURL PhotoAlbum: \(error.code)")
 
                     } else {
-                        println("PhotoAlbumViewController *******")
-                        println("error code: \(error.code)")
+                        println("error code in dataTaskWithURL PhotoAlbum: \(error.code)")
                         println("error domain: \(error.domain)")
                         println("error description: \(error.localizedDescription)")
                     }
