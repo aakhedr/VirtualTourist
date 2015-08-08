@@ -77,7 +77,14 @@ extension PhotoAlbumViewController: UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier(identifier, forIndexPath: indexPath) as! PhotoCollectionViewCell
         
         // Configure the cell
-        configureCell(cell, photo: photo)
+        cell.activityIndicator.hidden = false
+        cell.activityIndicator.startAnimating()
+        
+        if let image = photo.image {
+            cell.image.image = photo.image
+            cell.activityIndicator.hidden = true
+            cell.activityIndicator.stopAnimating()
+        }
         
         return cell
     }
@@ -191,16 +198,16 @@ extension PhotoAlbumViewController {
     
     func configureCell(cell: PhotoCollectionViewCell, photo: Photo) {
         
-        // Setup the activity indicator
-        cell.activityIndicator.hidden = false
-        cell.activityIndicator.startAnimating()
-        
-        // If image is saved to DocumentDirectory
-        if let image = photo.image  {
-            cell.image.image = image
-            cell.activityIndicator.hidden = true
-            cell.activityIndicator.stopAnimating()
-        }
+//        // Setup the activity indicator
+//        cell.activityIndicator.hidden = false
+//        cell.activityIndicator.startAnimating()
+//        
+//        // If image is saved to DocumentDirectory
+//        if let image = photo.image  {
+//            cell.image.image = image
+//            cell.activityIndicator.hidden = true
+//            cell.activityIndicator.stopAnimating()
+//        }
 //        else {
 //            
 //            // Get that image on background thread
