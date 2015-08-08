@@ -17,7 +17,6 @@ class TravelLocationsMapViewController: UIViewController {
     private var longPressGestureRecognizer: UILongPressGestureRecognizer!
     private var regionDataDictionary: [String : CLLocationDegrees]!
     private var tappedPin: Pin!
-    private var task: NSURLSessionDataTask!
 
     private struct regionDataDictionaryKeys {
         static let Lat = "latitude"
@@ -95,12 +94,6 @@ class TravelLocationsMapViewController: UIViewController {
 
             // set the photo album view controller properties
             (segue.destinationViewController as! PhotoAlbumViewController).tappedPin = tappedPin
-
-            // Cancel current task 
-            // as another will start in the next controller
-            if let task = task {
-                task.cancel()
-            }
         }
     }
     
@@ -379,7 +372,7 @@ extension TravelLocationsMapViewController {
                 println("photos = \(imageURLs!.count)")
                 
                 if let imageURLs = imageURLs as? [String] {
-                    imageURLs.map { (imageURL: String) -> Photo in
+                    imageURLs.map { (imageURL: String) -> Photo? in
                         let dictionary = [ Photo.Keys.ImageURL    : imageURL ]
                         
                         // Init the Photo object
@@ -390,17 +383,12 @@ extension TravelLocationsMapViewController {
                         let session = FlickrClient.sharedInstance().session
                         let url = NSURL(string: photo.imageURL)!
                         
-                        self.task = session.dataTaskWithURL(url) { data, response, error in
+                        let task = session.dataTaskWithURL(url) { data, response, error in
+                            
+                            println("started dataTaskWithURL TravelLocations")
+                            
                             if let error = error {
-                                
-                                // Task is cancelled
-                                if error.code == -999 {
-                                    
-                                    println("task in dataTaskWithURL in TravelLocations cancelled")
-                                    
-                                    return
-                                    
-                                } else if error.code == -1001 || error.code == -1005 || error.code == -1009 {
+                                if error.code == -1001 || error.code == -1005 || error.code == -1009 {
                                     
                                     // TODO: - Internet connection problem
                                     println("error code in dataTaskWithURL TravelLocations: \(error.code)")
@@ -419,13 +407,13 @@ extension TravelLocationsMapViewController {
                                     
                                     ImageCache.sharedCache().counter += 1
                                     if ImageCache.sharedCache().counter == imageURLs.count {
-                                        println("Done Downloading")
+                                        println("Done Downloading TravelLocations ***********")
                                         ImageCache.sharedCache().isDownloading = false
                                     }
                                 }
                             }
                         }
-                        self.task.resume()
+                        task.resume()
                         
                         return photo
                     }

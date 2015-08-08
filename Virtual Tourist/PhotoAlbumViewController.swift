@@ -200,39 +200,43 @@ extension PhotoAlbumViewController {
             cell.image.image = image
             cell.activityIndicator.hidden = true
             cell.activityIndicator.stopAnimating()
-        } else {
-            
-            // Get that image on background thread
-            let session = FlickrClient.sharedInstance().session
-            let url = NSURL(string: photo.imageURL)!
-            
-            let task = session.dataTaskWithURL(url) { data, response, error in
-                if let error = error {
-                    
-                    // Request timed out, Internet connection lost, Internet connection offline
-                    if error.code == -1001 || error.code == -1005 || error.code == -1009 {
-                        
-                        // TODO: - Internet connection problem
-                        println("error code in dataTaskWithURL PhotoAlbum: \(error.code)")
-
-                    } else {
-                        println("error code in dataTaskWithURL PhotoAlbum: \(error.code)")
-                        println("error domain: \(error.domain)")
-                        println("error description: \(error.localizedDescription)")
-                    }
-                } else {
-                    let image = UIImage(data: data)
-                    photo.image = image
-
-                    // Show to user asap
-                    dispatch_async(dispatch_get_main_queue()) {
-                        cell.image.image = image
-                        cell.activityIndicator.hidden = true
-                        cell.activityIndicator.stopAnimating()
-                    }
-                }
-            }
-            task.resume()
         }
+//        else {
+//            
+//            // Get that image on background thread
+//            let session = FlickrClient.sharedInstance().session
+//            let url = NSURL(string: photo.imageURL)!
+//            
+//            let task = session.dataTaskWithURL(url) { data, response, error in
+//                
+//                println("started dataTaskWithURL PhotoAlbum")
+//                
+//                if let error = error {
+//                    
+//                    // Request timed out, Internet connection lost, Internet connection offline
+//                    if error.code == -1001 || error.code == -1005 || error.code == -1009 {
+//                        
+//                        // TODO: - Internet connection problem
+//                        println("error code in dataTaskWithURL PhotoAlbum: \(error.code)")
+//
+//                    } else {
+//                        println("error code in dataTaskWithURL PhotoAlbum: \(error.code)")
+//                        println("error domain: \(error.domain)")
+//                        println("error description: \(error.localizedDescription)")
+//                    }
+//                } else {
+//                    let image = UIImage(data: data)
+//                    photo.image = image
+//
+//                    // Show to user asap
+//                    dispatch_async(dispatch_get_main_queue()) {
+//                        cell.image.image = image
+//                        cell.activityIndicator.hidden = true
+//                        cell.activityIndicator.stopAnimating()
+//                    }
+//                }
+//            }
+//            task.resume()
+//        }
     }
 }
