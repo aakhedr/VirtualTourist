@@ -233,6 +233,7 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
             
             if pinToBeDeleted.isDownloadingPhotos {
                 
+                // TODO: - add alert controller here
                 println("Cannot delete pin while images are downloading!")
                 
                 mapView.deselectAnnotation(view.annotation, animated: false)    // Important to be reselected
@@ -414,8 +415,6 @@ extension TravelLocationsMapViewController {
                                     println("error description: \(error.localizedDescription)")
                                 }
                             } else {
-                                let image = UIImage(data: data)
-                                
                                 dispatch_async(dispatch_get_main_queue()) {
                                     photo.image = UIImage(data: data)
                                     CoreDataStackManager.sharedInstance().saveContext()
