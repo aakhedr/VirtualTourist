@@ -44,22 +44,8 @@ extension FlickrClient {
                                 if photosArray.count == 0 {
                                     println("No photos for this location")      // TODO: No photos for this location
                                 }
-                                var imageURLS = [String]()
-                                
-                                for dictionary in photosArray {
-                                    if let imageURL = dictionary[JSONResponseKeys.ImagePath] as? String {
-                                        imageURLS.append(imageURL)
-                                    } else {
-                                        completionHandler(
-                                            data: nil,
-                                            error: NSError(
-                                                domain: "getPhotosForCoordinate",
-                                                code: 6,
-                                                userInfo: [NSLocalizedDescriptionKey : "Could not find iamgeURL"]))
-                                    }
-                                }
                                 completionHandler(
-                                    data: imageURLS,
+                                    data: photosArray,
                                     error: nil)
                             } else {
                                 completionHandler(

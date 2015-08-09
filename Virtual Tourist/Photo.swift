@@ -15,18 +15,20 @@ class Photo: NSManagedObject {
     
     struct Keys {
         static let ImageURL = "imageURL"
+        static let ImageID = "imageID"
     }
     
     @NSManaged var imageURL: String
+    @NSManaged var imageID: String
     @NSManaged var pin: Pin
-    
+
     var image: UIImage? {
         get {
-            return ImageCache.sharedCache().imageWithIdentifier(imageURL)
+            return ImageCache.sharedCache().imageWithIdentifier(imageID)
         }
         
         set {
-            ImageCache.sharedCache().storeImage(newValue, withIdentifier: imageURL)
+            ImageCache.sharedCache().storeImage(newValue, withIdentifier: imageID)
         }
     }
     
@@ -39,5 +41,6 @@ class Photo: NSManagedObject {
         super.init(entity: entity, insertIntoManagedObjectContext: context)
         
         imageURL = dictionary[Photo.Keys.ImageURL] as! String
+        imageID = dictionary[Photo.Keys.ImageID] as! String
     }
 }

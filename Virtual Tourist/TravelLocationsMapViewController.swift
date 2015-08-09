@@ -351,7 +351,7 @@ extension TravelLocationsMapViewController {
     }
     
     func getFlickrImagesAndSaveContext(#pin: Pin, annotationView: MKAnnotationView) {
-        FlickrClient.sharedInstance().getPhotosForCoordinate(latitude: annotationView.annotation.coordinate.latitude, longitude: annotationView.annotation.coordinate.longitude) { imageURLs, error in
+        FlickrClient.sharedInstance().getPhotosForCoordinate(latitude: annotationView.annotation.coordinate.latitude, longitude: annotationView.annotation.coordinate.longitude) { photosArray, error in
             
             println("isDownloading images")
             pin.isDownloadingPhotos = true
@@ -370,11 +370,22 @@ extension TravelLocationsMapViewController {
                 }
             } else {
                 
-                println("photos = \(imageURLs!.count)")
+                println("photos = \(photosArray!.count)")
                 
-                if let imageURLs = imageURLs as? [String] {
-                    imageURLs.map { (imageURL: String) -> Photo in
-                        let dictionary = [ Photo.Keys.ImageURL    : imageURL ]
+                if let photosArray = photosArray as? [[String : AnyObject]] {
+                    photosArray.map { (photoDictionary: [String : AnyObject]) -> Photo in
+                        var dictionary = [String : String]()
+                        
+                        if let imageURL = photoDictionary[FlickrClient.JSONResponseKeys.ImagePath] as? String {
+                            if let imageID = photoDictionary[FlickrClient.JSONResponseKeys.ImageID] as? String {
+                                dictionary[Photo.Keys.ImageID]      = imageID
+                                dictionary[Photo.Keys.ImageURL]     = imageURL
+                            } else {
+                                println("no imageID as String")
+                            }
+                        } else {
+                            println("no imageURL as String")
+                        }
                         
                         // Init the Photo object
                         let photo = Photo(dictionary: dictionary, context: self.sharedContext)
@@ -410,7 +421,7 @@ extension TravelLocationsMapViewController {
                                     CoreDataStackManager.sharedInstance().saveContext()
                                     
                                     counter += 1
-                                    if counter == imageURLs.count {
+                                    if counter == photosArray.count {
                                         
                                         println("Done Downloading TravelLocations ***********")
 

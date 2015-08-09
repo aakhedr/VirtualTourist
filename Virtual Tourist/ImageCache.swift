@@ -49,13 +49,18 @@ class ImageCache {
         
         // And in documents directory
         let data = UIImagePNGRepresentation(image!)
-        data.writeToFile(path, atomically: true)
+
+        var error: NSError?
+        if !data.writeToFile(path, options: .DataWritingAtomic, error: &error) {
+            println("error writing file: \(error)")
+        }
     }
     
     // MARK: - Helper
     
     func pathForIdentifier(identifier: String) -> String {
-        let documentDirectoryURL: NSURL = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask).first as! NSURL
+        let fileManager = NSFileManager.defaultManager()
+        let documentDirectoryURL: NSURL = fileManager.URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask).first as! NSURL
         let fullURL = documentDirectoryURL.URLByAppendingPathComponent(identifier)
         
         return fullURL.path!
