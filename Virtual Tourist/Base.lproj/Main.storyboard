@@ -84,10 +84,10 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="RvG-ff-Que">
-                                <rect key="frame" x="0.0" y="64" width="600" height="111"/>
+                                <rect key="frame" x="0.0" y="64" width="600" height="115"/>
                             </mapView>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="JSZ-IZ-G46">
-                                <rect key="frame" x="0.0" y="175" width="600" height="369.5"/>
+                                <rect key="frame" x="0.0" y="179" width="600" height="382.5"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="cr0-7u-ODm">
                                     <size key="itemSize" width="100" height="100"/>
@@ -129,7 +129,7 @@
                                 </cells>
                             </collectionView>
                             <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="nld-TX-Ont">
-                                <rect key="frame" x="0.0" y="544.5" width="600" height="55.5"/>
+                                <rect key="frame" x="0.0" y="561.5" width="600" height="38.5"/>
                                 <items>
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="f9l-Te-jQ2"/>
                                     <barButtonItem title="New Colelction" id="5dC-oR-wTK">
@@ -155,7 +155,7 @@
                             <constraint firstItem="RvG-ff-Que" firstAttribute="trailing" secondItem="JSZ-IZ-G46" secondAttribute="trailing" id="bI0-Qo-KzS"/>
                             <constraint firstItem="JSZ-IZ-G46" firstAttribute="trailing" secondItem="nld-TX-Ont" secondAttribute="trailing" id="ekA-sx-FVF"/>
                             <constraint firstItem="RvG-ff-Que" firstAttribute="leading" secondItem="JSZ-IZ-G46" secondAttribute="leading" id="qsZ-E0-pAg"/>
-                            <constraint firstItem="JSZ-IZ-G46" firstAttribute="height" secondItem="nld-TX-Ont" secondAttribute="height" multiplier="10:1.5" id="weS-gS-wqe"/>
+                            <constraint firstItem="JSZ-IZ-G46" firstAttribute="height" secondItem="nld-TX-Ont" secondAttribute="height" multiplier="10:1" id="weS-gS-wqe"/>
                             <constraint firstItem="RvG-ff-Que" firstAttribute="leading" secondItem="GxS-mV-KwB" secondAttribute="leading" id="yWq-jH-Ood"/>
                         </constraints>
                         <variation key="default">

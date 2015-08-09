@@ -84,13 +84,7 @@ extension PhotoAlbumViewController: UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier(identifier, forIndexPath: indexPath) as! PhotoCollectionViewCell
         
         // Configure the cell
-        if let image = photo.image {
-            cell.image.image = photo.image
-            cell.activityIndicator.hidden = true
-            cell.activityIndicator.stopAnimating()
-        } else {
-            cell.image.image = UIImage(named: "placeholder")
-        }
+        configureCell(cell: cell, photo: photo)
         
         return cell
     }
@@ -206,6 +200,52 @@ extension PhotoAlbumViewController {
         if error != nil {
             println("error performing the fetch in PhotoAlbumViewController: \(error)")
             abort()
+        }
+    }
+    
+    func configureCell(#cell: PhotoCollectionViewCell, photo: Photo) {
+        
+        if photo.image == nil {
+            cell.image.image = UIImage(named: "placeholder")
+            
+            println("image is nil")
+            
+            let session = FlickrClient.sharedInstance().session
+            let url = NSURL(string: photo.imageURL)!
+            
+            let task = session.dataTaskWithURL(url) { data, response, error in
+                
+                println("started dataTaskWithURL PhotoAlbum")
+                if let error = error {
+                    if error.code == -1001 || error.code == -1005 || error.code == -1009 {
+                        
+                        // TODO: - Internet connection problem
+                        println("error code in dataTaskWithURL PhotoAlbum: \(error.code)")
+                        
+                    } else {
+                        println("error code in dataTaskWithURL PhotoAlbum: \(error.code)")
+                        println("error domain: \(error.domain)")
+                        println("error description: \(error.localizedDescription)")
+                    }
+                } else {
+                    dispatch_async(dispatch_get_main_queue()) {
+                        photo.image = UIImage(data: data)
+                        cell.image.image = photo.image
+                        CoreDataStackManager.sharedInstance().saveContext()
+                        cell.activityIndicator.hidden = true
+                        cell.activityIndicator.stopAnimating()
+                    }
+                }
+            }
+            
+            task.resume()
+            
+        } else {
+            cell.image.image = photo.image
+            cell.activityIndicator.hidden = true
+            cell.activityIndicator.stopAnimating()
+            
+            println("image is NOT nil")
         }
     }
 }
