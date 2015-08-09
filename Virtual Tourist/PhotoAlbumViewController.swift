@@ -25,7 +25,7 @@ class PhotoAlbumViewController: UIViewController {
         let fetchRequest = NSFetchRequest(entityName: "Photo")
         
         // TODO: Change key as you add new properties to Photo
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "imageURL", ascending: true)]
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "imageID", ascending: true)]
         fetchRequest.predicate = NSPredicate(format: "pin == %@", self.tappedPin);
         
         let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest,
@@ -136,9 +136,6 @@ extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
             photoCollectionView.insertSections(NSIndexSet(index: sectionIndex))
             println("inserted section")
             
-        case .Update:
-            println("updated section")
-                        
         case .Delete:
             photoCollectionView.deleteSections(NSIndexSet(index: sectionIndex))
             println("deleted section")
@@ -154,9 +151,6 @@ extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
         case .Insert:
             photoCollectionView.insertItemsAtIndexPaths([newIndexPath!])
             println("inserted object")
-            
-        case .Update:
-            println("updating object")
             
         case .Delete:
             photoCollectionView.deleteItemsAtIndexPaths([indexPath!])
