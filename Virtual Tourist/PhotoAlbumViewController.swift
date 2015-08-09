@@ -13,7 +13,7 @@ class PhotoAlbumViewController: UIViewController {
 
     @IBOutlet private weak var mapView: MKMapView!
     @IBOutlet private weak var photoCollectionView: UICollectionView!
-    @IBOutlet weak var newCollectionButton: UIButton!
+    @IBOutlet weak var newCollectionButton: UIBarButtonItem!
     
     var tappedPin: Pin!
     
@@ -59,8 +59,10 @@ class PhotoAlbumViewController: UIViewController {
     }
     
     // MARK: - Actions
-    @IBAction func addNewCollection(sender: UIButton) {
+
+    @IBAction func addNewCollection(sender: UIBarButtonItem) {
     }
+    
 }
 
 extension PhotoAlbumViewController: UICollectionViewDataSource {

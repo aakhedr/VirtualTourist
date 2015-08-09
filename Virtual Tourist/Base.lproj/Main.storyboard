@@ -84,10 +84,10 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="RvG-ff-Que">
-                                <rect key="frame" x="0.0" y="64" width="600" height="100"/>
+                                <rect key="frame" x="0.0" y="64" width="600" height="150"/>
                             </mapView>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="JSZ-IZ-G46">
-                                <rect key="frame" x="0.0" y="164" width="600" height="386.5"/>
+                                <rect key="frame" x="0.0" y="214" width="600" height="336"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="cr0-7u-ODm">
                                     <size key="itemSize" width="100" height="100"/>
@@ -129,44 +129,39 @@
                                     </collectionViewCell>
                                 </cells>
                             </collectionView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3Xw-z0-wiE">
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="nld-TX-Ont">
                                 <rect key="frame" x="0.0" y="550" width="600" height="50"/>
-                                <state key="normal" title="Button">
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <connections>
-                                    <action selector="addNewCollection:" destination="iUB-bG-kG1" eventType="touchUpInside" id="N9Y-z3-w1q"/>
-                                </connections>
-                            </button>
+                                <items>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="f9l-Te-jQ2"/>
+                                    <barButtonItem title="New Colelction" id="5dC-oR-wTK">
+                                        <connections>
+                                            <action selector="addNewCollection:" destination="iUB-bG-kG1" id="Sbg-jq-r81"/>
+                                        </connections>
+                                    </barButtonItem>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="Nmg-DE-Nn5"/>
+                                </items>
+                            </toolbar>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="RvG-ff-Que" firstAttribute="height" secondItem="3Xw-z0-wiE" secondAttribute="height" multiplier="2:1" id="0KN-Gl-z4n"/>
-                            <constraint firstItem="JSZ-IZ-G46" firstAttribute="top" secondItem="n1V-CD-5Qb" secondAttribute="bottom" constant="152" id="3LC-qJ-eYL"/>
-                            <constraint firstItem="JSZ-IZ-G46" firstAttribute="trailing" secondItem="3Xw-z0-wiE" secondAttribute="trailing" id="5Wb-sZ-iVt"/>
                             <constraint firstItem="RvG-ff-Que" firstAttribute="top" secondItem="n1V-CD-5Qb" secondAttribute="bottom" id="623-3S-8wM"/>
-                            <constraint firstItem="JSZ-IZ-G46" firstAttribute="leading" secondItem="3Xw-z0-wiE" secondAttribute="leading" id="8u4-69-kfQ"/>
                             <constraint firstItem="JSZ-IZ-G46" firstAttribute="top" secondItem="RvG-ff-Que" secondAttribute="bottom" id="CPW-d7-qV3"/>
-                            <constraint firstItem="JSZ-IZ-G46" firstAttribute="width" secondItem="RvG-ff-Que" secondAttribute="height" multiplier="6:1" id="I30-XG-UCI"/>
-                            <constraint firstItem="3Xw-z0-wiE" firstAttribute="top" secondItem="JSZ-IZ-G46" secondAttribute="bottom" id="IHI-gb-ygs"/>
-                            <constraint firstItem="Ocp-Sd-47b" firstAttribute="top" secondItem="3Xw-z0-wiE" secondAttribute="bottom" id="Icg-pX-DcA"/>
+                            <constraint firstItem="JSZ-IZ-G46" firstAttribute="leading" secondItem="nld-TX-Ont" secondAttribute="leading" id="Dwe-Kr-gdw"/>
+                            <constraint firstItem="Ocp-Sd-47b" firstAttribute="top" secondItem="nld-TX-Ont" secondAttribute="bottom" id="HmT-mb-FnI"/>
+                            <constraint firstItem="JSZ-IZ-G46" firstAttribute="width" secondItem="RvG-ff-Que" secondAttribute="height" multiplier="4:1" id="I30-XG-UCI"/>
                             <constraint firstAttribute="trailing" secondItem="RvG-ff-Que" secondAttribute="trailing" id="Jlh-aI-Uy4"/>
+                            <constraint firstItem="RvG-ff-Que" firstAttribute="height" secondItem="nld-TX-Ont" secondAttribute="height" multiplier="3:1" id="LaS-Jd-95u"/>
+                            <constraint firstItem="nld-TX-Ont" firstAttribute="top" secondItem="JSZ-IZ-G46" secondAttribute="bottom" id="WYK-0B-Drc"/>
                             <constraint firstItem="RvG-ff-Que" firstAttribute="trailing" secondItem="JSZ-IZ-G46" secondAttribute="trailing" id="bI0-Qo-KzS"/>
-                            <constraint firstItem="JSZ-IZ-G46" firstAttribute="bottom" secondItem="Ocp-Sd-47b" secondAttribute="top" id="oj6-Kv-BDg"/>
+                            <constraint firstItem="JSZ-IZ-G46" firstAttribute="trailing" secondItem="nld-TX-Ont" secondAttribute="trailing" id="ekA-sx-FVF"/>
                             <constraint firstItem="RvG-ff-Que" firstAttribute="leading" secondItem="JSZ-IZ-G46" secondAttribute="leading" id="qsZ-E0-pAg"/>
                             <constraint firstItem="RvG-ff-Que" firstAttribute="leading" secondItem="GxS-mV-KwB" secondAttribute="leading" id="yWq-jH-Ood"/>
                         </constraints>
-                        <variation key="default">
-                            <mask key="constraints">
-                                <exclude reference="3LC-qJ-eYL"/>
-                                <exclude reference="oj6-Kv-BDg"/>
-                            </mask>
-                        </variation>
                     </view>
                     <navigationItem key="navigationItem" id="wqP-vv-qAh"/>
                     <connections>
                         <outlet property="mapView" destination="RvG-ff-Que" id="D00-yc-IZa"/>
-                        <outlet property="newCollectionButton" destination="3Xw-z0-wiE" id="wFN-CO-L0g"/>
+                        <outlet property="newCollectionButton" destination="5dC-oR-wTK" id="are-v8-rfD"/>
                         <outlet property="photoCollectionView" destination="JSZ-IZ-G46" id="P2l-T0-53O"/>
                     </connections>
                 </viewController>

@@ -86,7 +86,7 @@ class TravelLocationsMapViewController: UIViewController {
         // And set pinIsDraggable
         fetchAndShowPinAnnotations()
     }
-    
+
     // MARK:- Prepare for segue
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
