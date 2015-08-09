@@ -417,6 +417,9 @@ extension TravelLocationsMapViewController {
                             } else {
                                 dispatch_async(dispatch_get_main_queue()) {
                                     photo.image = UIImage(data: data)
+                                    
+                                    // Send notification to PhotoAlbumViewController to reload images as they downloaded
+                                    NSNotificationCenter.defaultCenter().postNotificationName("reloadData", object: self)
                                     CoreDataStackManager.sharedInstance().saveContext()
                                     
                                     counter += 1
