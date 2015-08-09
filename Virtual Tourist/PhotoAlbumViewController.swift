@@ -70,14 +70,7 @@ class PhotoAlbumViewController: UIViewController {
         NSNotificationCenter.defaultCenter().removeObserver(self, name: "reloadData", object: nil)
     }
     
-    // MARK: - Handle notification
-    func reloadData() {
-        photoCollectionView.reloadData()
-    }
-    
-    
     // MARK: - Actions
-
     @IBAction func addNewCollection(sender: UIBarButtonItem) {
     }
     
@@ -223,5 +216,9 @@ extension PhotoAlbumViewController {
             cell.activityIndicator.stopAnimating()
             cell.activityIndicator.hidden = true
         }
+    }
+    
+    func reloadData() {
+        photoCollectionView.reloadData()
     }
 }
