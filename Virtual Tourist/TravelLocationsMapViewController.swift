@@ -226,20 +226,21 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
         }
         
         if !tapPinToDeleteLabel.hidden {
-            if ImageCache.sharedCache().isDownloading {
-                println("Cannot delete pin while images are downloading!")
-                mapView.deselectAnnotation(view.annotation, animated: false)    // Important to be reselected
-                return
-            }
-
-            // Delete the pin from core data
             let pinToBeDeleted = searchForPinInCoreData(
                 latitude: view.annotation.coordinate.latitude,
                 longitude: view.annotation.coordinate.longitude
             )
-            sharedContext.deleteObject(pinToBeDeleted)
             
-            // Save context after deletion
+            if pinToBeDeleted.isDownloadingPhotos {
+                
+                println("Cannot delete pin while images are downloading!")
+                
+                mapView.deselectAnnotation(view.annotation, animated: false)    // Important to be reselected
+                return
+            }
+
+            // Delete the pin and save context
+            sharedContext.deleteObject(pinToBeDeleted)
             CoreDataStackManager.sharedInstance().saveContext()
             
             // Remove annotation from mapView
@@ -353,8 +354,8 @@ extension TravelLocationsMapViewController {
         FlickrClient.sharedInstance().getPhotosForCoordinate(latitude: annotationView.annotation.coordinate.latitude, longitude: annotationView.annotation.coordinate.longitude) { imageURLs, error in
             
             println("isDownloading images")
-            ImageCache.sharedCache().isDownloading = true
-            ImageCache.sharedCache().counter = 0
+            pin.isDownloadingPhotos = true
+            var counter = 0
             
             if let error = error {
                 if error.code == -1001 || error.code == -1005 || error.code == -1009 {
@@ -372,12 +373,15 @@ extension TravelLocationsMapViewController {
                 println("photos = \(imageURLs!.count)")
                 
                 if let imageURLs = imageURLs as? [String] {
-                    imageURLs.map { (imageURL: String) -> Photo? in
+                    imageURLs.map { (imageURL: String) -> Photo in
                         let dictionary = [ Photo.Keys.ImageURL    : imageURL ]
                         
                         // Init the Photo object
                         let photo = Photo(dictionary: dictionary, context: self.sharedContext)
-                        photo.pin = pin
+                        
+                        dispatch_async(dispatch_get_main_queue()) {
+                            photo.pin = pin
+                        }
                         
                         // Get that image on a background thread
                         let session = FlickrClient.sharedInstance().session
@@ -405,10 +409,12 @@ extension TravelLocationsMapViewController {
                                     photo.image = UIImage(data: data)
                                     CoreDataStackManager.sharedInstance().saveContext()
                                     
-                                    ImageCache.sharedCache().counter += 1
-                                    if ImageCache.sharedCache().counter == imageURLs.count {
+                                    counter += 1
+                                    if counter == imageURLs.count {
+                                        
                                         println("Done Downloading TravelLocations ***********")
-                                        ImageCache.sharedCache().isDownloading = false
+
+                                        pin.isDownloadingPhotos = false
                                     }
                                 }
                             }

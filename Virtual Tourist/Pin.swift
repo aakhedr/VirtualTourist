@@ -22,6 +22,8 @@ class Pin: NSManagedObject {
     @NSManaged var lon: NSNumber
     @NSManaged var photos: NSSet
     
+    var isDownloadingPhotos: Bool = false
+    
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
         super.init(entity: entity, insertIntoManagedObjectContext: context)
     }
