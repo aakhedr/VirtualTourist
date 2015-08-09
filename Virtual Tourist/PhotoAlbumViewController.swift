@@ -41,7 +41,7 @@ class PhotoAlbumViewController: UIViewController {
         super.viewDidLoad()
         
         // Add the tappedPin to the mapView
-        addTabbedPinToMapView()
+        addTappedPinToMapView()
         
         // Set mapView region
         setMapViewRegion()
@@ -88,6 +88,10 @@ extension PhotoAlbumViewController: UICollectionViewDataSource {
     
     func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
         let photo = fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
+
+        // Ensures image file path is deleted in .DocumentDirectory
+        photo.image = nil
+        
         sharedContext.deleteObject(photo)
         CoreDataStackManager.sharedInstance().saveContext()
     }
@@ -169,7 +173,7 @@ extension PhotoAlbumViewController {
     
     // MARK: - Helpers
     
-    func addTabbedPinToMapView() {
+    func addTappedPinToMapView() {
         let annotation = MKPointAnnotation()
         annotation.coordinate = CLLocationCoordinate2DMake(
             tappedPin.lat as! CLLocationDegrees,
