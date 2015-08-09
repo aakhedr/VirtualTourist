@@ -13,6 +13,7 @@ class PhotoAlbumViewController: UIViewController {
 
     @IBOutlet private weak var mapView: MKMapView!
     @IBOutlet private weak var photoCollectionView: UICollectionView!
+    @IBOutlet weak var newCollectionButton: UIButton!
     
     var tappedPin: Pin!
     
@@ -55,6 +56,10 @@ class PhotoAlbumViewController: UIViewController {
         
         // Perform the fetch
         performFetch()
+    }
+    
+    // MARK: - Actions
+    @IBAction func addNewCollection(sender: UIButton) {
     }
 }
 
