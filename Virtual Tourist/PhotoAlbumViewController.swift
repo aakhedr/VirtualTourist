@@ -77,14 +77,11 @@ extension PhotoAlbumViewController: UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier(identifier, forIndexPath: indexPath) as! PhotoCollectionViewCell
         
         // Configure the cell
-        cell.activityIndicator.hidden = false
-        cell.activityIndicator.startAnimating()
-        
-//        if let image = photo.image {
-        cell.image.image = photo.image
-        cell.activityIndicator.hidden = true
-        cell.activityIndicator.stopAnimating()
-//        }
+        if let image = photo.image {
+            cell.image.image = photo.image
+            cell.activityIndicator.hidden = true
+            cell.activityIndicator.stopAnimating()
+        }
         
         return cell
     }
