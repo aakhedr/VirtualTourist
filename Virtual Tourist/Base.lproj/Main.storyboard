@@ -84,10 +84,10 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="RvG-ff-Que">
-                                <rect key="frame" x="0.0" y="64" width="600" height="150"/>
+                                <rect key="frame" x="0.0" y="64" width="600" height="111"/>
                             </mapView>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="JSZ-IZ-G46">
-                                <rect key="frame" x="0.0" y="214" width="600" height="336"/>
+                                <rect key="frame" x="0.0" y="175" width="600" height="369.5"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="cr0-7u-ODm">
                                     <size key="itemSize" width="100" height="100"/>
@@ -108,7 +108,6 @@
                                                 </imageView>
                                                 <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" animating="YES" style="white" translatesAutoresizingMaskIntoConstraints="NO" id="SeC-hK-dTh">
                                                     <rect key="frame" x="15" y="15" width="20" height="20"/>
-                                                    <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                 </activityIndicatorView>
                                             </subviews>
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
@@ -130,7 +129,7 @@
                                 </cells>
                             </collectionView>
                             <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="nld-TX-Ont">
-                                <rect key="frame" x="0.0" y="550" width="600" height="50"/>
+                                <rect key="frame" x="0.0" y="544.5" width="600" height="55.5"/>
                                 <items>
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="f9l-Te-jQ2"/>
                                     <barButtonItem title="New Colelction" id="5dC-oR-wTK">
@@ -148,15 +147,23 @@
                             <constraint firstItem="JSZ-IZ-G46" firstAttribute="top" secondItem="RvG-ff-Que" secondAttribute="bottom" id="CPW-d7-qV3"/>
                             <constraint firstItem="JSZ-IZ-G46" firstAttribute="leading" secondItem="nld-TX-Ont" secondAttribute="leading" id="Dwe-Kr-gdw"/>
                             <constraint firstItem="Ocp-Sd-47b" firstAttribute="top" secondItem="nld-TX-Ont" secondAttribute="bottom" id="HmT-mb-FnI"/>
-                            <constraint firstItem="JSZ-IZ-G46" firstAttribute="width" secondItem="RvG-ff-Que" secondAttribute="height" multiplier="4:1" id="I30-XG-UCI"/>
+                            <constraint firstItem="JSZ-IZ-G46" firstAttribute="width" secondItem="RvG-ff-Que" secondAttribute="height" multiplier="10:3" id="I30-XG-UCI"/>
                             <constraint firstAttribute="trailing" secondItem="RvG-ff-Que" secondAttribute="trailing" id="Jlh-aI-Uy4"/>
                             <constraint firstItem="RvG-ff-Que" firstAttribute="height" secondItem="nld-TX-Ont" secondAttribute="height" multiplier="3:1" id="LaS-Jd-95u"/>
                             <constraint firstItem="nld-TX-Ont" firstAttribute="top" secondItem="JSZ-IZ-G46" secondAttribute="bottom" id="WYK-0B-Drc"/>
+                            <constraint firstItem="JSZ-IZ-G46" firstAttribute="height" secondItem="RvG-ff-Que" secondAttribute="height" multiplier="10:3" id="Zod-xY-GiY"/>
                             <constraint firstItem="RvG-ff-Que" firstAttribute="trailing" secondItem="JSZ-IZ-G46" secondAttribute="trailing" id="bI0-Qo-KzS"/>
                             <constraint firstItem="JSZ-IZ-G46" firstAttribute="trailing" secondItem="nld-TX-Ont" secondAttribute="trailing" id="ekA-sx-FVF"/>
                             <constraint firstItem="RvG-ff-Que" firstAttribute="leading" secondItem="JSZ-IZ-G46" secondAttribute="leading" id="qsZ-E0-pAg"/>
+                            <constraint firstItem="JSZ-IZ-G46" firstAttribute="height" secondItem="nld-TX-Ont" secondAttribute="height" multiplier="10:1.5" id="weS-gS-wqe"/>
                             <constraint firstItem="RvG-ff-Que" firstAttribute="leading" secondItem="GxS-mV-KwB" secondAttribute="leading" id="yWq-jH-Ood"/>
                         </constraints>
+                        <variation key="default">
+                            <mask key="constraints">
+                                <exclude reference="LaS-Jd-95u"/>
+                                <exclude reference="I30-XG-UCI"/>
+                            </mask>
+                        </variation>
                     </view>
                     <navigationItem key="navigationItem" id="wqP-vv-qAh"/>
                     <connections>

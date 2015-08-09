@@ -88,6 +88,8 @@ extension PhotoAlbumViewController: UICollectionViewDataSource {
             cell.image.image = photo.image
             cell.activityIndicator.hidden = true
             cell.activityIndicator.stopAnimating()
+        } else {
+            cell.image.image = UIImage(named: "placeholder")
         }
         
         return cell
