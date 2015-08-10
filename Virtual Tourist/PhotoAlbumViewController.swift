@@ -111,18 +111,22 @@ extension PhotoAlbumViewController: UICollectionViewDataSource, UICollectionView
     // MARK: - Collection View Delegate
     
     func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
-
-        // TODO: - So dome highlighting work here
-        let cell = photoCollectionView.cellForItemAtIndexPath(indexPath)!
-        cell.contentView.backgroundColor = UIColor.redColor()
-        
         let photo = fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
 
-        // Ensures image file path is deleted in .DocumentDirectory
-        photo.image = nil
-        
-        sharedContext.deleteObject(photo)
-        CoreDataStackManager.sharedInstance().saveContext()
+        if !photo.pin.isDownloadingPhotos {
+            let cell = photoCollectionView.cellForItemAtIndexPath(indexPath)!
+            cell.contentView.backgroundColor = UIColor.redColor()
+            
+            // Ensures image file path is deleted in .DocumentDirectory
+            photo.image = nil
+            
+            sharedContext.deleteObject(photo)
+            CoreDataStackManager.sharedInstance().saveContext()
+        } else {
+            
+            // TODO: - Add alert controller here
+            println("rest of pin images are still being downloaded")
+        }
     }
 }
 
@@ -189,6 +193,9 @@ extension PhotoAlbumViewController {
             cell.image.image = photo.image
             cell.activityIndicator.stopAnimating()
         }
+        
+        // Important in case of didSelectItemAtIndexPath is called
+        cell.contentView.backgroundColor = UIColor.whiteColor()
     }
     
     func reloadData() {
