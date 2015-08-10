@@ -55,16 +55,23 @@ class PhotoAlbumViewController: UIViewController {
         
         // Perform the fetch
         performFetch()
+        
+        // newColelctionButton enabled according to isDownloadingPhotos Bool
+        newCollectionButton.enabled = !tappedPin.isDownloadingPhotos
     }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
+        
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "reloadData", name: "reloadData", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "enableNewCollectionButton", name: "enableNewCollectionButton", object: nil)
     }
     
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
+        
         NSNotificationCenter.defaultCenter().removeObserver(self, name: "reloadData", object: nil)
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: "enableNewCollectionButton", object: nil)
     }
     
     override func viewDidLayoutSubviews() {
@@ -200,5 +207,11 @@ extension PhotoAlbumViewController {
     
     func reloadData() {
         photoCollectionView.reloadData()
+    }
+    
+    func enableNewCollectionButton() {
+        newCollectionButton.enabled = !tappedPin.isDownloadingPhotos
+        
+        println("Toggled newCollectionButton.enabled property: \(newCollectionButton.enabled)")
     }
 }

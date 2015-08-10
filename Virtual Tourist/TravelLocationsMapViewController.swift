@@ -355,8 +355,9 @@ extension TravelLocationsMapViewController {
         FlickrClient.sharedInstance().getPhotosForCoordinate(latitude: annotationView.annotation.coordinate.latitude, longitude: annotationView.annotation.coordinate.longitude) { photosArray, error in
             
             println("isDownloading images")
-            pin.isDownloadingPhotos = true
+
             var counter = 0
+            pin.isDownloadingPhotos = true
             
             if let error = error {
                 if error.code == -1001 || error.code == -1005 || error.code == -1009 {
@@ -427,8 +428,9 @@ extension TravelLocationsMapViewController {
                                     if counter == photosArray.count {
                                         
                                         println("Done Downloading TravelLocations ***********")
-
+                                        
                                         pin.isDownloadingPhotos = false
+                                        NSNotificationCenter.defaultCenter().postNotificationName("enableNewCollectionButton", object: self)
                                     }
                                 }
                             }
