@@ -73,7 +73,6 @@ class PhotoAlbumViewController: UIViewController {
     // MARK: - Actions
     @IBAction func addNewCollection(sender: UIBarButtonItem) {
     }
-    
 }
 
 extension PhotoAlbumViewController: UICollectionViewDataSource {
@@ -105,6 +104,9 @@ extension PhotoAlbumViewController: UICollectionViewDataSource {
 
         // Ensures image file path is deleted in .DocumentDirectory
         photo.image = nil
+        
+        // TODO: - So dome highlighting and selectino work here
+        
         
         sharedContext.deleteObject(photo)
         CoreDataStackManager.sharedInstance().saveContext()
@@ -140,28 +142,32 @@ extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
     
     // MARK: - Fetched Results Controller Delegate
     
-    func controller(controller: NSFetchedResultsController, didChangeSection sectionInfo: NSFetchedResultsSectionInfo, atIndex sectionIndex: Int, forChangeType type: NSFetchedResultsChangeType) {
-        switch type {
-            
-        case .Insert:
-            photoCollectionView.insertSections(NSIndexSet(index: sectionIndex))
-            println("inserted section")
-            
-        case .Delete:
-            photoCollectionView.deleteSections(NSIndexSet(index: sectionIndex))
-            println("deleted section")
-            
-        default:
-            return
-        }
+    func controllerWillChangeContent(controller: NSFetchedResultsController) {
+        println("controllerWillChangeContent called")
     }
+    
+//    func controller(controller: NSFetchedResultsController, didChangeSection sectionInfo: NSFetchedResultsSectionInfo, atIndex sectionIndex: Int, forChangeType type: NSFetchedResultsChangeType) {
+//        switch type {
+//            
+////        case .Insert:
+////            photoCollectionView.insertSections(NSIndexSet(index: sectionIndex))
+////            println("inserted section")
+////            
+////        case .Delete:
+////            photoCollectionView.deleteSections(NSIndexSet(index: sectionIndex))
+////            println("deleted section")
+//            
+//        default:
+//            return
+//        }
+//    }
     
     func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
         switch type {
             
-        case .Insert:
-            photoCollectionView.insertItemsAtIndexPaths([newIndexPath!])
-            println("inserted object")
+//        case .Insert:
+//            photoCollectionView.insertItemsAtIndexPaths([newIndexPath!])
+//            println("inserted object")
             
         case .Delete:
             photoCollectionView.deleteItemsAtIndexPaths([indexPath!])
