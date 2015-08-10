@@ -69,7 +69,7 @@ class PhotoAlbumViewController: UIViewController {
     
     override func viewDidLayoutSubviews() {
         let layout = UICollectionViewFlowLayout()
-        layout.sectionInset = UIEdgeInsets(top: 3, left: 3, bottom: 3, right: 3)
+        layout.sectionInset = UIEdgeInsets(top: 1, left: 1, bottom: 1, right: 1)
         layout.minimumLineSpacing = 4
         layout.minimumInteritemSpacing = 1
         
@@ -111,10 +111,12 @@ extension PhotoAlbumViewController: UICollectionViewDataSource, UICollectionView
     // MARK: - Collection View Delegate
     
     func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
-        let photo = fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
 
         // TODO: - So dome highlighting work here
+        let cell = photoCollectionView.cellForItemAtIndexPath(indexPath)!
+        cell.contentView.backgroundColor = UIColor.redColor()
         
+        let photo = fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
 
         // Ensures image file path is deleted in .DocumentDirectory
         photo.image = nil
@@ -122,24 +124,6 @@ extension PhotoAlbumViewController: UICollectionViewDataSource, UICollectionView
         sharedContext.deleteObject(photo)
         CoreDataStackManager.sharedInstance().saveContext()
     }
-
-//    func collectionView(collectionView: UICollectionView, didHighlightItemAtIndexPath indexPath: NSIndexPath) {
-//        let cell = photoCollectionView.cellForItemAtIndexPath(indexPath)!
-//        cell.contentView.backgroundColor = UIColor.redColor()
-//        
-//        let photo = fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
-//        
-//        // Ensures image file path is deleted in .DocumentDirectory
-//        photo.image = nil
-//        
-//        sharedContext.deleteObject(photo)
-//        CoreDataStackManager.sharedInstance().saveContext()
-//    }
-//    
-//    func collectionView(collectionView: UICollectionView, didUnhighlightItemAtIndexPath indexPath: NSIndexPath) {
-//        let cell = photoCollectionView.cellForItemAtIndexPath(indexPath)!
-//        cell.contentView.backgroundColor = UIColor.whiteColor()
-//    }
 }
 
 extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
