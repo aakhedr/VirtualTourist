@@ -47,9 +47,9 @@ class PhotoAlbumViewController: UIViewController {
         // Set mapView region
         setMapViewRegion()
         
-        // Set photoCollectionView delegate and data srouce
-        photoCollectionView.delegate = self
+        // Set photoCollectionView data srouce and delegate
         photoCollectionView.dataSource = self
+        photoCollectionView.delegate = self
         
         // Set fetchedResultsController delegate 
         fetchedResultsController.delegate = self
@@ -60,14 +60,24 @@ class PhotoAlbumViewController: UIViewController {
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "reloadData", name: "reloadData", object: nil)
     }
     
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
-        
         NSNotificationCenter.defaultCenter().removeObserver(self, name: "reloadData", object: nil)
+    }
+    
+    override func viewDidLayoutSubviews() {
+        let layout = UICollectionViewFlowLayout()
+        layout.sectionInset = UIEdgeInsets(top: 1, left: 1, bottom: 1, right: 1)
+        layout.minimumLineSpacing = 4
+        layout.minimumInteritemSpacing = 1
+        
+        let width = floor((photoCollectionView.frame.size.width / 3) - 5)
+        layout.itemSize = CGSize(width: width, height: width)
+        
+        photoCollectionView.collectionViewLayout = layout
     }
     
     // MARK: - Actions
@@ -75,7 +85,7 @@ class PhotoAlbumViewController: UIViewController {
     }
 }
 
-extension PhotoAlbumViewController: UICollectionViewDataSource {
+extension PhotoAlbumViewController: UICollectionViewDataSource, UICollectionViewDelegate {
     
     // MARK: - Collection View Data Source
     
@@ -99,44 +109,29 @@ extension PhotoAlbumViewController: UICollectionViewDataSource {
         return cell
     }
     
+    // MARK: - Collection View Delegate
+    
     func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
         let photo = fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
 
         // Ensures image file path is deleted in .DocumentDirectory
         photo.image = nil
         
-        // TODO: - So dome highlighting and selectino work here
+        // TODO: - So dome highlighting work here
         
         
         sharedContext.deleteObject(photo)
         CoreDataStackManager.sharedInstance().saveContext()
     }
-    
-    func collectionView(collectionView: UICollectionView, willDisplayCell cell: UICollectionViewCell, forItemAtIndexPath indexPath: NSIndexPath) {
-
-        // Resize the cell accordig to the size of the image from Flickr
-//        collectionView.collectionViewLayout.invalidateLayout()
-    }
 }
 
-extension PhotoAlbumViewController: UICollectionViewDelegateFlowLayout {
-    
-    // MARK: - Collection View Delegate Flow Layout
-    
-//    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
-//        
-//        let photo = fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
-//        if var size = photo.image?.size {
-//            if size.width > collectionView.frame.width {
-//                size.width = collectionView.frame.width - 1
-//            }
-//            return size
-//        }
-//        
-//        // Default cell size
-//        return CGSize(width: 100, height: 100)
+//extension PhotoAlbumViewController: UICollectionViewDelegate {
+//    
+//    func collectionView(collectionView: UICollectionView, didHighlightItemAtIndexPath indexPath: NSIndexPath) {
+//        let cell = photoCollectionView.cellForItemAtIndexPath(indexPath)!
+//        cell.contentView.backgroundColor = UIColor.redColor()
 //    }
-}
+//}
 
 extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
     
@@ -146,28 +141,8 @@ extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
         println("controllerWillChangeContent called")
     }
     
-//    func controller(controller: NSFetchedResultsController, didChangeSection sectionInfo: NSFetchedResultsSectionInfo, atIndex sectionIndex: Int, forChangeType type: NSFetchedResultsChangeType) {
-//        switch type {
-//            
-////        case .Insert:
-////            photoCollectionView.insertSections(NSIndexSet(index: sectionIndex))
-////            println("inserted section")
-////            
-////        case .Delete:
-////            photoCollectionView.deleteSections(NSIndexSet(index: sectionIndex))
-////            println("deleted section")
-//            
-//        default:
-//            return
-//        }
-//    }
-    
     func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
         switch type {
-            
-//        case .Insert:
-//            photoCollectionView.insertItemsAtIndexPaths([newIndexPath!])
-//            println("inserted object")
             
         case .Delete:
             photoCollectionView.deleteItemsAtIndexPaths([indexPath!])
@@ -220,7 +195,6 @@ extension PhotoAlbumViewController {
         } else {
             cell.image.image = photo.image
             cell.activityIndicator.stopAnimating()
-            cell.activityIndicator.hidden = true
         }
     }
     
