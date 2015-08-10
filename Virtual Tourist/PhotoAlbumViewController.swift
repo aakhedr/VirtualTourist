@@ -13,7 +13,7 @@ class PhotoAlbumViewController: UIViewController {
 
     @IBOutlet private weak var mapView: MKMapView!
     @IBOutlet private weak var photoCollectionView: UICollectionView!
-    @IBOutlet weak var newCollectionButton: UIBarButtonItem!
+    @IBOutlet private weak var newCollectionButton: UIBarButtonItem!
     
     var tappedPin: Pin!
     

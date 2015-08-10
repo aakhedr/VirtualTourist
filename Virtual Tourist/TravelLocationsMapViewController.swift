@@ -11,8 +11,8 @@ import CoreData
 
 class TravelLocationsMapViewController: UIViewController {
 
-    @IBOutlet weak var mapView: MKMapView!
-    @IBOutlet weak var tapPinToDeleteLabel: UILabel!
+    @IBOutlet private weak var mapView: MKMapView!
+    @IBOutlet private weak var tapPinToDeleteLabel: UILabel!
     
     private var longPressGestureRecognizer: UILongPressGestureRecognizer!
     private var regionDataDictionary: [String : CLLocationDegrees]!

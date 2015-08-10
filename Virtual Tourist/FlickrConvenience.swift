@@ -10,7 +10,7 @@ import UIKit
 
 extension FlickrClient {
     
-    func getPhotosForCoordinate(#latitude: Double, longitude: Double, completionHandler: (data: AnyObject?, error: NSError?) -> Void) {
+    func getPhotosForCoordinate(#latitude: Double, longitude: Double, page: Int = 0, completionHandler: (data: AnyObject?, error: NSError?) -> Void) {
         
         // 1. Set the parameters
         let parameters = [
@@ -22,7 +22,8 @@ extension FlickrClient {
             MethodArgumentKeys.EXTRAS           : MethodArgumentValues.EXTRAS,
             MethodArgumentKeys.DATA_FORMAT      : MethodArgumentValues.DATA_FORMAT,
             MethodArgumentKeys.NO_JSON_CALLBACK : MethodArgumentValues.NO_JSON_CALLBACK,
-            MethodArgumentKeys.PER_PAGE         : MethodArgumentValues.PER_PAGE
+            MethodArgumentKeys.PER_PAGE         : MethodArgumentValues.PER_PAGE,
+            MethodArgumentKeys.PAGE             : String((MethodArgumentValues.PAGE).toInt()! + page)
         ]
         
         // 2. Make the request

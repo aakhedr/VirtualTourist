@@ -25,6 +25,7 @@ extension FlickrClient {
         static let DATA_FORMAT      = "format"
         static let NO_JSON_CALLBACK = "nojsoncallback"
         static let PER_PAGE         = "per_page"
+        static let PAGE             = "page"
     }
     
     struct MethodArgumentValues {
@@ -34,6 +35,7 @@ extension FlickrClient {
         static let DATA_FORMAT      = "json"
         static let NO_JSON_CALLBACK = "1"
         static let PER_PAGE         = "21"
+        static let PAGE             = "1"
     }
     
     struct BoundingBox {
