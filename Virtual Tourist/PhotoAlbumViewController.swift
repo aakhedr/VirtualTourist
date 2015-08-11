@@ -157,6 +157,18 @@ extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
         }
     }
     
+    func controller(controller: NSFetchedResultsController, didChangeSection sectionInfo: NSFetchedResultsSectionInfo, atIndex sectionIndex: Int, forChangeType type: NSFetchedResultsChangeType) {
+        switch type {
+            
+        case NSFetchedResultsChangeType.Delete:
+            photoCollectionView.deleteSections(NSIndexSet(index: sectionIndex))
+            println("deleted section")
+
+        default:
+            return
+        }
+    }
+    
     func controllerDidChangeContent(controller: NSFetchedResultsController) {
         println("fetchedResultsController.fetchedObjects!.count \(fetchedResultsController.fetchedObjects!.count)")
     }
