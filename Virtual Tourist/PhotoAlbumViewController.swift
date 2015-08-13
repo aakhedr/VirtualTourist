@@ -60,11 +60,10 @@ class PhotoAlbumViewController: UIViewController {
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
+        enableOrDisableNewCollectionButton()
+
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "reloadData", name: "reloadData", object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "enableNewCollectionButton", name: "enableNewCollectionButton", object: nil)
-        
-        // newColelctionButton enabled according to isDownloadingPhotos Bool
-        newCollectionButton.enabled = !tappedPin.isDownloadingPhotos
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "enableOrDisableNewCollectionButton", name: "enableOrDisableNewCollectionButton", object: nil)
     }
     
     override func viewWillDisappear(animated: Bool) {
@@ -92,37 +91,18 @@ class PhotoAlbumViewController: UIViewController {
         tappedPin.page = tappedPin.page + 1
         
         // Delete previous set of photo objects
-        for photoObject in self.tappedPin.photos {
-            let photo = photoObject as! Photo
-            
-            photo.image = nil
-            self.sharedContext.deleteObject(photo)
-            CoreDataStackManager.sharedInstance().saveContext()
-        }
+        deleteAllPhotos()
         
-        FlickrClient.sharedInstance().getPhotosForCoordinate(
-            latitude: tappedPin.lat as Double,
-            longitude: tappedPin.lon as Double,
-            page: tappedPin.page) { photosArray, error in
-            
-            self.tappedPin.isDownloadingPhotos = true
-            self.enableNewCollectionButton()
-            
+        tappedPin.isDownloadingPhotos = true
+        enableOrDisableNewCollectionButton()
+
+        FlickrClient.sharedInstance().getPhotosForCoordinate(latitude: tappedPin.lat as Double, longitude: tappedPin.lon as Double, page: tappedPin.page) { photosArray, error in
             if let error = error {
-                if error.code == -1001 || error.code == -1005 || error.code == -1009 {
-                    
-                    // TODO: - Internet connection problem
-                    println("error code in getPhotosForCoordinate TravelLocations: \(error.code)")
-                    println("error description: \(error.localizedDescription)")
-                } else {
-                    println("error code: \(error.code)")
-                    println("error domain: \(error.domain)")
-                    println("error description: \(error.localizedDescription)")
-                }
-            } else {
                 
-                println("new set of photos = \(photosArray!.count)")
-                println(self.tappedPin.page)
+                // TODO: -
+                self.handleErrors(error)
+                
+            } else {
                 
                 // Download the new set of images
                 self.parsePhotosArray(photosArray!)
@@ -165,14 +145,20 @@ extension PhotoAlbumViewController: UICollectionViewDataSource, UICollectionView
             let cell = photoCollectionView.cellForItemAtIndexPath(indexPath)!
             cell.contentView.backgroundColor = UIColor.redColor()
             
-            // Ensures image file path is deleted in .DocumentDirectory
+            // Ensure image file path is deleted in .DocumentDirectory
             photo.image = nil
             
             sharedContext.deleteObject(photo)
             CoreDataStackManager.sharedInstance().saveContext()
+            reloadData()
         } else {
             
-            // TODO: - Add alert controller here
+            // Add alert controller
+            let alertController = UIAlertController(title: nil, message: "Cannot delete a photo while rest of the photos are being downloaded", preferredStyle: .Alert)
+            let okAction = UIAlertAction(title: "OK", style: .Default, handler: nil)
+            alertController.addAction(okAction)
+            self.presentViewController(alertController, animated: true, completion: nil)
+            
             println("rest of pin images are still being downloaded")
         }
     }
@@ -187,21 +173,6 @@ extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
         println("fetchedResultsController.fetchedObjects!.count \(fetchedResultsController.fetchedObjects!.count)")
     }
     
-    func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
-        switch type {
-            
-        case .Insert:
-            photoCollectionView.insertItemsAtIndexPaths([newIndexPath!])
-            
-        case .Delete:
-            photoCollectionView.deleteItemsAtIndexPaths([indexPath!])
-            println("deleted object")
-            
-        default:
-            return
-        }
-    }
-        
     func controllerDidChangeContent(controller: NSFetchedResultsController) {
         println("controllerDidChangeContent called")
         println("fetchedResultsController.fetchedObjects!.count \(fetchedResultsController.fetchedObjects!.count)")
@@ -257,10 +228,18 @@ extension PhotoAlbumViewController {
         photoCollectionView.reloadData()
     }
     
-    func enableNewCollectionButton() {
+    func enableOrDisableNewCollectionButton() {
         newCollectionButton.enabled = !tappedPin.isDownloadingPhotos
         
         println("Toggled newCollectionButton.enabled property: \(newCollectionButton.enabled)")
+    }
+    
+    func deleteAllPhotos() {
+        for photo in fetchedResultsController.fetchedObjects as! [Photo] {
+            photo.image = nil
+            self.sharedContext.deleteObject(photo)
+        }
+        reloadData()
     }
     
     func parsePhotosArray(photosArray: AnyObject) {
@@ -286,7 +265,7 @@ extension PhotoAlbumViewController {
                 
                 // Init the Photo object
                 let photo = Photo(dictionary: dictionary, context: self.sharedContext)
-                
+
                 dispatch_async(dispatch_get_main_queue()) {
                     photo.pin = self.tappedPin
                 }
@@ -299,29 +278,25 @@ extension PhotoAlbumViewController {
                     println("started dataTaskWithURL PhotoAlbum")
                     
                     if let error = error {
-                        if error.code == -1001 || error.code == -1005 || error.code == -1009 {
-                            
-                            // TODO: - Internet connection problem
-                            println("error code in dataTaskWithURL TravelLocations: \(error.code)")
-                        } else {
-                            println("error code in dataTaskWithURL PhotoAlbum: \(error.code)")
-                            println("error domain: \(error.domain)")
-                            println("error description: \(error.localizedDescription)")
-                        }
+                        
+                        // TODO: -
+                        self.handleErrors(error)
                     } else {
+                        let image = UIImage(data: data)
+                        
                         dispatch_async(dispatch_get_main_queue()) {
-                            photo.image = UIImage(data: data)
-                            self.sharedContext.insertObject(photo)
-                            CoreDataStackManager.sharedInstance().saveContext()
+                            photo.image = image
+                            self.reloadData()
                             
                             counter += 1
                             if counter == photosArray.count {
-                                self.reloadData()
+                                photo.pin = self.tappedPin
+                                CoreDataStackManager.sharedInstance().saveContext()
                                 
                                 println("********* Done downloading images PhotoAlbum")
                                 
                                 self.tappedPin.isDownloadingPhotos = false
-                                self.enableNewCollectionButton()
+                                self.enableOrDisableNewCollectionButton()
                             }
                         }
                     }
@@ -330,6 +305,16 @@ extension PhotoAlbumViewController {
                 
                 return photo
             }
+        }
+    }
+    
+    func handleErrors(error: NSError) {
+        if error.code == -1001 || error.code == -1005 || error.code == -1009 {
+            
+        } else {
+            println("error code: \(error.code)")
+            println("error domain: \(error.domain)")
+            println("error description: \(error.localizedDescription)")
         }
     }
 }

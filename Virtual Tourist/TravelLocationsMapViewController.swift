@@ -233,7 +233,12 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
             
             if pinToBeDeleted.isDownloadingPhotos {
                 
-                // TODO: - add alert controller here
+                // Add alert controller
+                let alertController = UIAlertController(title: nil, message: "Cannot delete a pin while its photos are being downloaded", preferredStyle: .Alert)
+                let okAction = UIAlertAction(title: "OK", style: .Default, handler: nil)
+                alertController.addAction(okAction)
+                self.presentViewController(alertController, animated: true, completion: nil)
+                
                 println("Cannot delete pin while images are downloading!")
                 
                 mapView.deselectAnnotation(view.annotation, animated: false)    // Important to be reselected
@@ -353,28 +358,17 @@ extension TravelLocationsMapViewController {
     }
     
     func getFlickrImagesAndSaveContext(#pin: Pin, annotationView: MKAnnotationView) {
-        FlickrClient.sharedInstance().getPhotosForCoordinate(
-            latitude: annotationView.annotation.coordinate.latitude,
-            longitude: annotationView.annotation.coordinate.longitude,
-            page: pin.page) { photosArray, error in
+        FlickrClient.sharedInstance().getPhotosForCoordinate(latitude: annotationView.annotation.coordinate.latitude, longitude: annotationView.annotation.coordinate.longitude, page: pin.page) { photosArray, error in
             
             println("isDownloading images")
 
             var counter = 0
             pin.isDownloadingPhotos = true
-            var timedOutRequestsForURLs = [String]()
             
             if let error = error {
-                if error.code == -1001 || error.code == -1005 || error.code == -1009 {
-                    
-                    // TODO: - Internet connection problem
-                    println("error code in getPhotosForCoordinate TravelLocations: \(error.code)")
-                    
-                } else {
-                    println("error code: \(error.code)")
-                    println("error domain: \(error.domain)")
-                    println("error description: \(error.localizedDescription)")
-                }
+                
+                // TODO: - 
+                self.handleErrors(error)
             } else {
                 
                 println("photos = \(photosArray!.count)")
@@ -411,17 +405,8 @@ extension TravelLocationsMapViewController {
                             
                             if let error = error {
                                 
-                                // Internet connection lost OR request timed out
-                                if error.code == -1001 || error.code == -1005 || error.code == -1009 {
-
-                                    println("error code in dataTaskWithURL TravelLocations: \(error.code)")
-                                    println("error description: \(error.localizedDescription)")
-                                    
-                                } else {
-                                    println("error code in dataTaskWithURL TravelLocations: \(error.code)")
-                                    println("error domain: \(error.domain)")
-                                    println("error description: \(error.localizedDescription)")
-                                }
+                                // TODO: -
+                                self.handleErrors(error)
                             } else {
                                 dispatch_async(dispatch_get_main_queue()) {
                                     photo.image = UIImage(data: data)
@@ -437,7 +422,7 @@ extension TravelLocationsMapViewController {
                                         println("Done Downloading TravelLocations ***********")
                                         
                                         pin.isDownloadingPhotos = false
-                                        NSNotificationCenter.defaultCenter().postNotificationName("enableNewCollectionButton", object: self)
+                                        NSNotificationCenter.defaultCenter().postNotificationName("enableOrDisableNewCollectionButton", object: self)
                                     }
                                 }
                             }
@@ -448,6 +433,17 @@ extension TravelLocationsMapViewController {
                     }
                 }
             }
+        }
+    }
+    
+    func handleErrors(error: NSError) {
+        if error.code == -1001 || error.code == -1005 || error.code == -1009 {
+            println("error code in getPhotosForCoordinate TravelLocations: \(error.code)")
+            
+        } else {
+            println("error code: \(error.code)")
+            println("error domain: \(error.domain)")
+            println("error description: \(error.localizedDescription)")
         }
     }
 }
