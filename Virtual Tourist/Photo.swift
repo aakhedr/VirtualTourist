@@ -20,6 +20,8 @@ class Photo: NSManagedObject {
     
     @NSManaged var imageURL: String
     @NSManaged var imageID: String
+    @NSManaged var addedAt: NSDate
+    
     @NSManaged var pin: Pin
 
     var image: UIImage? {
@@ -42,5 +44,6 @@ class Photo: NSManagedObject {
         
         imageURL = dictionary[Photo.Keys.ImageURL] as! String
         imageID = dictionary[Photo.Keys.ImageID] as! String
+        addedAt = NSDate()
     }
 }

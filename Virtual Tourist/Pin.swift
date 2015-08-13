@@ -15,15 +15,17 @@ class Pin: NSManagedObject {
     struct Keys {
         static let Lat = "lat"
         static let Lon = "lon"
+        static let Page = "page"
         static let Photos = "photos"
     }
     
     @NSManaged var lat: NSNumber
     @NSManaged var lon: NSNumber
+    @NSManaged var page: Int
+    
     @NSManaged var photos: NSSet
     
     var isDownloadingPhotos: Bool   = false
-    var page: Int                   = 1
     
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
         super.init(entity: entity, insertIntoManagedObjectContext: context)
@@ -35,5 +37,6 @@ class Pin: NSManagedObject {
 
         lat = dictionary[Pin.Keys.Lat] as! NSNumber
         lon = dictionary[Pin.Keys.Lon] as! NSNumber
+        page = dictionary[Pin.Keys.Page] as! Int
     }
 }

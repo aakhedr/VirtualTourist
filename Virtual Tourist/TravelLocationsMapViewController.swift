@@ -337,6 +337,7 @@ extension TravelLocationsMapViewController {
         let dictionary = [
             Pin.Keys.Lat    : annotation.coordinate.latitude as NSNumber,
             Pin.Keys.Lon    : annotation.coordinate.longitude as NSNumber,
+            Pin.Keys.Page   : 1
         ]
         return Pin(dictionary: dictionary, context: sharedContext)
     }
@@ -352,7 +353,7 @@ extension TravelLocationsMapViewController {
     }
     
     func getFlickrImagesAndSaveContext(#pin: Pin, annotationView: MKAnnotationView) {
-        FlickrClient.sharedInstance().getPhotosForCoordinate(latitude: annotationView.annotation.coordinate.latitude, longitude: annotationView.annotation.coordinate.longitude) { photosArray, error in
+        FlickrClient.sharedInstance().getPhotosForCoordinate(latitude: annotationView.annotation.coordinate.latitude, longitude: annotationView.annotation.coordinate.longitude, page: pin.page) { photosArray, error in
             
             println("isDownloading images")
 

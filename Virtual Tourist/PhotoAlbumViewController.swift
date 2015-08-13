@@ -24,7 +24,7 @@ class PhotoAlbumViewController: UIViewController {
     lazy private var fetchedResultsController : NSFetchedResultsController = {
         let fetchRequest = NSFetchRequest(entityName: "Photo")
         
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "imageID", ascending: true)]
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "addedAt", ascending: true)]
         fetchRequest.predicate = NSPredicate(format: "pin == %@", self.tappedPin);
         
         let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest,
@@ -87,7 +87,96 @@ class PhotoAlbumViewController: UIViewController {
     }
     
     // MARK: - Actions
+    
     @IBAction func addNewCollection(sender: UIBarButtonItem) {
+        tappedPin.page = tappedPin.page + 1
+        FlickrClient.sharedInstance().getPhotosForCoordinate(latitude: tappedPin.lat as Double, longitude: tappedPin.lon as Double, page: tappedPin.page) { photosArray, error in
+            
+            println("isDownoading new set of images")
+            
+            var counter = 0
+            self.tappedPin.isDownloadingPhotos = true
+            
+            if let error = error {
+                if error.code == -1001 || error.code == -1005 || error.code == -1009 {
+                    
+                    // TODO: - Internet connection problem
+                    println("error code in getPhotosForCoordinate TravelLocations: \(error.code)")
+                } else {
+                    println("error code: \(error.code)")
+                    println("error domain: \(error.domain)")
+                    println("error description: \(error.localizedDescription)")
+                }
+            } else {
+                
+                println("new set of photos = \(photosArray!.count)")
+                println(self.tappedPin.page)
+                
+                if let photosArray = photosArray as? [[String : AnyObject]] {
+                    photosArray.map { (photosDictionary: [String : AnyObject]) -> Photo in
+                        var dictionary = [String : String]()
+                        
+                        if let imageURL = photosDictionary[FlickrClient.JSONResponseKeys.ImagePath] as? String {
+                            if let imageID = photosDictionary[FlickrClient.JSONResponseKeys.ImageID] as? String {
+                                dictionary[Photo.Keys.ImageID]      = imageID
+                                dictionary[Photo.Keys.ImageURL]      = imageURL
+                            } else {
+                                println("no imageID as String")
+                            }
+                        } else {
+                            println("no ImageURL as String")
+                        }
+                        
+                        // Init the Photo object 
+                        let photo = Photo(dictionary: dictionary, context: self.sharedContext)
+
+                        dispatch_async(dispatch_get_main_queue()) {
+                            photo.pin = self.tappedPin
+                            self.photoCollectionView.reloadData()
+                        }
+                        
+                        // Get that image on a background thread
+                        let session = FlickrClient.sharedInstance().session
+                        let url = NSURL(string: photo.imageURL)!
+                        
+                        let task = session.dataTaskWithURL(url) { data, response, error in
+                            
+                            println("started dataTaskWithURL PhotoAlbum")
+                            
+                            if let error = error {
+                                if error.code == -1001 || error.code == -1005 || error.code == -1009 {
+                                    
+                                    // TODO: - Internet connection problem
+                                    println("error code in dataTaskWithURL TravelLocations: \(error.code)")
+                                } else {
+                                    println("error code in dataTaskWithURL PhotoAlbum: \(error.code)")
+                                    println("error domain: \(error.domain)")
+                                    println("error description: \(error.localizedDescription)")
+                                }
+                            } else {
+                                dispatch_async(dispatch_get_main_queue()) {
+                                    photo.image = UIImage(data: data)
+                                    self.photoCollectionView.reloadData()
+                                    CoreDataStackManager.sharedInstance().saveContext()
+                                    
+                                    counter += 1
+                                    if counter == photosArray.count {
+                                        
+                                        println("********* Done downloading images PhotoAlbum")
+                                        
+                                        self.tappedPin.isDownloadingPhotos = false
+                                        self.enableNewCollectionButton()
+                                    }
+                                }
+                            }
+                        }
+                        task.resume()
+                        
+                        return photo
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -160,7 +249,7 @@ extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
     func controller(controller: NSFetchedResultsController, didChangeSection sectionInfo: NSFetchedResultsSectionInfo, atIndex sectionIndex: Int, forChangeType type: NSFetchedResultsChangeType) {
         switch type {
             
-        case NSFetchedResultsChangeType.Delete:
+        case .Delete:
             photoCollectionView.deleteSections(NSIndexSet(index: sectionIndex))
             println("deleted section")
 
@@ -206,6 +295,8 @@ extension PhotoAlbumViewController {
     }
     
     func configureCell(#cell: PhotoCollectionViewCell, photo: Photo) {
+        cell.activityIndicator.startAnimating()
+        
         if photo.image == nil {
             cell.image.image = UIImage(named: "placeholder")
         } else {
