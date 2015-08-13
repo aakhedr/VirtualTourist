@@ -55,9 +55,6 @@ class PhotoAlbumViewController: UIViewController {
         
         // Perform the fetch
         performFetch()
-        
-        // newColelctionButton enabled according to isDownloadingPhotos Bool
-        newCollectionButton.enabled = !tappedPin.isDownloadingPhotos
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -65,6 +62,9 @@ class PhotoAlbumViewController: UIViewController {
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "reloadData", name: "reloadData", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "enableNewCollectionButton", name: "enableNewCollectionButton", object: nil)
+        
+        // newColelctionButton enabled according to isDownloadingPhotos Bool
+        newCollectionButton.enabled = !tappedPin.isDownloadingPhotos
     }
     
     override func viewWillDisappear(animated: Bool) {
@@ -90,18 +90,30 @@ class PhotoAlbumViewController: UIViewController {
     
     @IBAction func addNewCollection(sender: UIBarButtonItem) {
         tappedPin.page = tappedPin.page + 1
-        FlickrClient.sharedInstance().getPhotosForCoordinate(latitude: tappedPin.lat as Double, longitude: tappedPin.lon as Double, page: tappedPin.page) { photosArray, error in
+        
+        // Delete previous set of photo objects
+        for photoObject in self.tappedPin.photos {
+            let photo = photoObject as! Photo
             
-            println("isDownoading new set of images")
+            photo.image = nil
+            self.sharedContext.deleteObject(photo)
+            CoreDataStackManager.sharedInstance().saveContext()
+        }
+        
+        FlickrClient.sharedInstance().getPhotosForCoordinate(
+            latitude: tappedPin.lat as Double,
+            longitude: tappedPin.lon as Double,
+            page: tappedPin.page) { photosArray, error in
             
-            var counter = 0
             self.tappedPin.isDownloadingPhotos = true
+            self.enableNewCollectionButton()
             
             if let error = error {
                 if error.code == -1001 || error.code == -1005 || error.code == -1009 {
                     
                     // TODO: - Internet connection problem
                     println("error code in getPhotosForCoordinate TravelLocations: \(error.code)")
+                    println("error description: \(error.localizedDescription)")
                 } else {
                     println("error code: \(error.code)")
                     println("error domain: \(error.domain)")
@@ -112,73 +124,13 @@ class PhotoAlbumViewController: UIViewController {
                 println("new set of photos = \(photosArray!.count)")
                 println(self.tappedPin.page)
                 
-                if let photosArray = photosArray as? [[String : AnyObject]] {
-                    photosArray.map { (photosDictionary: [String : AnyObject]) -> Photo in
-                        var dictionary = [String : String]()
-                        
-                        if let imageURL = photosDictionary[FlickrClient.JSONResponseKeys.ImagePath] as? String {
-                            if let imageID = photosDictionary[FlickrClient.JSONResponseKeys.ImageID] as? String {
-                                dictionary[Photo.Keys.ImageID]      = imageID
-                                dictionary[Photo.Keys.ImageURL]      = imageURL
-                            } else {
-                                println("no imageID as String")
-                            }
-                        } else {
-                            println("no ImageURL as String")
-                        }
-                        
-                        // Init the Photo object 
-                        let photo = Photo(dictionary: dictionary, context: self.sharedContext)
-
-                        dispatch_async(dispatch_get_main_queue()) {
-                            photo.pin = self.tappedPin
-                            self.photoCollectionView.reloadData()
-                        }
-                        
-                        // Get that image on a background thread
-                        let session = FlickrClient.sharedInstance().session
-                        let url = NSURL(string: photo.imageURL)!
-                        
-                        let task = session.dataTaskWithURL(url) { data, response, error in
-                            
-                            println("started dataTaskWithURL PhotoAlbum")
-                            
-                            if let error = error {
-                                if error.code == -1001 || error.code == -1005 || error.code == -1009 {
-                                    
-                                    // TODO: - Internet connection problem
-                                    println("error code in dataTaskWithURL TravelLocations: \(error.code)")
-                                } else {
-                                    println("error code in dataTaskWithURL PhotoAlbum: \(error.code)")
-                                    println("error domain: \(error.domain)")
-                                    println("error description: \(error.localizedDescription)")
-                                }
-                            } else {
-                                dispatch_async(dispatch_get_main_queue()) {
-                                    photo.image = UIImage(data: data)
-                                    self.photoCollectionView.reloadData()
-                                    CoreDataStackManager.sharedInstance().saveContext()
-                                    
-                                    counter += 1
-                                    if counter == photosArray.count {
-                                        
-                                        println("********* Done downloading images PhotoAlbum")
-                                        
-                                        self.tappedPin.isDownloadingPhotos = false
-                                        self.enableNewCollectionButton()
-                                    }
-                                }
-                            }
-                        }
-                        task.resume()
-                        
-                        return photo
-                    }
-                }
+                // Download the new set of images
+                self.parsePhotosArray(photosArray!)
             }
         }
     }
 }
+
 
 extension PhotoAlbumViewController: UICollectionViewDataSource, UICollectionViewDelegate {
     
@@ -232,10 +184,14 @@ extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
     
     func controllerWillChangeContent(controller: NSFetchedResultsController) {
         println("controllerWillChangeContent called")
+        println("fetchedResultsController.fetchedObjects!.count \(fetchedResultsController.fetchedObjects!.count)")
     }
     
     func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
         switch type {
+            
+        case .Insert:
+            photoCollectionView.insertItemsAtIndexPaths([newIndexPath!])
             
         case .Delete:
             photoCollectionView.deleteItemsAtIndexPaths([indexPath!])
@@ -245,20 +201,9 @@ extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
             return
         }
     }
-    
-    func controller(controller: NSFetchedResultsController, didChangeSection sectionInfo: NSFetchedResultsSectionInfo, atIndex sectionIndex: Int, forChangeType type: NSFetchedResultsChangeType) {
-        switch type {
-            
-        case .Delete:
-            photoCollectionView.deleteSections(NSIndexSet(index: sectionIndex))
-            println("deleted section")
-
-        default:
-            return
-        }
-    }
-    
+        
     func controllerDidChangeContent(controller: NSFetchedResultsController) {
+        println("controllerDidChangeContent called")
         println("fetchedResultsController.fetchedObjects!.count \(fetchedResultsController.fetchedObjects!.count)")
     }
 }
@@ -316,5 +261,75 @@ extension PhotoAlbumViewController {
         newCollectionButton.enabled = !tappedPin.isDownloadingPhotos
         
         println("Toggled newCollectionButton.enabled property: \(newCollectionButton.enabled)")
+    }
+    
+    func parsePhotosArray(photosArray: AnyObject) {
+        
+        println("isDownoading new set of images")
+        
+        var counter = 0
+        
+        if let photosArray = photosArray as? [[String : AnyObject]] {
+            photosArray.map { (photosDictionary: [String : AnyObject]) -> Photo in
+                var dictionary = [String : String]()
+                
+                if let imageURL = photosDictionary[FlickrClient.JSONResponseKeys.ImagePath] as? String {
+                    if let imageID = photosDictionary[FlickrClient.JSONResponseKeys.ImageID] as? String {
+                        dictionary[Photo.Keys.ImageID]      = imageID
+                        dictionary[Photo.Keys.ImageURL]      = imageURL
+                    } else {
+                        println("no imageID as String")
+                    }
+                } else {
+                    println("no ImageURL as String")
+                }
+                
+                // Init the Photo object
+                let photo = Photo(dictionary: dictionary, context: self.sharedContext)
+                
+                dispatch_async(dispatch_get_main_queue()) {
+                    photo.pin = self.tappedPin
+                }
+                
+                // Get that image on a background thread
+                let session = FlickrClient.sharedInstance().session
+                let url = NSURL(string: photo.imageURL)!
+                let task = session.dataTaskWithURL(url) { data, response, error in
+                    
+                    println("started dataTaskWithURL PhotoAlbum")
+                    
+                    if let error = error {
+                        if error.code == -1001 || error.code == -1005 || error.code == -1009 {
+                            
+                            // TODO: - Internet connection problem
+                            println("error code in dataTaskWithURL TravelLocations: \(error.code)")
+                        } else {
+                            println("error code in dataTaskWithURL PhotoAlbum: \(error.code)")
+                            println("error domain: \(error.domain)")
+                            println("error description: \(error.localizedDescription)")
+                        }
+                    } else {
+                        dispatch_async(dispatch_get_main_queue()) {
+                            photo.image = UIImage(data: data)
+                            self.sharedContext.insertObject(photo)
+                            CoreDataStackManager.sharedInstance().saveContext()
+                            
+                            counter += 1
+                            if counter == photosArray.count {
+                                self.reloadData()
+                                
+                                println("********* Done downloading images PhotoAlbum")
+                                
+                                self.tappedPin.isDownloadingPhotos = false
+                                self.enableNewCollectionButton()
+                            }
+                        }
+                    }
+                }
+                task.resume()
+                
+                return photo
+            }
+        }
     }
 }

@@ -17,7 +17,7 @@ class TravelLocationsMapViewController: UIViewController {
     private var longPressGestureRecognizer: UILongPressGestureRecognizer!
     private var regionDataDictionary: [String : CLLocationDegrees]!
     private var tappedPin: Pin!
-
+    
     private struct regionDataDictionaryKeys {
         static let Lat = "latitude"
         static let Lon = "longitude"
@@ -353,12 +353,16 @@ extension TravelLocationsMapViewController {
     }
     
     func getFlickrImagesAndSaveContext(#pin: Pin, annotationView: MKAnnotationView) {
-        FlickrClient.sharedInstance().getPhotosForCoordinate(latitude: annotationView.annotation.coordinate.latitude, longitude: annotationView.annotation.coordinate.longitude, page: pin.page) { photosArray, error in
+        FlickrClient.sharedInstance().getPhotosForCoordinate(
+            latitude: annotationView.annotation.coordinate.latitude,
+            longitude: annotationView.annotation.coordinate.longitude,
+            page: pin.page) { photosArray, error in
             
             println("isDownloading images")
 
             var counter = 0
             pin.isDownloadingPhotos = true
+            var timedOutRequestsForURLs = [String]()
             
             if let error = error {
                 if error.code == -1001 || error.code == -1005 || error.code == -1009 {
@@ -406,10 +410,12 @@ extension TravelLocationsMapViewController {
                             println("started dataTaskWithURL TravelLocations")
                             
                             if let error = error {
+                                
+                                // Internet connection lost OR request timed out
                                 if error.code == -1001 || error.code == -1005 || error.code == -1009 {
-                                    
-                                    // TODO: - Internet connection problem
+
                                     println("error code in dataTaskWithURL TravelLocations: \(error.code)")
+                                    println("error description: \(error.localizedDescription)")
                                     
                                 } else {
                                     println("error code in dataTaskWithURL TravelLocations: \(error.code)")
@@ -420,7 +426,7 @@ extension TravelLocationsMapViewController {
                                 dispatch_async(dispatch_get_main_queue()) {
                                     photo.image = UIImage(data: data)
                                     
-                                    // Send notification to PhotoAlbumViewController to reload images as they downloaded
+                                    // Send notification to PhotoAlbumViewController to reload images as they download
                                     NSNotificationCenter.defaultCenter().postNotificationName("reloadData", object: self)
 
                                     CoreDataStackManager.sharedInstance().saveContext()
