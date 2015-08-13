@@ -286,7 +286,7 @@ extension PhotoAlbumViewController {
                         
                         dispatch_async(dispatch_get_main_queue()) {
                             photo.image = image
-                            self.reloadData()
+                            NSNotificationCenter.defaultCenter().postNotificationName("reloadData", object: self)
                             
                             counter += 1
                             if counter == photosArray.count {
@@ -296,8 +296,7 @@ extension PhotoAlbumViewController {
                                 println("********* Done downloading images PhotoAlbum")
                                 
                                 self.tappedPin.isDownloadingPhotos = false
-                                self.enableOrDisableNewCollectionButton()
-                            }
+                                NSNotificationCenter.defaultCenter().postNotificationName("enableOrDisableNewCollectionButton", object: self)                            }
                         }
                     }
                 }
