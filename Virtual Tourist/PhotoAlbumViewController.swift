@@ -61,7 +61,12 @@ class PhotoAlbumViewController: UIViewController {
         super.viewWillAppear(animated)
         
         enableOrDisableNewCollectionButton()
-
+        
+        // No Images label
+        if tappedPin.photos.count == 0 {
+            showNoImageLabel()
+        }
+        
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "reloadData", name: "reloadData", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "enableOrDisableNewCollectionButton", name: "enableOrDisableNewCollectionButton", object: nil)
     }
@@ -74,6 +79,10 @@ class PhotoAlbumViewController: UIViewController {
     }
     
     override func viewDidLayoutSubviews() {
+        if photoCollectionView.hidden {
+            return
+        }
+        
         let layout = UICollectionViewFlowLayout()
         layout.sectionInset = UIEdgeInsets(top: 1, left: 1, bottom: 1, right: 1)
         layout.minimumLineSpacing = 4
@@ -249,6 +258,12 @@ extension PhotoAlbumViewController {
         var counter = 0
         
         if let photosArray = photosArray as? [[String : AnyObject]] {
+
+            // No Images label
+            if photosArray.count == 0 {
+                showNoImageLabel()
+                return
+            }
             photosArray.map { (photosDictionary: [String : AnyObject]) -> Photo in
                 var dictionary = [String : String]()
                 
@@ -296,7 +311,8 @@ extension PhotoAlbumViewController {
                                 println("********* Done downloading images PhotoAlbum")
                                 
                                 self.tappedPin.isDownloadingPhotos = false
-                                NSNotificationCenter.defaultCenter().postNotificationName("enableOrDisableNewCollectionButton", object: self)                            }
+                                NSNotificationCenter.defaultCenter().postNotificationName("enableOrDisableNewCollectionButton", object: self)
+                            }
                         }
                     }
                 }
@@ -315,5 +331,19 @@ extension PhotoAlbumViewController {
             println("error domain: \(error.domain)")
             println("error description: \(error.localizedDescription)")
         }
+    }
+    
+    func showNoImageLabel() {
+        photoCollectionView.hidden = true
+        
+        var label = UILabel(frame: CGRectMake(0, 0, 200, 21))
+        label.center = self.view.center
+        label.textAlignment = .Center
+        label.text = "No Images"
+        label.hidden = false
+        self.view.addSubview(label)
+        
+        tappedPin.isDownloadingPhotos = false
+        newCollectionButton.enabled = false
     }
 }

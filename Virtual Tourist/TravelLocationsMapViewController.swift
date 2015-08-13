@@ -374,6 +374,11 @@ extension TravelLocationsMapViewController {
                 println("photos = \(photosArray!.count)")
                 
                 if let photosArray = photosArray as? [[String : AnyObject]] {
+
+                    // No Images label
+                    if photosArray.count == 0 {
+                        return
+                    }
                     photosArray.map { (photoDictionary: [String : AnyObject]) -> Photo in
                         var dictionary = [String : String]()
                         
