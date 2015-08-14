@@ -230,7 +230,7 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
                 latitude: view.annotation.coordinate.latitude,
                 longitude: view.annotation.coordinate.longitude
             )
-            
+
             if pinToBeDeleted.isDownloadingPhotos {
                 
                 // Add alert controller
@@ -246,6 +246,10 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
             }
 
             // Delete the pin and save context
+            for photoObject in pinToBeDeleted.photos {
+                let photo = photoObject as! Photo
+                photo.image = nil
+            }
             sharedContext.deleteObject(pinToBeDeleted)
             CoreDataStackManager.sharedInstance().saveContext()
             
@@ -367,8 +371,9 @@ extension TravelLocationsMapViewController {
             
             if let error = error {
                 
-                // TODO: - Handle errors
-                self.handleErrors(error)
+                // Handle errors
+                println("error code: \(error.code)")
+                println("error description: \(error.localizedDescription)")
             } else {
                 
                 println("photos = \(photosArray!.count)")

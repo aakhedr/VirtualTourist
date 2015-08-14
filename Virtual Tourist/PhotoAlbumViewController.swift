@@ -107,10 +107,8 @@ class PhotoAlbumViewController: UIViewController {
 
         FlickrClient.sharedInstance().getPhotosForCoordinate(latitude: tappedPin.lat as Double, longitude: tappedPin.lon as Double, page: tappedPin.page) { photosArray, error in
             if let error = error {
-                
-                // TODO: - Handle errors
-                self.handleErrors(error)
-                
+                println("error code: \(error.code)")
+                println("error description: \(error.localizedDescription)")
             } else {
                 
                 // Download the new set of images
