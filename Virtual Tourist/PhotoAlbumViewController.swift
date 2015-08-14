@@ -60,15 +60,20 @@ class PhotoAlbumViewController: UIViewController {
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
-        enableOrDisableNewCollectionButton()
-        
-        // No Images label
-        if tappedPin.photos.count == 0 {
-            showNoImageLabel()
-        }
-        
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "reloadData", name: "reloadData", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "enableOrDisableNewCollectionButton", name: "enableOrDisableNewCollectionButton", object: nil)
+        
+        if tappedPin.photos.count != 0 {
+            if tappedPin.isDownloadingPhotos {
+                newCollectionButton.enabled = false
+            }
+        }
+        
+        if tappedPin.photos.count == 0 {
+            if !tappedPin.isDownloadingPhotos {
+                showNoImageLabel()
+            }
+        }
     }
     
     override func viewWillDisappear(animated: Bool) {
@@ -254,13 +259,14 @@ extension PhotoAlbumViewController {
         println("isDownoading new set of images")
         
         var counter = 0
-        
         if let photosArray = photosArray as? [[String : AnyObject]] {
 
             // No Images label
             if photosArray.count == 0 {
                 dispatch_async(dispatch_get_main_queue()) {
                     self.showNoImageLabel()
+                    self.tappedPin.photos = NSSet()
+                    CoreDataStackManager.sharedInstance().saveContext()
                 }
                 return
             }

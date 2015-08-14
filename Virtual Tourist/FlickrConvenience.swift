@@ -42,12 +42,6 @@ extension FlickrClient {
                     if successMessage == "ok" {
                         if let photosDictinoary = JSONResult.valueForKey(JSONResponseKeys.PhotosDictionary) as? [String : AnyObject] {
                             if let photosArray = photosDictinoary[JSONResponseKeys.PhotosArray] as? [[String : AnyObject]] {
-                                if photosArray.count == 0 {
-                                    completionHandler(
-                                        data: [AnyObject](),
-                                        error: nil)
-                                    println("No photos for this location")      // TODO: No photos for this location
-                                }
                                 completionHandler(
                                     data: photosArray,
                                     error: nil)

@@ -364,14 +364,9 @@ extension TravelLocationsMapViewController {
     func getFlickrImagesAndSaveContext(#pin: Pin, annotationView: MKAnnotationView) {
         FlickrClient.sharedInstance().getPhotosForCoordinate(latitude: annotationView.annotation.coordinate.latitude, longitude: annotationView.annotation.coordinate.longitude, page: pin.page) { photosArray, error in
             
-            println("isDownloading images")
-
-            var counter = 0
             pin.isDownloadingPhotos = true
-            
+            var counter = 0
             if let error = error {
-                
-                // Handle errors
                 println("error code: \(error.code)")
                 println("error description: \(error.localizedDescription)")
             } else {
@@ -379,6 +374,11 @@ extension TravelLocationsMapViewController {
                 println("photos = \(photosArray!.count)")
                 
                 if let photosArray = photosArray as? [[String : AnyObject]] {
+                    if photosArray.count == 0 {
+                        dispatch_async(dispatch_get_main_queue()) {
+                            pin.isDownloadingPhotos = false
+                        }
+                    }
                     photosArray.map { (photoDictionary: [String : AnyObject]) -> Photo in
                         var dictionary = [String : String]()
                         
@@ -423,10 +423,10 @@ extension TravelLocationsMapViewController {
                                     
                                     counter += 1
                                     if counter == photosArray.count {
-                                        
+                                        pin.isDownloadingPhotos = false
+
                                         println("Done Downloading TravelLocations ***********")
                                         
-                                        pin.isDownloadingPhotos = false
                                         NSNotificationCenter.defaultCenter().postNotificationName("enableOrDisableNewCollectionButton", object: self)
                                     }
                                 }
