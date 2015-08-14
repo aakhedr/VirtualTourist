@@ -61,7 +61,7 @@ class PhotoAlbumViewController: UIViewController {
         super.viewWillAppear(animated)
         
         // No Images label
-        if tappedPin.photos.count == 0 && !tappedPin.isDownloadingPhotos {
+        if tappedPin.photos.count == 0 {
             showNoImageLabel()
         }
         
