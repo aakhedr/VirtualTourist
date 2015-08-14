@@ -60,6 +60,8 @@ class PhotoAlbumViewController: UIViewController {
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
+        enableOrDisableNewCollectionButton()
+        
         // No Images label
         if tappedPin.photos.count == 0 {
             showNoImageLabel()
