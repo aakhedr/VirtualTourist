@@ -60,10 +60,8 @@ class PhotoAlbumViewController: UIViewController {
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
-        enableOrDisableNewCollectionButton()
-        
         // No Images label
-        if tappedPin.photos.count == 0 {
+        if tappedPin.photos.count == 0 && !tappedPin.isDownloadingPhotos {
             showNoImageLabel()
         }
         
@@ -108,7 +106,7 @@ class PhotoAlbumViewController: UIViewController {
         FlickrClient.sharedInstance().getPhotosForCoordinate(latitude: tappedPin.lat as Double, longitude: tappedPin.lon as Double, page: tappedPin.page) { photosArray, error in
             if let error = error {
                 
-                // TODO: -
+                // TODO: - Handle errors
                 self.handleErrors(error)
                 
             } else {
@@ -261,7 +259,9 @@ extension PhotoAlbumViewController {
 
             // No Images label
             if photosArray.count == 0 {
-                showNoImageLabel()
+                dispatch_async(dispatch_get_main_queue()) {
+                    self.showNoImageLabel()
+                }
                 return
             }
             photosArray.map { (photosDictionary: [String : AnyObject]) -> Photo in
@@ -294,7 +294,7 @@ extension PhotoAlbumViewController {
                     
                     if let error = error {
                         
-                        // TODO: -
+                        // TODO: - Handle errors
                         self.handleErrors(error)
                     } else {
                         let image = UIImage(data: data)
@@ -325,7 +325,9 @@ extension PhotoAlbumViewController {
     
     func handleErrors(error: NSError) {
         if error.code == -1001 || error.code == -1005 || error.code == -1009 {
-            
+            println("error code: \(error.code)")
+            println("error domain: \(error.domain)")
+            println("error description: \(error.localizedDescription)")
         } else {
             println("error code: \(error.code)")
             println("error domain: \(error.domain)")

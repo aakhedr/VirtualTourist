@@ -374,11 +374,6 @@ extension TravelLocationsMapViewController {
                 println("photos = \(photosArray!.count)")
                 
                 if let photosArray = photosArray as? [[String : AnyObject]] {
-
-                    // No Images label
-                    if photosArray.count == 0 {
-                        return
-                    }
                     photosArray.map { (photoDictionary: [String : AnyObject]) -> Photo in
                         var dictionary = [String : String]()
                         
@@ -410,7 +405,7 @@ extension TravelLocationsMapViewController {
                             
                             if let error = error {
                                 
-                                // TODO: -
+                                // TODO: - Handle errors
                                 self.handleErrors(error)
                             } else {
                                 dispatch_async(dispatch_get_main_queue()) {
@@ -443,8 +438,9 @@ extension TravelLocationsMapViewController {
     
     func handleErrors(error: NSError) {
         if error.code == -1001 || error.code == -1005 || error.code == -1009 {
-            println("error code in getPhotosForCoordinate TravelLocations: \(error.code)")
-            
+            println("error code: \(error.code)")
+            println("error domain: \(error.domain)")
+            println("error description: \(error.localizedDescription)")
         } else {
             println("error code: \(error.code)")
             println("error domain: \(error.domain)")

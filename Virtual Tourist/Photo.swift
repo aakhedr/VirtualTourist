@@ -15,7 +15,7 @@ class Photo: NSManagedObject {
     
     struct Keys {
         static let ImageURL = "imageURL"
-        static let ImageID = "imageID"
+        static let ImageID  = "imageID"
     }
     
     @NSManaged var imageURL: String
