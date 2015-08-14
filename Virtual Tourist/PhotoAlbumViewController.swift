@@ -162,7 +162,7 @@ extension PhotoAlbumViewController: UICollectionViewDataSource, UICollectionView
             
             sharedContext.deleteObject(photo)
             CoreDataStackManager.sharedInstance().saveContext()
-            reloadData()
+            photoCollectionView.reloadData()
         } else {
             
             // Add alert controller
@@ -251,7 +251,7 @@ extension PhotoAlbumViewController {
             photo.image = nil
             self.sharedContext.deleteObject(photo)
         }
-        reloadData()
+        photoCollectionView.reloadData()
     }
     
     func parsePhotosArray(photosArray: AnyObject) {
