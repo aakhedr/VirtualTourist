@@ -293,9 +293,7 @@ extension PhotoAlbumViewController {
                     println("started dataTaskWithURL PhotoAlbum")
                     
                     if let error = error {
-                        
-                        // TODO: - Handle errors
-                        self.handleErrors(error)
+                        self.handleErrors(photo: photo, error: error)
                     } else {
                         let image = UIImage(data: data)
                         
@@ -323,11 +321,15 @@ extension PhotoAlbumViewController {
         }
     }
     
-    func handleErrors(error: NSError) {
+    func handleErrors(#photo: Photo, error: NSError) {
+        
+        // Errors caused by bad Internet connection
         if error.code == -1001 || error.code == -1005 || error.code == -1009 {
-            println("error code: \(error.code)")
-            println("error domain: \(error.domain)")
-            println("error description: \(error.localizedDescription)")
+            dispatch_async(dispatch_get_main_queue()) {
+                photo.error = true
+                CoreDataStackManager.sharedInstance().saveContext()
+            }
+            
         } else {
             println("error code: \(error.code)")
             println("error domain: \(error.domain)")

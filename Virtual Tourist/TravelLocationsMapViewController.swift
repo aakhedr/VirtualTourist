@@ -409,10 +409,7 @@ extension TravelLocationsMapViewController {
                             println("started dataTaskWithURL TravelLocations")
                             
                             if let error = error {
-                                
-                                // TODO: - Handle errors
                                 self.handleErrors(photo: photo, error: error)
-                                
                             } else {
                                 let image = UIImage(data: data)
                                 
