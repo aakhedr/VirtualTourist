@@ -18,9 +18,10 @@ class Photo: NSManagedObject {
         static let ImageID  = "imageID"
     }
     
-    @NSManaged var imageURL: String
-    @NSManaged var imageID: String
-    @NSManaged var addedAt: NSDate
+    @NSManaged var imageURL : String
+    @NSManaged var imageID  : String
+    @NSManaged var addedAt  : NSDate
+    @NSManaged var error    : Bool
     
     @NSManaged var pin: Pin
 

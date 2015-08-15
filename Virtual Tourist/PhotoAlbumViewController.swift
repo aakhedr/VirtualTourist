@@ -66,18 +66,8 @@ class PhotoAlbumViewController: UIViewController {
         // Enables the newCollectionButton once all images are downloaded
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "enableOrDisableNewCollectionButton", name: "enableOrDisableNewCollectionButton", object: nil)
         
-        
-        if tappedPin.photos.count != 0 {
-            if tappedPin.isDownloadingPhotos {
-                newCollectionButton.enabled = false
-            }
-        }
-        
-        if tappedPin.photos.count == 0 {
-            if !tappedPin.isDownloadingPhotos {
-                showNoImageLabel()
-            }
-        }
+        // Check how many photo objects for this pin (either 0 or more) and handle current view/ subViews accordingly
+        checkPhotosCount()
     }
     
     override func viewWillDisappear(animated: Bool) {
@@ -357,5 +347,72 @@ extension PhotoAlbumViewController {
         
         tappedPin.isDownloadingPhotos = false
         newCollectionButton.enabled = false
+    }
+    
+    func checkForConnectionErrors() {
+        var photosWithErrorCounter = 0
+        var counter = 0
+
+        for object in tappedPin.photos {
+            let photo = object as! Photo
+            
+            if photo.error == true {
+                photosWithErrorCounter++
+                
+                // get that image
+                let session = FlickrClient.sharedInstance().session
+                let url = NSURL(string: photo.imageURL)!
+                let task = session.dataTaskWithURL(url) { data, response, error in
+                    if let error = error {
+                        
+                        // errors due to bad Internet again?
+                        if error.code == -1001 || error.code == -1005 || error.code == -1009 {
+                            
+                            dispatch_async(dispatch_get_main_queue()) {
+                                photo.error = true
+                                CoreDataStackManager.sharedInstance().saveContext()
+                            }
+                        } else {
+                            println("error code: \(error.code)")
+                            println("error description: \(error.localizedDescription)")
+                        }
+                    } else {
+                        let image = UIImage(data: data)
+                        dispatch_async(dispatch_get_main_queue()) {
+                            photo.image = image
+                            photo.error = false
+                            self.photoCollectionView.reloadData()
+                        }
+                        counter++
+                        
+                        if counter == photosWithErrorCounter {
+                            
+                            println("Got all images with errors")
+                            
+                            dispatch_async(dispatch_get_main_queue()) {
+                                self.tappedPin.isDownloadingPhotos = false
+                                self.newCollectionButton.enabled = true
+                            }
+                        }
+                    }
+                }
+                task.resume()
+            }
+        }
+    }
+    
+    func checkPhotosCount() {
+        if tappedPin.photos.count != 0 {
+            if tappedPin.isDownloadingPhotos {
+                newCollectionButton.enabled = false
+            }
+            checkForConnectionErrors()
+        }
+        
+        if tappedPin.photos.count == 0 {
+            if !tappedPin.isDownloadingPhotos {
+                showNoImageLabel()
+            }
+        }
     }
 }
