@@ -60,8 +60,12 @@ class PhotoAlbumViewController: UIViewController {
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
+        // Reloads photoCollectionView data once an image is set in a Photo instance
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "reloadData", name: "reloadData", object: nil)
+        
+        // Enables the newCollectionButton once all images are downloaded
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "enableOrDisableNewCollectionButton", name: "enableOrDisableNewCollectionButton", object: nil)
+        
         
         if tappedPin.photos.count != 0 {
             if tappedPin.isDownloadingPhotos {

@@ -411,12 +411,13 @@ extension TravelLocationsMapViewController {
                             if let error = error {
                                 
                                 // TODO: - Handle errors
-                                self.handleErrors(error)
+                                self.handleErrors(error, url: url)
+                                
                             } else {
                                 dispatch_async(dispatch_get_main_queue()) {
                                     photo.image = UIImage(data: data)
                                     
-                                    // Send notification to PhotoAlbumViewController to reload images as they download
+                                    // Send notification to PhotoAlbumViewController to reload image
                                     NSNotificationCenter.defaultCenter().postNotificationName("reloadData", object: self)
 
                                     CoreDataStackManager.sharedInstance().saveContext()
@@ -427,6 +428,7 @@ extension TravelLocationsMapViewController {
 
                                         println("Done Downloading TravelLocations ***********")
                                         
+                                        // Inform PhotoAlbumViewController to toggle enabled property of newCollectionButton
                                         NSNotificationCenter.defaultCenter().postNotificationName("enableOrDisableNewCollectionButton", object: self)
                                     }
                                 }
@@ -441,7 +443,7 @@ extension TravelLocationsMapViewController {
         }
     }
     
-    func handleErrors(error: NSError) {
+    func handleErrors(error: NSError, url: NSURL) {
         if error.code == -1001 || error.code == -1005 || error.code == -1009 {
             println("error code: \(error.code)")
             println("error domain: \(error.domain)")
