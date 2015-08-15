@@ -370,6 +370,7 @@ extension PhotoAlbumViewController {
                         // errors due to bad Internet again?
                         if error.code == -1001 || error.code == -1005 || error.code == -1009 {
                             
+                            // Just for reconfirmation :)
                             dispatch_async(dispatch_get_main_queue()) {
                                 photo.error = true
                                 CoreDataStackManager.sharedInstance().saveContext()
@@ -384,6 +385,9 @@ extension PhotoAlbumViewController {
                             photo.image = image
                             photo.error = false
                             self.photoCollectionView.reloadData()
+                            
+                            // Save new value of photo.error
+                            CoreDataStackManager.sharedInstance().saveContext()
                         }
                         counter++
                         
@@ -394,6 +398,9 @@ extension PhotoAlbumViewController {
                             dispatch_async(dispatch_get_main_queue()) {
                                 self.tappedPin.isDownloadingPhotos = false
                                 self.newCollectionButton.enabled = true
+                                
+                                // save new value of tappedPin.isDownloadingPhotos
+                                CoreDataStackManager.sharedInstance().saveContext()
                             }
                         }
                     }
