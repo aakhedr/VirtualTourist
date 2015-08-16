@@ -14,9 +14,10 @@ class PhotoAlbumViewController: UIViewController {
     @IBOutlet private weak var mapView: MKMapView!
     @IBOutlet private weak var photoCollectionView: UICollectionView!
     @IBOutlet private weak var newCollectionButton: UIBarButtonItem!
+    @IBOutlet weak var noImageLabel: UILabel!
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     
     var tappedPin: Pin!
-    var noImageLabel: UILabel!
     
     private var sharedContext : NSManagedObjectContext {
         return CoreDataStackManager.sharedInstance().managedObjectContext!
@@ -59,20 +60,11 @@ class PhotoAlbumViewController: UIViewController {
         performFetch()
         
         /* No Image Label shows up in case a pin has no photos - Initially hidden */
-        noImageLabel = UILabel(frame: CGRectMake(0, 0, 200, 21))
-        noImageLabel.center = self.view.center
-        noImageLabel.textAlignment = .Center
-        noImageLabel.text = "No Images"
         noImageLabel.hidden = true
-        view.addSubview(noImageLabel)
         
         /* Activity indicator for the photoCollectionView (NOT individual cells) */
-//        activityIndicator = UIActivityIndicatorView(activityIndicatorStyle: .WhiteLarge)
+        activityIndicator.startAnimating()
         
-//        activityIndicator.hidesWhenStopped = true
-//        activityIndicator.backgroundColor = UIColor.blackColor()
-//        activityIndicator.startAnimating()
-//        view.addSubview(activityIndicator)
     }
     
     override func viewWillAppear(animated: Bool) {
