@@ -18,6 +18,7 @@ class TravelLocationsMapViewController: UIViewController {
     private var regionDataDictionary: [String : CLLocationDegrees]!
     private var tappedPin: Pin!
     
+    // Keys of the regionDataDictionary, to be saved in NSUserDefaults
     private struct regionDataDictionaryKeys {
         static let Lat = "latitude"
         static let Lon = "longitude"
@@ -51,7 +52,7 @@ class TravelLocationsMapViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // tapPinToDeleteLabel
+        // tapPinToDeleteLabel hidden unless edit button is tapped
         tapPinToDeleteLabel.hidden = true
 
         // Set mapView delegate
@@ -70,10 +71,9 @@ class TravelLocationsMapViewController: UIViewController {
 
         } else {
             
-            // In case there's a previous region saved.
-            // Set the mapView region to the last region.
+            // In case there's a previous region saved. Set the mapView region to the last region.
             let region = setRegionCenterAndSpan()
-            mapView.setRegion(region, animated: true)
+            mapView.setRegion(region, animated: false)
         }
         
         // Set Fetched Results Controller delegate
@@ -83,7 +83,6 @@ class TravelLocationsMapViewController: UIViewController {
         performFetch()
         
         // Fetch and show pins in the map view
-        // And set pinIsDraggable
         fetchAndShowPinAnnotations()
     }
 
@@ -117,9 +116,9 @@ class TravelLocationsMapViewController: UIViewController {
     }
 }
 
+// MARK:- Gesture Recognizer Delegate
+
 extension TravelLocationsMapViewController: UIGestureRecognizerDelegate {
-    
-    // MARK:- Gesture Recognizer Delegate
     
     func handleLongPressGesture(recognizer: UILongPressGestureRecognizer) {
         if recognizer.state == .Ended {
@@ -140,9 +139,9 @@ extension TravelLocationsMapViewController: UIGestureRecognizerDelegate {
     }
 }
 
+// MARK:- Map View Delegate
+
 extension TravelLocationsMapViewController: MKMapViewDelegate {
-    
-    // MARK:- Map View Delegate
     
     func mapView(mapView: MKMapView!, viewForAnnotation annotation: MKAnnotation!) -> MKAnnotationView! {
         if let annotation = annotation as? MKPointAnnotation {
@@ -221,7 +220,7 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
                 latitude: view.annotation.coordinate.latitude,
                 longitude: view.annotation.coordinate.longitude
             )
-            mapView.deselectAnnotation(view.annotation, animated: false)        // Important to be reselected
+            mapView.deselectAnnotation(view.annotation, animated: false)        // Important to be reselected later
             performSegueWithIdentifier("photoAlbumSegue", sender: self)
         }
         
@@ -233,15 +232,21 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
 
             if pinToBeDeleted.isDownloadingPhotos {
                 
-                // Add alert controller
-                let alertController = UIAlertController(title: nil, message: "Cannot delete a pin while its photos are being downloaded", preferredStyle: .Alert)
-                let okAction = UIAlertAction(title: "OK", style: .Default, handler: nil)
+                // Inform the user
+                let alertController = UIAlertController(
+                    title: nil,
+                    message: "Cannot delete a pin while its photos are being downloaded",
+                    preferredStyle: .Alert
+                )
+                let okAction = UIAlertAction(
+                    title: "OK",
+                    style: .Default,
+                    handler: nil
+                )
                 alertController.addAction(okAction)
                 self.presentViewController(alertController, animated: true, completion: nil)
-                
-                println("Cannot delete pin while images are downloading!")
-                
-                mapView.deselectAnnotation(view.annotation, animated: false)    // Important to be reselected
+ 
+                mapView.deselectAnnotation(view.annotation, animated: false)    // Important to be reselected later
                 return
             }
 
@@ -259,16 +264,16 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
     }
 }
 
+// MARK: - Fetched Results Controller Delegate
+
 extension TravelLocationsMapViewController: NSFetchedResultsControllerDelegate {
-    
-    // MARK: - Fetched Results Controller Delegate
     
     func controllerDidChangeContent(controller: NSFetchedResultsController) {   }
 }
 
+// MARK:- Helpers
+
 extension TravelLocationsMapViewController {
-    
-    // MARK:- Helpers
     
     func saveValue() {
         let userDefaults = NSUserDefaults.standardUserDefaults()
@@ -294,7 +299,7 @@ extension TravelLocationsMapViewController {
     
     func fetchAndShowPinAnnotations() {
         if let pins = fetchedResultsController.fetchedObjects as? [Pin] {
-            mapView.removeAnnotations(mapView.annotations)
+            mapView.removeAnnotations(mapView.annotations)      // Remove existing annotations before adding the fetched pins
             for pin in pins {
                 MKPointAnnotationMake(coordinate:
                     CLLocationCoordinate2DMake(
@@ -309,7 +314,7 @@ extension TravelLocationsMapViewController {
     func configureLongPressGestureRecognizer() {
         longPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: "handleLongPressGesture:")
         longPressGestureRecognizer.minimumPressDuration = 1
-        longPressGestureRecognizer.numberOfTouchesRequired = 1
+        longPressGestureRecognizer.numberOfTouchesRequired = 1      // Ensure long press
         longPressGestureRecognizer.delegate = self
         mapView.addGestureRecognizer(longPressGestureRecognizer)
     }
@@ -364,21 +369,52 @@ extension TravelLocationsMapViewController {
     func getFlickrImagesAndSaveContext(#pin: Pin, annotationView: MKAnnotationView) {
         FlickrClient.sharedInstance().getPhotosForCoordinate(latitude: annotationView.annotation.coordinate.latitude, longitude: annotationView.annotation.coordinate.longitude, page: pin.page) { photosArray, error in
             
+            /* Photo objects are bing downloaded, so user cannot delete neiher pin not any of the downloaded images - until done downloading */
             pin.isDownloadingPhotos = true
+            
+            /* Track how many images have been downloaded. Hence set isDowloadingPhotos tappedPin property and enable newCollectionButton via posting a notification to NSNotificationCenter (to be received/ observed by PhotoAbumViewController). */
             var counter = 0
+            
             if let error = error {
-                println("error code: \(error.code)")
-                println("error description: \(error.localizedDescription)")
-            } else {
                 
-                println("photos = \(photosArray!.count)")
+                /* Internet connection error */
+                if error.code == 1 {
+                    
+                    /* Inform the user */
+                    let alertController = UIAlertController(
+                        title: error.localizedDescription,
+                        message: "Check your Internet connection",
+                        preferredStyle: .Alert
+                    )
+                    let okAction = UIAlertAction(
+                        title: "OK",
+                        style: .Default,
+                        handler: nil
+                    )
+                    alertController.addAction(okAction)
+                    self.presentViewController(alertController, animated: true, completion: nil)
+                } else {
+                    
+                    /* Another error */
+                    println("error code: \(error.code)")
+                    println("error description: \(error.localizedDescription)")
+                }
+            } else {
+
+                /* Flickr API called did return indeed if execution flow reached this point here (test with breakpoint and println). */
                 pin.flickrAPICallDidReturn = true
                 
                 if let photosArray = photosArray as? [[String : AnyObject]] {
                     if photosArray.count == 0 {
                         dispatch_async(dispatch_get_main_queue()) {
+                            
+                            /* User can no delete this pin. */
                             pin.isDownloadingPhotos = false
+                            
+                            /* Even if app termiantes and is reopened, isDownloadingPhotos property is false for this pin (savedin core data). */
+                            CoreDataStackManager.sharedInstance().saveContext()
                         }
+                        return
                     }
                     photosArray.map { (photoDictionary: [String : AnyObject]) -> Photo in
                         var dictionary = [String : String]()
@@ -387,11 +423,7 @@ extension TravelLocationsMapViewController {
                             if let imageID = photoDictionary[FlickrClient.JSONResponseKeys.ImageID] as? String {
                                 dictionary[Photo.Keys.ImageID]      = imageID
                                 dictionary[Photo.Keys.ImageURL]     = imageURL
-                            } else {
-                                println("no imageID as String")
                             }
-                        } else {
-                            println("no imageURL as String")
                         }
                         
                         // Init the Photo object
@@ -406,34 +438,34 @@ extension TravelLocationsMapViewController {
                         let url = NSURL(string: photo.imageURL)!
                         
                         let task = session.dataTaskWithURL(url) { data, response, error in
-                            
-                            println("started dataTaskWithURL TravelLocations")
-                            
                             if let error = error {
+                                
+                                /* If error is related to bad Internet connection, photo object must set its error property to true. And will then be downlaoded next time PhotoAlbumViewController appears (viewWillAppear) */
                                 self.handleErrors(photo: photo, error: error)
-                            } else {
+                            }
+                            else {
                                 let image = UIImage(data: data)
                                 
                                 dispatch_async(dispatch_get_main_queue()) {
                                     photo.image = image
-                                    CoreDataStackManager.sharedInstance().saveContext()         // TODO: - Do I need this?
                                     
-                                    // Send notification to PhotoAlbumViewController to reload image
+                                    /* Post notification to PhotoAlbumViewController to reload photoCollectionView and newly downloaded image. */
                                     NSNotificationCenter.defaultCenter().postNotificationName("reloadData", object: self)
                                 }
                                 
                                 counter++
+                                
+                                /* If done downloading all images */
                                 if counter == photosArray.count {
-                                    
-                                    println("Done Downloading TravelLocations ***********")
-                                    
                                     dispatch_async(dispatch_get_main_queue()) {
+                                        
+                                        /* Now user can delete pin and any of its associated images */
                                         pin.isDownloadingPhotos = false
                                         
-                                        // Save the new pin.isDownloadingPhotos property to Core Data
+                                        /* Save all photos' relation to this pin and save the new isDownloadingPhotos managed property for next time this pin is tapped */
                                         CoreDataStackManager.sharedInstance().saveContext()
                                     
-                                        // Inform PhotoAlbumViewController to toggle enabled property of newCollectionButton
+                                        /* Inform PhotoAlbumViewController to toggle enabled property of newCollectionButton */
                                         NSNotificationCenter.defaultCenter().postNotificationName("enableOrDisableNewCollectionButton", object: self)
                                     }
                                 }
@@ -450,14 +482,16 @@ extension TravelLocationsMapViewController {
     
     func handleErrors(#photo: Photo, error: NSError) {
         
-        // Errors caused by bad Internet connection
+        /* Errors caused by bad Internet connection */
         if error.code == -1001 || error.code == -1005 || error.code == -1009 {
             dispatch_async(dispatch_get_main_queue()) {
                 photo.error = true
                 CoreDataStackManager.sharedInstance().saveContext()
             }
-            
-        } else {
+        }
+
+        /* Unknown error */
+        else {
             println("error code: \(error.code)")
             println("error domain: \(error.domain)")
             println("error description: \(error.localizedDescription)")

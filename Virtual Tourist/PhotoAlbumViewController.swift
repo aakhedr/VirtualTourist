@@ -125,9 +125,28 @@ class PhotoAlbumViewController: UIViewController {
         FlickrClient.sharedInstance().getPhotosForCoordinate(latitude: tappedPin.lat as Double, longitude: tappedPin.lon as Double, page: tappedPin.page) { photosArray, error in
             if let error = error {
                 
-                // TODO: - Add alert controller here
-                println("error code: \(error.code)")
-                println("error description: \(error.localizedDescription)")
+                /* Internet connection error */
+                if error.code == 1 {
+                    
+                    /* Inform the user */
+                    let alertController = UIAlertController(
+                        title: error.localizedDescription,
+                        message: "Check your Internet connection",
+                        preferredStyle: .Alert
+                    )
+                    let okAction = UIAlertAction(
+                        title: "OK",
+                        style: .Default,
+                        handler: nil
+                    )
+                    alertController.addAction(okAction)
+                    self.presentViewController(alertController, animated: true, completion: nil)
+                } else {
+                    
+                    /* Another error */
+                    println("error code: \(error.code)")
+                    println("error description: \(error.localizedDescription)")
+                }
             } else {
                 
                 /* Download the new set of images */
@@ -329,7 +348,7 @@ extension PhotoAlbumViewController {
                                 /* Now user can delete pin and any of its associated images */
                                 self.tappedPin.isDownloadingPhotos = false
                                 
-                                /* Save the new isDownloadingPhotos managed property for next time this pin is tapped */
+                                /* Save all photos' relation to this pin and save the new isDownloadingPhotos managed property for next time this pin is tapped */
                                 CoreDataStackManager.sharedInstance().saveContext()
 
                                 /* Enable newCollectionButton. Hence user is now able to download new set of images again. */
@@ -468,14 +487,14 @@ extension PhotoAlbumViewController {
                 showNoImageLabel()
             }
             
-            /* If returned, then there must be no photos for this location. */
+            /* If Flickr API Call returned with no photos for this location. */
             if let flickrAPICallDidReturn = tappedPin.flickrAPICallDidReturn {
                 if flickrAPICallDidReturn == true {
                     showNoImageLabel()
                 }
             }
             
-            /* If not disable the newCollectionButton and wait for the execution of the API call in TravelLocationsViewController */
+            /* If Flickr API call == false (TODO: - revisit with activity indicator!) disable the newCollectionButton and wait for the execution of the API call in TravelLocationsViewController */
             else {
                 newCollectionButton.enabled = false
             }
