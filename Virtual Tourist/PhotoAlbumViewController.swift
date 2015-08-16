@@ -16,6 +16,7 @@ class PhotoAlbumViewController: UIViewController {
     @IBOutlet private weak var newCollectionButton: UIBarButtonItem!
     
     var tappedPin: Pin!
+    var noImageLabel: UILabel!
     
     private var sharedContext : NSManagedObjectContext {
         return CoreDataStackManager.sharedInstance().managedObjectContext!
@@ -55,6 +56,12 @@ class PhotoAlbumViewController: UIViewController {
         
         // Perform the fetch
         performFetch()
+        
+        noImageLabel = UILabel(frame: CGRectMake(0, 0, 200, 21))
+        noImageLabel.center = self.view.center
+        noImageLabel.textAlignment = .Center
+        noImageLabel.text = "No Images"
+        noImageLabel.hidden = true
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -228,13 +235,15 @@ extension PhotoAlbumViewController {
             cell.image.image = photo.image
             cell.activityIndicator.stopAnimating()
         }
-        
-        // Important in case of didSelectItemAtIndexPath is called
-        cell.contentView.backgroundColor = UIColor.whiteColor()
     }
     
     func reloadData() {
         photoCollectionView.reloadData()
+        
+        if tappedPin.photos.count > 0 && photoCollectionView.hidden {
+            photoCollectionView.hidden = false
+            noImageLabel.hidden = true
+        }
     }
     
     func enableOrDisableNewCollectionButton() {
@@ -307,11 +316,11 @@ extension PhotoAlbumViewController {
                             counter += 1
                             if counter == photosArray.count {
                                 photo.pin = self.tappedPin
+                                self.tappedPin.isDownloadingPhotos = false
                                 CoreDataStackManager.sharedInstance().saveContext()
                                 
                                 println("********* Done downloading images PhotoAlbum")
                                 
-                                self.tappedPin.isDownloadingPhotos = false
                                 NSNotificationCenter.defaultCenter().postNotificationName("enableOrDisableNewCollectionButton", object: self)
                             }
                         }
@@ -342,13 +351,8 @@ extension PhotoAlbumViewController {
     
     func showNoImageLabel() {
         photoCollectionView.hidden = true
-        
-        var label = UILabel(frame: CGRectMake(0, 0, 200, 21))
-        label.center = self.view.center
-        label.textAlignment = .Center
-        label.text = "No Images"
-        label.hidden = false
-        self.view.addSubview(label)
+        noImageLabel.hidden = false
+        self.view.addSubview(noImageLabel)
         
         tappedPin.isDownloadingPhotos = false
         newCollectionButton.enabled = false
@@ -387,6 +391,8 @@ extension PhotoAlbumViewController {
                         dispatch_async(dispatch_get_main_queue()) {
                             photo.image = image
                             photo.error = false
+                            
+                            // Reload collection view data to show the image
                             self.photoCollectionView.reloadData()
                             
                             // Save new value of photo.error
@@ -414,19 +420,38 @@ extension PhotoAlbumViewController {
     }
     
     func checkPhotosCount() {
+        
+        /* If Flickr API call return some photos for the pin. */
         if tappedPin.photos.count != 0 {
+            
+            /* And is still downloading the photos */
             if tappedPin.isDownloadingPhotos {
+                
+                /* newCollectionButton must be disabled */
                 newCollectionButton.enabled = false
             }
+            
+            /* Check and handle Internet connection errors from the last time in case any image could not be downloaded before for either a slow connection, lost connection, timed-out requests. */
             handlePreviousConnectionErrors()
         }
         
+        /* In case of slow Internet connection, check if Flickr API call returned or not. */
         if tappedPin.photos.count == 0 {
             
-            /* In case of slow Internet connection, check if Flickr API call returned or not. If returned, then there must be no photos for this location. If not disable the newCollectionButton and wait for the execution of the API call in TravelLocationsViewController */
-            if tappedPin.flickrAPICallDidReturn {
+            /* App is just opened? */
+            if tappedPin.flickrAPICallDidReturn == nil {
                 showNoImageLabel()
-            } else {
+            }
+            
+            /* If returned, then there must be no photos for this location. */
+            if let flickrAPICallDidReturn = tappedPin.flickrAPICallDidReturn {
+                if flickrAPICallDidReturn == true {
+                    showNoImageLabel()
+                }
+            }
+            
+            /* If not disable the newCollectionButton and wait for the execution of the API call in TravelLocationsViewController */
+            else {
                 newCollectionButton.enabled = false
             }
         }

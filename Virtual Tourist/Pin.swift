@@ -26,7 +26,7 @@ class Pin: NSManagedObject {
     
     @NSManaged var photos               : NSSet
     
-    var flickrAPICallDidReturn          : Bool = false
+    var flickrAPICallDidReturn          : Bool!
     
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
         super.init(entity: entity, insertIntoManagedObjectContext: context)
