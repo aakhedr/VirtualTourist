@@ -68,6 +68,9 @@ class PhotoAlbumViewController: UIViewController {
         
         // Check how many photo objects for this pin (either 0 or more) and handle current view/ subViews accordingly
         checkPhotosCount()
+        
+        println("tappedPin.isDownloadingPhotos: \(tappedPin.isDownloadingPhotos)")
+        println("newCollectionButton.enabled: \(newCollectionButton.enabled)")
     }
     
     override func viewWillDisappear(animated: Bool) {
@@ -351,7 +354,7 @@ extension PhotoAlbumViewController {
         newCollectionButton.enabled = false
     }
     
-    func checkForConnectionErrors() {
+    func handlePreviousConnectionErrors() {
         var photosWithErrorCounter = 0
         var counter = 0
 
@@ -415,12 +418,16 @@ extension PhotoAlbumViewController {
             if tappedPin.isDownloadingPhotos {
                 newCollectionButton.enabled = false
             }
-            checkForConnectionErrors()
+            handlePreviousConnectionErrors()
         }
         
         if tappedPin.photos.count == 0 {
-            if !tappedPin.isDownloadingPhotos {
+            
+            /* In case of slow Internet connection, check if Flickr API call returned or not. If returned, then there must be no photos for this location. If not disable the newCollectionButton and wait for the execution of the API call in TravelLocationsViewController */
+            if tappedPin.flickrAPICallDidReturn {
                 showNoImageLabel()
+            } else {
+                newCollectionButton.enabled = false
             }
         }
     }

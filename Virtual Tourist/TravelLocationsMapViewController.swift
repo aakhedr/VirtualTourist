@@ -372,6 +372,7 @@ extension TravelLocationsMapViewController {
             } else {
                 
                 println("photos = \(photosArray!.count)")
+                pin.flickrAPICallDidReturn = true
                 
                 if let photosArray = photosArray as? [[String : AnyObject]] {
                     if photosArray.count == 0 {
@@ -428,6 +429,9 @@ extension TravelLocationsMapViewController {
                                     
                                     dispatch_async(dispatch_get_main_queue()) {
                                         pin.isDownloadingPhotos = false
+                                        
+                                        // Save the new pin.isDownloadingPhotos property to Core Data
+                                        CoreDataStackManager.sharedInstance().saveContext()
                                     
                                         // Inform PhotoAlbumViewController to toggle enabled property of newCollectionButton
                                         NSNotificationCenter.defaultCenter().postNotificationName("enableOrDisableNewCollectionButton", object: self)

@@ -19,12 +19,14 @@ class Pin: NSManagedObject {
         static let Photos = "photos"
     }
     
-    @NSManaged var lat: NSNumber
-    @NSManaged var lon: NSNumber
-    @NSManaged var page: Int
-    @NSManaged var isDownloadingPhotos: Bool
+    @NSManaged var lat                  : NSNumber
+    @NSManaged var lon                  : NSNumber
+    @NSManaged var page                 : Int
+    @NSManaged var isDownloadingPhotos  : Bool
     
-    @NSManaged var photos: NSSet
+    @NSManaged var photos               : NSSet
+    
+    var flickrAPICallDidReturn          : Bool = false
     
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
         super.init(entity: entity, insertIntoManagedObjectContext: context)
