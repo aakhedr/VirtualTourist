@@ -416,7 +416,7 @@ extension TravelLocationsMapViewController {
                                 
                                 dispatch_async(dispatch_get_main_queue()) {
                                     photo.image = image
-                                    CoreDataStackManager.sharedInstance().saveContext()
+                                    CoreDataStackManager.sharedInstance().saveContext()         // TODO: - Do I need this?
                                     
                                     // Send notification to PhotoAlbumViewController to reload image
                                     NSNotificationCenter.defaultCenter().postNotificationName("reloadData", object: self)

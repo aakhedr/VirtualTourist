@@ -48,7 +48,7 @@ extension FlickrClient {
     }
     
     struct JSONResponseKeys {
-        static let StatusMessage    = "message"      // TODO: Test!
+        static let StatusMessage    = "message"         // Tested
         static let SuccessMessage   = "stat"
         static let PhotosDictionary = "photos"
         static let PhotosArray      = "photo"

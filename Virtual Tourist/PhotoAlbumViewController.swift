@@ -25,6 +25,7 @@ class PhotoAlbumViewController: UIViewController {
     lazy private var fetchedResultsController : NSFetchedResultsController = {
         let fetchRequest = NSFetchRequest(entityName: "Photo")
         
+        /* Sort by data/time added to core data */
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: "addedAt", ascending: true)]
         fetchRequest.predicate = NSPredicate(format: "pin == %@", self.tappedPin);
         
@@ -41,48 +42,51 @@ class PhotoAlbumViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // Add the tappedPin to the mapView
+        /* Add the tapped pin from TravelLocationsMapViewController to mapView */
         addTappedPinToMapView()
         
-        // Set mapView region
+        /* Set mapView region from the tapped pin lat/ lon properties */
         setMapViewRegion()
         
-        // Set photoCollectionView data srouce and delegate
+        /* Set photoCollectionView data srouce and delegate */
         photoCollectionView.dataSource = self
         photoCollectionView.delegate = self
         
-        // Set fetchedResultsController delegate 
+        /* Set fetchedResultsController delegate */
         fetchedResultsController.delegate = self
         
-        // Perform the fetch
+        /* Perform the fetch */
         performFetch()
         
+        /* No Image Label shows up in case a pin has no photos - Initially hidden */
         noImageLabel = UILabel(frame: CGRectMake(0, 0, 200, 21))
         noImageLabel.center = self.view.center
         noImageLabel.textAlignment = .Center
         noImageLabel.text = "No Images"
         noImageLabel.hidden = true
+        view.addSubview(noImageLabel)
     }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
-        // Reloads photoCollectionView data once an image is set in a Photo instance
+        /* Subscribe to NSNotifications */
+        
+        /* PhotoAlbumViewController is set to receive notifications named "reloadData" (from TravelLocationsMapViewController) everytime the function getFlickrImagesAndSaveContext sets the image property of a Photo instance - So that photoCollectionView reloads its data, hence show the new image as soon as it's downloaded. */
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "reloadData", name: "reloadData", object: nil)
         
-        // Enables the newCollectionButton once all images are downloaded
+        /* PhotoAlbumViewController set to receive notifications (from TravelLocationsMapVIewControlelr getFlickrImagesAndSaveContext) to enable or disable the newCollectionButton according to whether pin is/ is not  downloading photos. 
+        If pin is downloading photos, newColelctionButton disabled - If pin is done downloading images, newCollectionButton is enabled. */
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "enableOrDisableNewCollectionButton", name: "enableOrDisableNewCollectionButton", object: nil)
         
-        // Check how many photo objects for this pin (either 0 or more) and handle current view/ subViews accordingly
+        /* Check how many photo objects for this pin (either 0 or more) and handle current view/ subViews according to all possible use cases. */
         checkPhotosCount()
-        
-        println("tappedPin.isDownloadingPhotos: \(tappedPin.isDownloadingPhotos)")
-        println("newCollectionButton.enabled: \(newCollectionButton.enabled)")
     }
     
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
         
+        /* Unsubscribe */
         NSNotificationCenter.defaultCenter().removeObserver(self, name: "reloadData", object: nil)
         NSNotificationCenter.defaultCenter().removeObserver(self, name: "enableNewCollectionButton", object: nil)
     }
@@ -108,19 +112,25 @@ class PhotoAlbumViewController: UIViewController {
     @IBAction func addNewCollection(sender: UIBarButtonItem) {
         tappedPin.page = tappedPin.page + 1
         
-        // Delete previous set of photo objects
+        /* Delete previous set of photo objects */
         deleteAllPhotos()
         
+        /* This pin now cannot be deleted or any its associated images. Until this property is set back to false. */
         tappedPin.isDownloadingPhotos = true
+        
+        /* Toggle newCollectionButton.enabled property. */
         enableOrDisableNewCollectionButton()
 
+        
         FlickrClient.sharedInstance().getPhotosForCoordinate(latitude: tappedPin.lat as Double, longitude: tappedPin.lon as Double, page: tappedPin.page) { photosArray, error in
             if let error = error {
+                
+                // TODO: - Add alert controller here
                 println("error code: \(error.code)")
                 println("error description: \(error.localizedDescription)")
             } else {
                 
-                // Download the new set of images
+                /* Download the new set of images */
                 self.parsePhotosArray(photosArray!)
             }
         }
@@ -134,9 +144,6 @@ extension PhotoAlbumViewController: UICollectionViewDataSource, UICollectionView
     
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         let sectionInfo = fetchedResultsController.sections![section] as! NSFetchedResultsSectionInfo
-        
-        println("sectionInfo.numberOfObjects: \(sectionInfo.numberOfObjects)")
-        
         return sectionInfo.numberOfObjects
     }
     
@@ -157,42 +164,41 @@ extension PhotoAlbumViewController: UICollectionViewDataSource, UICollectionView
     func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
         let photo = fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
 
+        /* Allow user to delete an image iff no other images are yet downloading */
         if !photo.pin.isDownloadingPhotos {
             let cell = photoCollectionView.cellForItemAtIndexPath(indexPath)!
-            cell.contentView.backgroundColor = UIColor.redColor()
             
-            // Ensure image file path is deleted in .DocumentDirectory
+            /* Ensure image file path is deleted in .DocumentDirectory */
             photo.image = nil
             
             sharedContext.deleteObject(photo)
             CoreDataStackManager.sharedInstance().saveContext()
             photoCollectionView.reloadData()
-        } else {
-            
-            // Add alert controller
-            let alertController = UIAlertController(title: nil, message: "Cannot delete a photo while rest of the photos are being downloaded", preferredStyle: .Alert)
-            let okAction = UIAlertAction(title: "OK", style: .Default, handler: nil)
+        }
+        
+        /* Inform the user */
+        else {
+            let alertController = UIAlertController(
+                title: nil,
+                message: "Cannot delete a photo while rest of the photos are being downloaded",
+                preferredStyle: .Alert
+            )
+            let okAction = UIAlertAction(
+                title: "OK",
+                style: .Default,
+                handler: nil
+            )
             alertController.addAction(okAction)
             self.presentViewController(alertController, animated: true, completion: nil)
-            
-            println("rest of pin images are still being downloaded")
         }
     }
 }
 
+// MARK: - Fetched Results Controller Delegate
+
 extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
     
-    // MARK: - Fetched Results Controller Delegate
-    
-    func controllerWillChangeContent(controller: NSFetchedResultsController) {
-        println("controllerWillChangeContent called")
-        println("fetchedResultsController.fetchedObjects!.count \(fetchedResultsController.fetchedObjects!.count)")
-    }
-    
-    func controllerDidChangeContent(controller: NSFetchedResultsController) {
-        println("controllerDidChangeContent called")
-        println("fetchedResultsController.fetchedObjects!.count \(fetchedResultsController.fetchedObjects!.count)")
-    }
+    func controllerDidChangeContent(controller: NSFetchedResultsController) {   }
 }
 
 extension PhotoAlbumViewController {
@@ -214,7 +220,7 @@ extension PhotoAlbumViewController {
             tappedPin.lon as! CLLocationDegrees
         )
         let span = MKCoordinateSpanMake(1.0, 1.0)
-        mapView.region = MKCoordinateRegionMake(center, span)
+        mapView.setRegion(MKCoordinateRegionMake(center, span), animated: false)
     }
     
     func performFetch() {
@@ -248,31 +254,32 @@ extension PhotoAlbumViewController {
     
     func enableOrDisableNewCollectionButton() {
         newCollectionButton.enabled = !tappedPin.isDownloadingPhotos
-        
-        println("Toggled newCollectionButton.enabled property: \(newCollectionButton.enabled)")
     }
     
     func deleteAllPhotos() {
         for photo in fetchedResultsController.fetchedObjects as! [Photo] {
+            
+            /* Must delete image in the .DocumentDirectory */
             photo.image = nil
+            
             self.sharedContext.deleteObject(photo)
+            CoreDataStackManager.sharedInstance().saveContext()
         }
         photoCollectionView.reloadData()
     }
     
     func parsePhotosArray(photosArray: AnyObject) {
         
-        println("isDownoading new set of images")
-        
+        /* Use this to track how many images have been downloaded. Hence enable newCollectionButton and set isDowloadingPhotos tappedPin property */
         var counter = 0
+        
         if let photosArray = photosArray as? [[String : AnyObject]] {
 
-            // No Images label
+            /* In case photos array is empty -> No images for this location.
+            pin.photos NSSet has been emptied in the previous step (deleteAllPhotos). */
             if photosArray.count == 0 {
                 dispatch_async(dispatch_get_main_queue()) {
                     self.showNoImageLabel()
-                    self.tappedPin.photos = NSSet()
-                    CoreDataStackManager.sharedInstance().saveContext()
                 }
                 return
             }
@@ -283,45 +290,50 @@ extension PhotoAlbumViewController {
                     if let imageID = photosDictionary[FlickrClient.JSONResponseKeys.ImageID] as? String {
                         dictionary[Photo.Keys.ImageID]      = imageID
                         dictionary[Photo.Keys.ImageURL]      = imageURL
-                    } else {
-                        println("no imageID as String")
                     }
-                } else {
-                    println("no ImageURL as String")
                 }
                 
-                // Init the Photo object
+                /* Init the Photo object */
                 let photo = Photo(dictionary: dictionary, context: self.sharedContext)
 
                 dispatch_async(dispatch_get_main_queue()) {
                     photo.pin = self.tappedPin
                 }
                 
-                // Get that image on a background thread
+                /* Get that image on a background thread */
+                
                 let session = FlickrClient.sharedInstance().session
                 let url = NSURL(string: photo.imageURL)!
                 let task = session.dataTaskWithURL(url) { data, response, error in
-                    
-                    println("started dataTaskWithURL PhotoAlbum")
-                    
                     if let error = error {
+                        
+                        /* If error is related to bad Internet connection, photo object must set its error property to true. And will then be downlaoded next time PhotoAlbumViewController appears (viewWillAppear) */
                         self.handleErrors(photo: photo, error: error)
-                    } else {
+                    }
+                    
+                    else {
                         let image = UIImage(data: data)
                         
                         dispatch_async(dispatch_get_main_queue()) {
                             photo.image = image
-                            NSNotificationCenter.defaultCenter().postNotificationName("reloadData", object: self)
                             
+                            /* Show the newly downloaded image. */
+                            self.photoCollectionView.reloadData()
+                            
+                            /* Increment counter variable everytime photo.image is set (i.e. image is downloaded) */
                             counter += 1
+                            
+                            /* If done downloading all images */
                             if counter == photosArray.count {
-                                photo.pin = self.tappedPin
+                                
+                                /* Now user can delete pin and any of its associated images */
                                 self.tappedPin.isDownloadingPhotos = false
+                                
+                                /* Save the new isDownloadingPhotos managed property for next time this pin is tapped */
                                 CoreDataStackManager.sharedInstance().saveContext()
-                                
-                                println("********* Done downloading images PhotoAlbum")
-                                
-                                NSNotificationCenter.defaultCenter().postNotificationName("enableOrDisableNewCollectionButton", object: self)
+
+                                /* Enable newCollectionButton. Hence user is now able to download new set of images again. */
+                                self.newCollectionButton.enabled = true
                             }
                         }
                     }
@@ -335,14 +347,16 @@ extension PhotoAlbumViewController {
     
     func handleErrors(#photo: Photo, error: NSError) {
         
-        // Errors caused by bad Internet connection
+        /* Errors caused by bad Internet connection */
         if error.code == -1001 || error.code == -1005 || error.code == -1009 {
             dispatch_async(dispatch_get_main_queue()) {
                 photo.error = true
                 CoreDataStackManager.sharedInstance().saveContext()
             }
-            
-        } else {
+        }
+        
+        /* Unknown error */
+        else {
             println("error code: \(error.code)")
             println("error domain: \(error.domain)")
             println("error description: \(error.localizedDescription)")
@@ -352,14 +366,18 @@ extension PhotoAlbumViewController {
     func showNoImageLabel() {
         photoCollectionView.hidden = true
         noImageLabel.hidden = false
-        self.view.addSubview(noImageLabel)
-        
+
+        /* User cannot get new images for the locaiton. And this pin is done downloading! */
         tappedPin.isDownloadingPhotos = false
         newCollectionButton.enabled = false
     }
     
     func handlePreviousConnectionErrors() {
+        
+        /* Keep track of how many photos have errors */
         var photosWithErrorCounter = 0
+        
+        /* Keep track of total number of image downloads to compare to total number number of photos with Errors. Hence be able to toggle isDownloading Pin property and newCollectionButton enabled property */
         var counter = 0
 
         for object in tappedPin.photos {
@@ -368,16 +386,17 @@ extension PhotoAlbumViewController {
             if photo.error == true {
                 photosWithErrorCounter++
                 
-                // get that image
+                /* get that image */
                 let session = FlickrClient.sharedInstance().session
                 let url = NSURL(string: photo.imageURL)!
                 let task = session.dataTaskWithURL(url) { data, response, error in
                     if let error = error {
                         
-                        // errors due to bad Internet again?
+                        /* errors due to bad Internet again? */
                         if error.code == -1001 || error.code == -1005 || error.code == -1009 {
                             
-                            // Just for reconfirmation :)
+                            /* Just for reconfirmation :)
+                            Could have simply left this if body blank as photo.error won't change from true to false */
                             dispatch_async(dispatch_get_main_queue()) {
                                 photo.error = true
                                 CoreDataStackManager.sharedInstance().saveContext()
@@ -387,28 +406,34 @@ extension PhotoAlbumViewController {
                             println("error description: \(error.localizedDescription)")
                         }
                     } else {
+                        
+                        /* Got the image?
+                        Set it, toggle photo.error proprty and save the context */
                         let image = UIImage(data: data)
+                        
                         dispatch_async(dispatch_get_main_queue()) {
                             photo.image = image
                             photo.error = false
                             
-                            // Reload collection view data to show the image
+                            /* Reload collection view data to show the image */
                             self.photoCollectionView.reloadData()
                             
-                            // Save new value of photo.error
+                            /* Save new value of photo.error */
                             CoreDataStackManager.sharedInstance().saveContext()
                         }
+                        
+                        /* Now that an image is downloaded, increment image downloads counter */
                         counter++
                         
+                        /* Are we done downloading all images with errors? */
                         if counter == photosWithErrorCounter {
-                            
-                            println("Got all images with errors")
-                            
+
+                            /* isDownloadingPhotos property is no longer false and user can download new set of images for the location by tapping the newCollectionButton */
                             dispatch_async(dispatch_get_main_queue()) {
                                 self.tappedPin.isDownloadingPhotos = false
                                 self.newCollectionButton.enabled = true
                                 
-                                // save new value of tappedPin.isDownloadingPhotos
+                                /* save new value of tappedPin.isDownloadingPhotos */
                                 CoreDataStackManager.sharedInstance().saveContext()
                             }
                         }
