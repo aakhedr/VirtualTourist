@@ -22,6 +22,7 @@
 		36E2BF451B690A080060F219 /* FlickrClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E2BF441B690A080060F219 /* FlickrClient.swift */; };
 		36E2BF471B690A260060F219 /* FlickrConvenience.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E2BF461B690A260060F219 /* FlickrConvenience.swift */; };
 		36E2BF491B690A390060F219 /* FlickrConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E2BF481B690A390060F219 /* FlickrConstants.swift */; };
+		36E670011B8110B8002BD896 /* LaunchImage.png in Resources */ = {isa = PBXBuildFile; fileRef = 36E670001B8110B8002BD896 /* LaunchImage.png */; };
 		36F565551B6D788300CC0DD6 /* ImageCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36F565541B6D788300CC0DD6 /* ImageCache.swift */; };
 /* End PBXBuildFile section */
 
@@ -55,6 +56,7 @@
 		36E2BF441B690A080060F219 /* FlickrClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlickrClient.swift; sourceTree = "<group>"; };
 		36E2BF461B690A260060F219 /* FlickrConvenience.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlickrConvenience.swift; sourceTree = "<group>"; };
 		36E2BF481B690A390060F219 /* FlickrConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlickrConstants.swift; sourceTree = "<group>"; };
+		36E670001B8110B8002BD896 /* LaunchImage.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = LaunchImage.png; sourceTree = "<group>"; };
 		36F565541B6D788300CC0DD6 /* ImageCache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageCache.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -112,6 +114,7 @@
 			isa = PBXGroup;
 			children = (
 				362EBCCA1B643EBD00A1320B /* AppDelegate.swift */,
+				36E670001B8110B8002BD896 /* LaunchImage.png */,
 				362EBCC91B643EBD00A1320B /* Info.plist */,
 			);
 			name = "Supporting Files";
@@ -254,6 +257,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				36E670011B8110B8002BD896 /* LaunchImage.png in Resources */,
 				362EBCD01B643EBD00A1320B /* Main.storyboard in Resources */,
 				362EBCD51B643EBD00A1320B /* LaunchScreen.xib in Resources */,
 				362EBCD21B643EBD00A1320B /* Images.xcassets in Resources */,
