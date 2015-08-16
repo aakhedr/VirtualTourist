@@ -73,7 +73,7 @@ class TravelLocationsMapViewController: UIViewController {
             
             // In case there's a previous region saved. Set the mapView region to the last region.
             let region = setRegionCenterAndSpan()
-            mapView.setRegion(region, animated: false)
+            mapView.setRegion(region, animated: true)
         }
         
         // Set Fetched Results Controller delegate
@@ -411,6 +411,9 @@ extension TravelLocationsMapViewController {
                             /* User can no delete this pin. */
                             pin.isDownloadingPhotos = false
                             
+                            /* Post notification to PhotoAlbumViewController to reload photoCollectionView and newly downloaded image. */
+                            NSNotificationCenter.defaultCenter().postNotificationName("reloadData", object: self)
+
                             /* Even if app termiantes and is reopened, isDownloadingPhotos property is false for this pin (savedin core data). */
                             CoreDataStackManager.sharedInstance().saveContext()
                         }

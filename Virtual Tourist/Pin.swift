@@ -26,7 +26,7 @@ class Pin: NSManagedObject {
     
     @NSManaged var photos               : NSSet
     
-    var flickrAPICallDidReturn          : Bool!
+    var flickrAPICallDidReturn          : Bool = false
     
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
         super.init(entity: entity, insertIntoManagedObjectContext: context)
@@ -40,6 +40,6 @@ class Pin: NSManagedObject {
         lon = dictionary[Pin.Keys.Lon] as! NSNumber
         page = dictionary[Pin.Keys.Page] as! Int
         
-        isDownloadingPhotos = false
+        isDownloadingPhotos = true
     }
 }

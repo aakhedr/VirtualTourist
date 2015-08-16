@@ -238,7 +238,7 @@ extension PhotoAlbumViewController {
             tappedPin.lon as! CLLocationDegrees
         )
         let span = MKCoordinateSpanMake(1.0, 1.0)
-        mapView.setRegion(MKCoordinateRegionMake(center, span), animated: false)
+        mapView.setRegion(MKCoordinateRegionMake(center, span), animated: true)
     }
     
     func performFetch() {
@@ -264,9 +264,14 @@ extension PhotoAlbumViewController {
     func reloadData() {
         photoCollectionView.reloadData()
         
+        if tappedPin.photos.count == 0 {
+            showNoImageLabel()
+        }
+        
         if tappedPin.photos.count > 0 && photoCollectionView.hidden {
             photoCollectionView.hidden = false
             noImageLabel.hidden = true
+            activityIndicator.stopAnimating()
         }
     }
     
@@ -472,7 +477,7 @@ extension PhotoAlbumViewController {
     
     func checkPhotosCount() {
         
-        /* If Flickr API call return some photos for the pin. */
+        /* If Flickr API call returned and there are some photos for the pin. */
         if tappedPin.photos.count != 0 {
             
             /* And is still downloading the photos */
@@ -486,24 +491,25 @@ extension PhotoAlbumViewController {
             handlePreviousConnectionErrors()
         }
         
-        /* In case of slow Internet connection, check if Flickr API call returned or not. */
+        /* if by the time the view appears the tappedPin doesn't have any photos */
         if tappedPin.photos.count == 0 {
             
-            /* App is just opened? */
-            if tappedPin.flickrAPICallDidReturn == nil {
+            /* It could be because Internet connection is ok but the location doesn't have any images.
+            In which case, showNoImageLabel is invoked */
+            if tappedPin.flickrAPICallDidReturn && !tappedPin.isDownloadingPhotos {
                 showNoImageLabel()
             }
             
-            /* If Flickr API Call returned with no photos for this location. */
-            if let flickrAPICallDidReturn = tappedPin.flickrAPICallDidReturn {
-                if flickrAPICallDidReturn == true {
-                    showNoImageLabel()
-                }
+            /* If Flickr API call didn't return yet (because of slow Internet connection), disable the newCollectionButton, show activity indicator and wait for the execution of the API call in TravelLocationsViewController to show the photoCollectionView */
+            else if !tappedPin.flickrAPICallDidReturn && tappedPin.isDownloadingPhotos {
+                photoCollectionView.hidden = true
+                newCollectionButton.enabled = false
+                activityIndicator.startAnimating()
             }
             
-            /* If Flickr API call == false (TODO: - revisit with activity indicator!) disable the newCollectionButton and wait for the execution of the API call in TravelLocationsViewController */
-            else {
-                newCollectionButton.enabled = false
+            /* App is just opened? */
+            else if !tappedPin.flickrAPICallDidReturn && !tappedPin.isDownloadingPhotos {
+                showNoImageLabel()
             }
         }
     }
