@@ -63,7 +63,7 @@ class PhotoAlbumViewController: UIViewController {
         noImageLabel.hidden = true
         
         /* Activity indicator for the photoCollectionView (NOT individual cells) */
-        activityIndicator.startAnimating()
+        activityIndicator.hidesWhenStopped = true
         
     }
     
@@ -111,6 +111,9 @@ class PhotoAlbumViewController: UIViewController {
     
     @IBAction func addNewCollection(sender: UIBarButtonItem) {
         tappedPin.page = tappedPin.page + 1
+        
+        // TODO: - Check why it doesn't work?
+        activityIndicator.startAnimating()
         
         /* Delete previous set of photo objects */
         deleteAllPhotos()
@@ -336,7 +339,8 @@ extension PhotoAlbumViewController {
                         dispatch_async(dispatch_get_main_queue()) {
                             photo.image = image
                             
-                            /* Show the newly downloaded image. */
+                            /* Stop indicator animation and show the newly downloaded image. */
+                            self.activityIndicator.stopAnimating()
                             self.photoCollectionView.reloadData()
                             
                             /* Increment counter variable everytime photo.image is set (i.e. image is downloaded) */
