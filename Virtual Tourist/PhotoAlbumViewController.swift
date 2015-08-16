@@ -65,6 +65,14 @@ class PhotoAlbumViewController: UIViewController {
         noImageLabel.text = "No Images"
         noImageLabel.hidden = true
         view.addSubview(noImageLabel)
+        
+        /* Activity indicator for the photoCollectionView (NOT individual cells) */
+//        activityIndicator = UIActivityIndicatorView(activityIndicatorStyle: .WhiteLarge)
+        
+//        activityIndicator.hidesWhenStopped = true
+//        activityIndicator.backgroundColor = UIColor.blackColor()
+//        activityIndicator.startAnimating()
+//        view.addSubview(activityIndicator)
     }
     
     override func viewWillAppear(animated: Bool) {
