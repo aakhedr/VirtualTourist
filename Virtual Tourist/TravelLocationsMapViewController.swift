@@ -251,8 +251,8 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
             }
 
             // Delete the pin and save context
-            for photoObject in pinToBeDeleted.photos {
-                let photo = photoObject as! Photo
+            for object in pinToBeDeleted.photos {
+                let photo = object as! Photo
                 photo.image = nil
             }
             sharedContext.deleteObject(pinToBeDeleted)
@@ -408,10 +408,10 @@ extension TravelLocationsMapViewController {
                     if photosArray.count == 0 {
                         dispatch_async(dispatch_get_main_queue()) {
                             
-                            /* User can no delete this pin. */
+                            /* User can now delete this pin. */
                             pin.isDownloadingPhotos = false
                             
-                            /* Post notification to PhotoAlbumViewController to reload photoCollectionView and newly downloaded image. */
+                            /* Post notification to PhotoAlbumViewController to reload photoCollectionView and show no image label. */
                             NSNotificationCenter.defaultCenter().postNotificationName("reloadData", object: self)
 
                             /* Even if app termiantes and is reopened, isDownloadingPhotos property is false for this pin (savedin core data). */

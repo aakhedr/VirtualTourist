@@ -219,9 +219,9 @@ extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
     func controllerDidChangeContent(controller: NSFetchedResultsController) {   }
 }
 
+// MARK: - Helpers
+
 extension PhotoAlbumViewController {
-    
-    // MARK: - Helpers
     
     func addTappedPinToMapView() {
         let annotation = MKPointAnnotation()
