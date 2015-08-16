@@ -112,19 +112,15 @@ class PhotoAlbumViewController: UIViewController {
     @IBAction func addNewCollection(sender: UIBarButtonItem) {
         tappedPin.page = tappedPin.page + 1
         
-        // TODO: - Check why it doesn't work?
-        activityIndicator.startAnimating()
-        
         /* Delete previous set of photo objects */
         deleteAllPhotos()
-        
+
         /* This pin now cannot be deleted or any its associated images. Until this property is set back to false. */
-        tappedPin.isDownloadingPhotos = true
+        self.tappedPin.isDownloadingPhotos = true
         
         /* Toggle newCollectionButton.enabled property. */
-        enableOrDisableNewCollectionButton()
+        self.enableOrDisableNewCollectionButton()
 
-        
         FlickrClient.sharedInstance().getPhotosForCoordinate(latitude: tappedPin.lat as Double, longitude: tappedPin.lon as Double, page: tappedPin.page) { photosArray, error in
             if let error = error {
                 
@@ -279,6 +275,11 @@ extension PhotoAlbumViewController {
     }
     
     func deleteAllPhotos() {
+        
+        /* Show activity indicator spinning and hide collection view */
+        photoCollectionView.hidden = true
+        activityIndicator.startAnimating()
+
         for photo in fetchedResultsController.fetchedObjects as! [Photo] {
             
             /* Must delete image in the .DocumentDirectory */
@@ -340,8 +341,9 @@ extension PhotoAlbumViewController {
                             photo.image = image
                             
                             /* Stop indicator animation and show the newly downloaded image. */
-                            self.activityIndicator.stopAnimating()
                             self.photoCollectionView.reloadData()
+                            self.activityIndicator.stopAnimating()
+                            self.photoCollectionView.hidden = false
                             
                             /* Increment counter variable everytime photo.image is set (i.e. image is downloaded) */
                             counter += 1
@@ -388,6 +390,7 @@ extension PhotoAlbumViewController {
     
     func showNoImageLabel() {
         photoCollectionView.hidden = true
+        activityIndicator.stopAnimating()
         noImageLabel.hidden = false
 
         /* User cannot get new images for the locaiton. And this pin is done downloading! */
