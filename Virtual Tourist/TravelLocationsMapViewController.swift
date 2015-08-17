@@ -99,8 +99,6 @@ class TravelLocationsMapViewController: UIViewController {
     // MARK:- Actions
     
     @IBAction func deletePin(sender: UIBarButtonItem) {
-        println(sender.valueForKey("systemItem") as! Int)
-        
         var newY: CGFloat
 
         if sender.valueForKey("systemItem") as! Int == 2 {      // 2 is UIBarButtonSystemItem.Edit
