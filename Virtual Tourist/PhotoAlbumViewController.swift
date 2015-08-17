@@ -127,14 +127,17 @@ class PhotoAlbumViewController: UIViewController {
                 /* Internet connection error */
                 if error.code == 1 {
                     
+                    let alertMessage = NSLocalizedString("message2", value: "Check your Internet connection", comment: "")
+                    let okActionTitle = NSLocalizedString("okActionTitle", value: "OK", comment: "")
+                    
                     /* Inform the user */
                     let alertController = UIAlertController(
                         title: error.localizedDescription,
-                        message: "Check your Internet connection",
+                        message: alertMessage,
                         preferredStyle: .Alert
                     )
                     let okAction = UIAlertAction(
-                        title: "OK",
+                        title: okActionTitle,
                         style: .Default,
                         handler: nil
                     )
