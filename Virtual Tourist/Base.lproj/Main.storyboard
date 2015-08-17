@@ -178,7 +178,13 @@
                             </mask>
                         </variation>
                     </view>
-                    <navigationItem key="navigationItem" id="wqP-vv-qAh"/>
+                    <navigationItem key="navigationItem" id="wqP-vv-qAh">
+                        <barButtonItem key="rightBarButtonItem" systemItem="refresh" id="INJ-0q-tz7">
+                            <connections>
+                                <action selector="refreshNotYetDownloadedImages:" destination="iUB-bG-kG1" id="v8D-XA-wKS"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <outlet property="activityIndicator" destination="gXr-Uv-qlK" id="69G-Qf-OKp"/>
                         <outlet property="mapView" destination="RvG-ff-Que" id="D00-yc-IZa"/>

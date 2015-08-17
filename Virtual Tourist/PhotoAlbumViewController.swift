@@ -153,6 +153,74 @@ class PhotoAlbumViewController: UIViewController {
             }
         }
     }
+    
+    @IBAction func refreshNotYetDownloadedImages(sender: UIBarButtonItem) {
+        
+        /* In case the app terminates while some images are still being downloaded. User can tap the refresh button to re-start requests for the pin's images that have not been downloaded the last time the app ran */
+        
+        var counter = 0
+        var photosWithNilImages = 0
+        
+        for photo in fetchedResultsController.fetchedObjects as! [Photo] {
+            if photo.image == nil {     // i.e. not set
+                photosWithNilImages++
+                
+                // Start a task for URL here
+                let session = FlickrClient.sharedInstance().session
+                let url = NSURL(string: photo.imageURL)!
+                let task = session.dataTaskWithURL(url) { data, response, error in
+                    if let error = error {
+                        
+                        /* errors due to bad Internet again? */
+                        if error.code == -1001 || error.code == -1005 || error.code == -1009 {
+                            
+                            /* Just for reconfirmation :)
+                            Could have simply left this if body blank as photo.error won't change from true to false */
+                            dispatch_async(dispatch_get_main_queue()) {
+                                photo.error = true
+                                CoreDataStackManager.sharedInstance().saveContext()
+                            }
+                        } else {
+                            println("error code: \(error.code)")
+                            println("error description: \(error.localizedDescription)")
+                        }
+                    } else {
+                        
+                        /* Got the image?
+                        Set it and save the context */
+                        let image = UIImage(data: data)
+                        
+                        dispatch_async(dispatch_get_main_queue()) {
+                            photo.image = image
+                            
+                            /* Reload collection view data to show the image */
+                            self.photoCollectionView.reloadData()
+                            
+                            /* Save new value of photo.error */
+                            CoreDataStackManager.sharedInstance().saveContext()
+                        }
+                        
+                        /* Now that an image is downloaded, increment image downloads counter */
+                        counter++
+                        
+                        /* Are we done downloading all images with errors? */
+                        if counter == photosWithNilImages {
+                            
+                            /* isDownloadingPhotos property is no longer false and user can download new set of images for the location by tapping the newCollectionButton */
+                            dispatch_async(dispatch_get_main_queue()) {
+                                self.tappedPin.isDownloadingPhotos = false
+                                self.newCollectionButton.enabled = true
+                                
+                                /* save new value of tappedPin.isDownloadingPhotos */
+                                CoreDataStackManager.sharedInstance().saveContext()
+                            }
+                        }
+                    }
+                }
+                task.resume()
+            }
+        }
+    }
 }
 
 
