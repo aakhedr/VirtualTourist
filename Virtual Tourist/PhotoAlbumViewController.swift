@@ -192,14 +192,25 @@ extension PhotoAlbumViewController: UICollectionViewDataSource, UICollectionView
 
         /* Allow user to delete an image iff no other images are yet downloading */
         if !photo.pin.isDownloadingPhotos {
-            let cell = photoCollectionView.cellForItemAtIndexPath(indexPath)!
+            let cell = photoCollectionView.cellForItemAtIndexPath(indexPath) as! PhotoCollectionViewCell
+
+            /* If image is not selected, select it! */
+            if photo.selected != true {
+                selectImage(cell: cell, photo: photo)
+            }
             
-            /* Ensure image file path is deleted in .DocumentDirectory */
-            photo.image = nil
-            
-            sharedContext.deleteObject(photo)
-            CoreDataStackManager.sharedInstance().saveContext()
-            photoCollectionView.reloadData()
+            /* If image is selected, deleted it */
+            else if let selected = photo.selected {
+                if selected {
+                    
+                    /* Ensure image file path is deleted in .DocumentDirectory */
+                    photo.image = nil
+                    
+                    sharedContext.deleteObject(photo)
+                    CoreDataStackManager.sharedInstance().saveContext()
+                    photoCollectionView.reloadData()
+                }
+            }
         }
         
         /* Inform the user */
@@ -270,6 +281,9 @@ extension PhotoAlbumViewController {
             cell.image.image = photo.image
             cell.activityIndicator.stopAnimating()
         }
+        
+        /* In case image is selected for deletion, backgroundColor needs to be set back to whiteColor */
+        cell.contentView.backgroundColor = UIColor.whiteColor()
     }
     
     func reloadData() {
@@ -405,6 +419,11 @@ extension PhotoAlbumViewController {
             println("error domain: \(error.domain)")
             println("error description: \(error.localizedDescription)")
         }
+    }
+    
+    func selectImage(#cell: PhotoCollectionViewCell, photo: Photo) {
+        cell.contentView.backgroundColor = UIColor.redColor()
+        photo.selected = true
     }
     
     func showNoImageLabel() {

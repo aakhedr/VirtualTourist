@@ -25,6 +25,7 @@ class Photo: NSManagedObject {
     
     @NSManaged var pin: Pin
 
+    var selected            : Bool!
     var image: UIImage? {
         get {
             return ImageCache.sharedCache().imageWithIdentifier(imageID)
