@@ -193,41 +193,6 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
         saveValue()
     }
     
-    func mapView(mapView: MKMapView!, annotationView view: MKAnnotationView!, didChangeDragState newState: MKAnnotationViewDragState, fromOldState oldState: MKAnnotationViewDragState) {
-        switch oldState {
-        
-        // Old coordinate
-        case .Starting:
-            
-            println("changDragState starting")
-            
-            let pinToBeDeleted = searchForPinInCoreData(
-                latitude: view.annotation.coordinate.latitude,
-                longitude: view.annotation.coordinate.longitude)
-            
-            // Delete old object
-            sharedContext.deleteObject(pinToBeDeleted)
-            CoreDataStackManager.sharedInstance().saveContext()
-
-            println(pinToBeDeleted.photos.count)
-            
-        // New coordinate
-        case .Ending:
-
-            println("changDragState ending")
-            
-            // Init new pin and save context
-            let pinToBeAdded = pinFromAnnotation(annotation: view.annotation)
-            CoreDataStackManager.sharedInstance().saveContext()
-
-            // Get Flickr images and Save context
-            getFlickrImagesAndSaveContext(pin: pinToBeAdded)
-            
-        default:
-            break
-        }
-    }
-    
     func mapView(mapView: MKMapView!, didSelectAnnotationView view: MKAnnotationView!) {
         if tapPinToDeleteLabel.hidden {
             
