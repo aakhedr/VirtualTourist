@@ -11,7 +11,7 @@
         <attribute name="isDownloadingPhotos" attributeType="Boolean" syncable="YES"/>
         <attribute name="lat" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
         <attribute name="lon" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
-        <attribute name="page" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <attribute name="page" attributeType="Float" defaultValueString="0" syncable="YES"/>
         <relationship name="photos" toMany="YES" deletionRule="Cascade" destinationEntity="Photo" inverseName="pin" inverseEntity="Photo" syncable="YES"/>
     </entity>
     <elements>

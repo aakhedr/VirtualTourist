@@ -84,15 +84,11 @@ class TravelLocationsMapViewController: UIViewController {
         
         // Fetch and show pins in the map view
         fetchAndShowPinAnnotations()
-    }
-    
-    override func viewWillAppear(animated: Bool) {
-        super.viewWillAppear(animated)
         
         let pins = fetchedResultsController.fetchedObjects as! [Pin]
         for pin in pins {
             
-            /* Only if this pin exists in core data (from previous run of the app) AND Flickr API call never invoked (i.e. it doesn't have photos). 
+            /* Only if this pin exists in core data (from previous run of the app) AND Flickr API call never invoked (i.e. it doesn't have photos).
             Although isDownloadingPhotos property is set to true upon intializaing the Pin object */
             if !pin.flickrAPICallDidReturn && pin.isDownloadingPhotos {
                 

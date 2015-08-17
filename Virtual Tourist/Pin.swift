@@ -21,7 +21,7 @@ class Pin: NSManagedObject {
     
     @NSManaged var lat                  : NSNumber
     @NSManaged var lon                  : NSNumber
-    @NSManaged var page                 : Int
+    @NSManaged var page                 : Float
     @NSManaged var isDownloadingPhotos  : Bool
     
     @NSManaged var photos               : NSSet
@@ -38,7 +38,7 @@ class Pin: NSManagedObject {
 
         lat = dictionary[Pin.Keys.Lat] as! NSNumber
         lon = dictionary[Pin.Keys.Lon] as! NSNumber
-        page = dictionary[Pin.Keys.Page] as! Int
+        page = dictionary[Pin.Keys.Page] as! Float
         
         isDownloadingPhotos = true
     }
