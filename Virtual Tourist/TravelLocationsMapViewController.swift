@@ -252,8 +252,8 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
 
             if pinToBeDeleted.isDownloadingPhotos {
                 
-                let alertMessage = NSLocalizedString("message1", value: "Cannot delete a pin while its photos are being downloaded", comment: "Let user know that he/ she cannot delete a pin while its photos are yet downloading")
-                let okActionTitle = NSLocalizedString("okActionTitle", value: "OK", comment: "Dismisses alert view")
+                let alertMessage = NSLocalizedString("Cannot delete a pin while its photos are being downloaded", comment: "Let user know that he/ she cannot delete a pin while its photos are yet downloading")
+                let okActionTitle = NSLocalizedString("OK", comment: "Dismisses alert view")
                 
                 // Inform the user
                 let alertController = UIAlertController(
@@ -403,12 +403,13 @@ extension TravelLocationsMapViewController {
                 /* Internet connection error */
                 if error.code == 1 {
                     
-                    let alertMessage = NSLocalizedString("message2", value: "Check your Internet connection", comment: "Let user know of a problem with Internet conenction")
-                    let okActionTitle = NSLocalizedString("okActionTitle", value: "OK", comment: "Dismisses alert view")
+                    let alertTitle = NSLocalizedString("Network Error", comment: "")
+                    let alertMessage = NSLocalizedString("Check your Internet connection", comment: "")
+                    let okActionTitle = NSLocalizedString("OK", comment: "")
                     
                     /* Inform the user */
                     let alertController = UIAlertController(
-                        title: error.localizedDescription,
+                        title: alertTitle,
                         message: alertMessage,
                         preferredStyle: .Alert
                     )

@@ -56,21 +56,26 @@
       <tool tool-id="com.apple.dt.xcode" tool-name="Xcode" tool-version="6.4" build-num="6E35b"/>
     </header>
     <body>
-      <trans-unit id="message1">
+      <trans-unit id="Cannot delete a photo while rest of the photos are being downloaded">
+        <source>Cannot delete a photo while rest of the photos are being downloaded</source>
+        <target>No se puede eliminar imagénes mientras descargar los demás</target>
+        <note>Let user know it's not possible to delete an image while others are being downloaded</note>
+      </trans-unit>
+      <trans-unit id="Cannot delete a pin while its photos are being downloaded">
         <source>Cannot delete a pin while its photos are being downloaded</source>
         <target>No se puede eliminar botones mientras descargar imagénes</target>
         <note>Let user know that he/ she cannot delete a pin while its photos are yet downloading</note>
       </trans-unit>
-      <trans-unit id="message2">
+      <trans-unit id="Check your Internet connection">
         <source>Check your Internet connection</source>
         <target>Combrobar su conexión a Internet</target>
-        <note>Let user know of a problem with Internet conenction</note>
+        <note>No comment provided by engineer.</note>
       </trans-unit>
-      <trans-unit id="message3">
-        <source>Cannot delete a photo while rest of the photos are being downloaded</source>
-        <note>Let user know it's not possible to delete an image while others are being downloaded</note>
+      <trans-unit id="Network Error">
+        <source>Network Error</source>
+        <note>No comment provided by engineer.</note>
       </trans-unit>
-      <trans-unit id="okActionTitle">
+      <trans-unit id="OK">
         <source>OK</source>
         <target>OK</target>
         <note>Dismisses alert view</note>

@@ -1,12 +1,15 @@
-/* Let user know that he/ she cannot delete a pin while its photos are yet downloading */
-"message1" = "No se puede eliminar botones mientras descargar imagénes";
-
-/* Let user know of a problem with Internet conenction */
-"message2" = "Combrobar su conexión a Internet";
-
 /* Let user know it's not possible to delete an image while others are being downloaded */
-"message3" = "No se puede eliminar imagénes mientras descargar los demás";
+"Cannot delete a photo while rest of the photos are being downloaded" = "No se puede eliminar imagénes mientras descargar los demás";
+
+/* Let user know that he/ she cannot delete a pin while its photos are yet downloading */
+"Cannot delete a pin while its photos are being downloaded" = "No se puede eliminar botones mientras descargar imagénes";
+
+/* No comment provided by engineer. */
+"Check your Internet connection" = "Combrobar su conexión a Internet";
+
+/* No comment provided by engineer. */
+"Network Error" = "Error de Red";
 
 /* Dismisses alert view */
-"okActionTitle" = "OK";
+"OK" = "OK";
 

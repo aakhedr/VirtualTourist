@@ -36,7 +36,7 @@ extension FlickrClient {
                     error: NSError(
                         domain: "getPhotosForCoordinate",
                         code: 1,
-                        userInfo: [NSLocalizedDescriptionKey: "network error"]))
+                        userInfo: [NSLocalizedDescriptionKey: "Network Error"]))
             } else {
                 if let successMessage = JSONResult.valueForKey(JSONResponseKeys.SuccessMessage) as? String {
                     if successMessage == "ok" {

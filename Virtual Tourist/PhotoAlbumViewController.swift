@@ -127,12 +127,13 @@ class PhotoAlbumViewController: UIViewController {
                 /* Internet connection error */
                 if error.code == 1 {
                     
-                    let alertMessage = NSLocalizedString("message2", value: "Check your Internet connection", comment: "")
-                    let okActionTitle = NSLocalizedString("okActionTitle", value: "OK", comment: "")
+                    let alertTitle = NSLocalizedString("Network Error", comment: "")
+                    let alertMessage = NSLocalizedString("Check your Internet connection", comment: "")
+                    let okActionTitle = NSLocalizedString("OK", comment: "")
                     
                     /* Inform the user */
                     let alertController = UIAlertController(
-                        title: error.localizedDescription,
+                        title: alertTitle,
                         message: alertMessage,
                         preferredStyle: .Alert
                     )
@@ -203,8 +204,8 @@ extension PhotoAlbumViewController: UICollectionViewDataSource, UICollectionView
         
         /* Inform the user */
         else {
-            let alertMessage = NSLocalizedString("message3", value: "Cannot delete a photo while rest of the photos are being downloaded", comment: "Let user know it's not possible to delete an image while others are being downloaded")
-            let okActionTitle = NSLocalizedString("okActionTitle", value: "OK", comment: "Dismisses alert view")
+            let alertMessage = NSLocalizedString("Cannot delete a photo while rest of the photos are being downloaded", comment: "Let user know it's not possible to delete an image while others are being downloaded")
+            let okActionTitle = NSLocalizedString("OK", comment: "Dismisses alert view")
             
             let alertController = UIAlertController(
                 title: nil,
