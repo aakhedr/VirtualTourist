@@ -99,16 +99,22 @@ class TravelLocationsMapViewController: UIViewController {
     // MARK:- Actions
     
     @IBAction func deletePin(sender: UIBarButtonItem) {
+        println(sender.valueForKey("systemItem") as! Int)
+        
         var newY: CGFloat
 
-        if sender.title == "Edit" {
+        if sender.valueForKey("systemItem") as! Int == 2 {      // 2 is UIBarButtonSystemItem.Edit
             tapPinToDeleteLabel.hidden = false
-            sender.title = "Done"
+            let doneButton = UIBarButtonItem(barButtonSystemItem: .Done, target: self, action: "deletePin:")
+            self.navigationItem.rightBarButtonItem = doneButton
+            sender.enabled = false
             newY = mapView.frame.origin.y - tapPinToDeleteLabel.frame.height
         } else {
             newY = mapView.frame.origin.y + tapPinToDeleteLabel.frame.height
             tapPinToDeleteLabel.hidden = true
-            sender.title = "Edit"
+            let editButton = UIBarButtonItem(barButtonSystemItem: .Edit, target: self, action: "deletePin:")
+            self.navigationItem.rightBarButtonItem = editButton
+            sender.enabled = false
         }
         
         // Animate sliding the map view up/ down

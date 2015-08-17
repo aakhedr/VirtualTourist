@@ -54,7 +54,7 @@
                     </view>
                     <navigationItem key="navigationItem" title="Virtual Tourist" id="luR-cH-v4l">
                         <barButtonItem key="backBarButtonItem" title="OK" id="zG2-VU-yqp"/>
-                        <barButtonItem key="rightBarButtonItem" title="Edit" id="dXr-ND-6It">
+                        <barButtonItem key="rightBarButtonItem" systemItem="edit" id="dXr-ND-6It">
                             <connections>
                                 <action selector="deletePin:" destination="uSi-VY-s4y" id="Kl5-XN-Gt7"/>
                             </connections>
