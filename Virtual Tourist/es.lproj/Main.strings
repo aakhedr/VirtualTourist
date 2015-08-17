@@ -1,0 +1,18 @@
+
+/* Class = "UIBarButtonItem"; title = "New Collection"; ObjectID = "5dC-oR-wTK"; */
+"5dC-oR-wTK.title" = "New Collection";
+
+/* Class = "UILabel"; text = "Tap Pins to Delete"; ObjectID = "L1N-fs-r5p"; */
+"L1N-fs-r5p.text" = "Tap Pins to Delete";
+
+/* Class = "UILabel"; text = "No Images"; ObjectID = "ZmH-Be-C4E"; */
+"ZmH-Be-C4E.text" = "No Images";
+
+/* Class = "UIBarButtonItem"; title = "Edit"; ObjectID = "dXr-ND-6It"; */
+"dXr-ND-6It.title" = "Edit";
+
+/* Class = "UINavigationItem"; title = "Virtual Tourist"; ObjectID = "luR-cH-v4l"; */
+"luR-cH-v4l.title" = "Virtual Tourist";
+
+/* Class = "UIBarButtonItem"; title = "OK"; ObjectID = "zG2-VU-yqp"; */
+"zG2-VU-yqp.title" = "OK";
