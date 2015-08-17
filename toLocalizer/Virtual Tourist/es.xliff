@@ -13,22 +13,22 @@
     <body>
       <trans-unit id="5dC-oR-wTK.title">
         <source>New Collection</source>
-        <target>New Collection</target>
+        <target>Nueva Colección</target>
         <note>Class = "UIBarButtonItem"; title = "New Collection"; ObjectID = "5dC-oR-wTK";</note>
       </trans-unit>
       <trans-unit id="L1N-fs-r5p.text">
         <source>Tap Pins to Delete</source>
-        <target>Tap Pins to Delete</target>
+        <target>Tocar Botón para Eliminar</target>
         <note>Class = "UILabel"; text = "Tap Pins to Delete"; ObjectID = "L1N-fs-r5p";</note>
       </trans-unit>
       <trans-unit id="ZmH-Be-C4E.text">
         <source>No Images</source>
-        <target>No Images</target>
+        <target>Sin Imagénes</target>
         <note>Class = "UILabel"; text = "No Images"; ObjectID = "ZmH-Be-C4E";</note>
       </trans-unit>
       <trans-unit id="luR-cH-v4l.title">
         <source>Virtual Tourist</source>
-        <target>Virtual Tourist</target>
+        <target>Turista Virtual</target>
         <note>Class = "UINavigationItem"; title = "Virtual Tourist"; ObjectID = "luR-cH-v4l";</note>
       </trans-unit>
       <trans-unit id="zG2-VU-yqp.title">
@@ -48,6 +48,25 @@
       </trans-unit>
       <trans-unit id="CFBundleShortVersionString">
         <source>1.0</source>
+      </trans-unit>
+    </body>
+  </file>
+  <file original="Virtual Tourist/Localizable.strings" source-language="en" datatype="plaintext" target-language="es">
+    <header>
+      <tool tool-id="com.apple.dt.xcode" tool-name="Xcode" tool-version="6.4" build-num="6E35b"/>
+    </header>
+    <body>
+      <trans-unit id="message1">
+        <source>Cannot delete a pin while its photos are being downloaded</source>
+        <note>Let user know that he/ she cannot delete a pin while its photos are yet downloading</note>
+      </trans-unit>
+      <trans-unit id="message2">
+        <source>Check your Internet connection</source>
+        <note>Let user know of a problem with Internet conenction</note>
+      </trans-unit>
+      <trans-unit id="okActionTitle">
+        <source>OK</source>
+        <note>Dismisses alert view</note>
       </trans-unit>
     </body>
   </file>

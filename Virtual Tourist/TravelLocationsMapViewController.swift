@@ -236,14 +236,17 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
 
             if pinToBeDeleted.isDownloadingPhotos {
                 
+                let alertMessage = NSLocalizedString("message1", value: "Cannot delete a pin while its photos are being downloaded", comment: "Let user know that he/ she cannot delete a pin while its photos are yet downloading")
+                let okActionTitle = NSLocalizedString("okActionTitle", value: "OK", comment: "Dismisses alert view")
+                
                 // Inform the user
                 let alertController = UIAlertController(
                     title: nil,
-                    message: "Cannot delete a pin while its photos are being downloaded",
+                    message: alertMessage,
                     preferredStyle: .Alert
                 )
                 let okAction = UIAlertAction(
-                    title: "OK",
+                    title: okActionTitle,
                     style: .Default,
                     handler: nil
                 )
@@ -384,14 +387,17 @@ extension TravelLocationsMapViewController {
                 /* Internet connection error */
                 if error.code == 1 {
                     
+                    let alertMessage = NSLocalizedString("message2", value: "Check your Internet connection", comment: "Let user know of a problem with Internet conenction")
+                    let okActionTitle = NSLocalizedString("okActionTitle", value: "OK", comment: "Dismisses alert view")
+                    
                     /* Inform the user */
                     let alertController = UIAlertController(
                         title: error.localizedDescription,
-                        message: "Check your Internet connection",
+                        message: alertMessage,
                         preferredStyle: .Alert
                     )
                     let okAction = UIAlertAction(
-                        title: "OK",
+                        title: okActionTitle,
                         style: .Default,
                         handler: nil
                     )

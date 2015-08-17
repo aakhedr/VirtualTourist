@@ -51,6 +51,28 @@
       </trans-unit>
     </body>
   </file>
+  <file original="Virtual Tourist/Localizable.strings" source-language="en" datatype="plaintext" target-language="es">
+    <header>
+      <tool tool-id="com.apple.dt.xcode" tool-name="Xcode" tool-version="6.4" build-num="6E35b"/>
+    </header>
+    <body>
+      <trans-unit id="message1">
+        <source>Cannot delete a pin while its photos are being downloaded</source>
+        <target>No se puede eliminar botones mientras descargar imagénes</target>
+        <note>Let user know that he/ she cannot delete a pin while its photos are yet downloading</note>
+      </trans-unit>
+      <trans-unit id="message2">
+        <source>Check your Internet connection</source>
+        <target>Combrobar su conexión a Internet</target>
+        <note>Let user know of a problem with Internet conenction</note>
+      </trans-unit>
+      <trans-unit id="okActionTitle">
+        <source>OK</source>
+        <target>OK</target>
+        <note>Dismisses alert view</note>
+      </trans-unit>
+    </body>
+  </file>
   <file original="Virtual TouristTests/Info.plist" source-language="en" datatype="plaintext" target-language="es">
     <header>
       <tool tool-id="com.apple.dt.xcode" tool-name="Xcode" tool-version="6.4" build-num="6E35b"/>

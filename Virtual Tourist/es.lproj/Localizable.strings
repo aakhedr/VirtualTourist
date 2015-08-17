@@ -1,0 +1,9 @@
+/* Let user know that he/ she cannot delete a pin while its photos are yet downloading */
+"message1" = "No se puede eliminar botones mientras descargar imagénes";
+
+/* Let user know of a problem with Internet conenction */
+"message2" = "Combrobar su conexión a Internet";
+
+/* Dismisses alert view */
+"okActionTitle" = "OK";
+
