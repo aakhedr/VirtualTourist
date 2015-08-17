@@ -461,7 +461,10 @@ extension TravelLocationsMapViewController {
                                 
                                 dispatch_async(dispatch_get_main_queue()) {
                                     photo.image = image
-                                    
+
+                                    /* Save photo's relation to this pin */
+                                    CoreDataStackManager.sharedInstance().saveContext()
+
                                     /* Post notification to PhotoAlbumViewController to reload photoCollectionView and newly downloaded image. */
                                     NSNotificationCenter.defaultCenter().postNotificationName("reloadData", object: self)
                                 }
@@ -475,7 +478,7 @@ extension TravelLocationsMapViewController {
                                         /* Now user can delete pin and any of its associated images */
                                         pin.isDownloadingPhotos = false
                                         
-                                        /* Save all photos' relation to this pin and save the new isDownloadingPhotos managed property for next time this pin is tapped */
+                                        /* Save the new isDownloadingPhotos managed property for next time this pin is tapped */
                                         CoreDataStackManager.sharedInstance().saveContext()
                                     
                                         /* Inform PhotoAlbumViewController to toggle enabled property of newCollectionButton */

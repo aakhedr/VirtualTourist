@@ -353,6 +353,9 @@ extension PhotoAlbumViewController {
                             self.activityIndicator.stopAnimating()
                             self.photoCollectionView.hidden = false
                             
+                            /* Save photo's relation to this pin */
+                            CoreDataStackManager.sharedInstance().saveContext()
+                            
                             /* Increment counter variable everytime photo.image is set (i.e. image is downloaded) */
                             counter += 1
                             
@@ -362,7 +365,7 @@ extension PhotoAlbumViewController {
                                 /* Now user can delete pin and any of its associated images */
                                 self.tappedPin.isDownloadingPhotos = false
                                 
-                                /* Save all photos' relation to this pin and save the new isDownloadingPhotos managed property for next time this pin is tapped */
+                                /* Save the new isDownloadingPhotos managed property for next time this pin is tapped */
                                 CoreDataStackManager.sharedInstance().saveContext()
 
                                 /* Enable newCollectionButton. Hence user is now able to download new set of images again. */
@@ -503,18 +506,49 @@ extension PhotoAlbumViewController {
                 showNoImageLabel()
             }
             
-            /* If Flickr API call (in either TravelLocationsMapViewController or PhotoAlbumViewController) didn't return yet because of slow Internet connection, disable the newCollectionButton, show activity indicator and wait for the execution of the API call in TravelLocationsViewController to show the photoCollectionView */
+            /* If Flickr API call didn't return yet because of slow Internet connection, disable the newCollectionButton, show activity indicator and wait for the execution of the API call in TravelLocationsViewController to show the photoCollectionView */
             else if !tappedPin.flickrAPICallDidReturn && tappedPin.isDownloadingPhotos {
                 photoCollectionView.hidden = true
                 newCollectionButton.enabled = false
                 activityIndicator.startAnimating()
                 
-                /* Another case of Flickr API call did't return and pin isDownloadingPhotos is true is when the Fickr API call is never actually made because app just started - Pin exists from previous run where app was terminated before saving its photos to Core Data */
-                
-                
+                /* Another case of Flickr API call did't return and pin isDownloadingPhotos is true is when the Fickr API call is never actually invoked because app just started - Pin exists from previous run where app was terminated before saving its photos to Core Data */
+//                if true {
+//                    FlickrClient.sharedInstance().getPhotosForCoordinate(latitude: tappedPin.lat as Double, longitude:  tappedPin.lon as Double, page: tappedPin.page) { photosArray, error in
+//                        if let error = error {
+//                            
+//                            /* Internet connection error */
+//                            if error.code == 1 {
+//                                
+//                                /* Inform the user */
+//                                let alertController = UIAlertController(
+//                                    title: error.localizedDescription,
+//                                    message: "Check your Internet connection",
+//                                    preferredStyle: .Alert
+//                                )
+//                                let okAction = UIAlertAction(
+//                                    title: "OK",
+//                                    style: .Default,
+//                                    handler: nil
+//                                )
+//                                alertController.addAction(okAction)
+//                                self.presentViewController(alertController, animated: true, completion: nil)
+//                            } else {
+//                                
+//                                /* Another error */
+//                                println("error code: \(error.code)")
+//                                println("error description: \(error.localizedDescription)")
+//                            }
+//                        } else {
+//                            
+//                            /* Download images */
+//                            self.parsePhotosArray(photosArray!)
+//                        }
+//                    }
+//                }
             }
             
-            /* App is just opened? */
+            /* Flickr API call was not invoked and pin is not downloading images becuase there are actually no images for the location */
             else if !tappedPin.flickrAPICallDidReturn && !tappedPin.isDownloadingPhotos {
                 showNoImageLabel()
             }
