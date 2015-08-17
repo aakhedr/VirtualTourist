@@ -66,6 +66,11 @@
         <target>Combrobar su conexión a Internet</target>
         <note>Let user know of a problem with Internet conenction</note>
       </trans-unit>
+      <trans-unit id="message3">
+        <source>Cannot delete a photo while rest of the photos are being downloaded</source>
+        <target>No se puede eliminar imagénes mientras descargar los demás</target>
+        <note>Let user know it's not possible to delete an image while others are being downloaded</note>
+      </trans-unit>
       <trans-unit id="okActionTitle">
         <source>OK</source>
         <target>OK</target>

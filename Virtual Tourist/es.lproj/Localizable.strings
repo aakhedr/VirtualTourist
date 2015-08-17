@@ -4,6 +4,9 @@
 /* Let user know of a problem with Internet conenction */
 "message2" = "Combrobar su conexión a Internet";
 
+/* Let user know it's not possible to delete an image while others are being downloaded */
+"message3" = "No se puede eliminar imagénes mientras descargar los demás";
+
 /* Dismisses alert view */
 "okActionTitle" = "OK";
 

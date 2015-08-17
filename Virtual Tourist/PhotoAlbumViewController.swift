@@ -153,74 +153,6 @@ class PhotoAlbumViewController: UIViewController {
             }
         }
     }
-    
-    @IBAction func refreshNotYetDownloadedImages(sender: UIBarButtonItem) {
-        
-        /* In case the app terminates while some images are still being downloaded. User can tap the refresh button to re-start task for the pin's images that have not been downloaded the last time the app ran */
-        
-        var counter = 0
-        var photosWithNilImages = 0
-        
-        for photo in fetchedResultsController.fetchedObjects as! [Photo] {
-            if photo.image == nil && !photo.error {     // i.e. image not set and avoid making duplicate dataTaskWithURL
-                photosWithNilImages++
-                
-                // Start a task for URL here
-                let session = FlickrClient.sharedInstance().session
-                let url = NSURL(string: photo.imageURL)!
-                let task = session.dataTaskWithURL(url) { data, response, error in
-                    if let error = error {
-                        
-                        /* errors due to bad Internet again? */
-                        if error.code == -1001 || error.code == -1005 || error.code == -1009 {
-                            
-                            /* Just for reconfirmation :)
-                            Could have simply left this if body blank as photo.error won't change from true to false */
-                            dispatch_async(dispatch_get_main_queue()) {
-                                photo.error = true
-                                CoreDataStackManager.sharedInstance().saveContext()
-                            }
-                        } else {
-                            println("error code: \(error.code)")
-                            println("error description: \(error.localizedDescription)")
-                        }
-                    } else {
-                        
-                        /* Got the image?
-                        Set it and save the context */
-                        let image = UIImage(data: data)
-                        
-                        dispatch_async(dispatch_get_main_queue()) {
-                            photo.image = image
-                            
-                            /* Reload collection view data to show the image */
-                            self.photoCollectionView.reloadData()
-                            
-                            /* Save new value of photo.error */
-                            CoreDataStackManager.sharedInstance().saveContext()
-                        }
-                        
-                        /* Now that an image is downloaded, increment image downloads counter */
-                        counter++
-                        
-                        /* Are we done downloading all images with errors? */
-                        if counter == photosWithNilImages {
-                            
-                            /* isDownloadingPhotos property is no longer false and user can download new set of images for the location by tapping the newCollectionButton */
-                            dispatch_async(dispatch_get_main_queue()) {
-                                self.tappedPin.isDownloadingPhotos = false
-                                self.newCollectionButton.enabled = true
-                                
-                                /* save new value of tappedPin.isDownloadingPhotos */
-                                CoreDataStackManager.sharedInstance().saveContext()
-                            }
-                        }
-                    }
-                }
-                task.resume()
-            }
-        }
-    }
 }
 
 
@@ -264,13 +196,16 @@ extension PhotoAlbumViewController: UICollectionViewDataSource, UICollectionView
         
         /* Inform the user */
         else {
+            let alertMessage = NSLocalizedString("message3", value: "Cannot delete a photo while rest of the photos are being downloaded", comment: "Let user know it's not possible to delete an image while others are being downloaded")
+            let okActionTitle = NSLocalizedString("okActionTitle", value: "OK", comment: "Dismisses alert view")
+            
             let alertController = UIAlertController(
                 title: nil,
-                message: "Cannot delete a photo while rest of the photos are being downloaded",
+                message: alertMessage,
                 preferredStyle: .Alert
             )
             let okAction = UIAlertAction(
-                title: "OK",
+                title: okActionTitle,
                 style: .Default,
                 handler: nil
             )
@@ -568,11 +503,15 @@ extension PhotoAlbumViewController {
                 showNoImageLabel()
             }
             
-            /* If Flickr API call didn't return yet (because of slow Internet connection), disable the newCollectionButton, show activity indicator and wait for the execution of the API call in TravelLocationsViewController to show the photoCollectionView */
+            /* If Flickr API call (in either TravelLocationsMapViewController or PhotoAlbumViewController) didn't return yet because of slow Internet connection, disable the newCollectionButton, show activity indicator and wait for the execution of the API call in TravelLocationsViewController to show the photoCollectionView */
             else if !tappedPin.flickrAPICallDidReturn && tappedPin.isDownloadingPhotos {
                 photoCollectionView.hidden = true
                 newCollectionButton.enabled = false
                 activityIndicator.startAnimating()
+                
+                /* Another case of Flickr API call did't return and pin isDownloadingPhotos is true is when the Fickr API call is never actually made because app just started - Pin exists from previous run where app was terminated before saving its photos to Core Data */
+                
+                
             }
             
             /* App is just opened? */

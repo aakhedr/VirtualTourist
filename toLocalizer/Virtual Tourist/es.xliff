@@ -58,14 +58,21 @@
     <body>
       <trans-unit id="message1">
         <source>Cannot delete a pin while its photos are being downloaded</source>
+        <target>No se puede eliminar botones mientras descargar imagénes</target>
         <note>Let user know that he/ she cannot delete a pin while its photos are yet downloading</note>
       </trans-unit>
       <trans-unit id="message2">
         <source>Check your Internet connection</source>
+        <target>Combrobar su conexión a Internet</target>
         <note>Let user know of a problem with Internet conenction</note>
+      </trans-unit>
+      <trans-unit id="message3">
+        <source>Cannot delete a photo while rest of the photos are being downloaded</source>
+        <note>Let user know it's not possible to delete an image while others are being downloaded</note>
       </trans-unit>
       <trans-unit id="okActionTitle">
         <source>OK</source>
+        <target>OK</target>
         <note>Dismisses alert view</note>
       </trans-unit>
     </body>
