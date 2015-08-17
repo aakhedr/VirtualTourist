@@ -85,6 +85,22 @@ class TravelLocationsMapViewController: UIViewController {
         // Fetch and show pins in the map view
         fetchAndShowPinAnnotations()
     }
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        let pins = fetchedResultsController.fetchedObjects as! [Pin]
+        for pin in pins {
+            
+            /* Only if this pin exists in core data (from previous run of the app) AND Flickr API call never invoked (i.e. it doesn't have photos). 
+            Although isDownloadingPhotos property is set to true upon intializaing the Pin object */
+            if !pin.flickrAPICallDidReturn && pin.isDownloadingPhotos {
+                
+                // Get its images
+                getFlickrImagesAndSaveContext(pin: pin)
+            }
+        }
+    }
 
     // MARK:- Prepare for segue
     
@@ -138,7 +154,7 @@ extension TravelLocationsMapViewController: UIGestureRecognizerDelegate {
             CoreDataStackManager.sharedInstance().saveContext()
             
             // Start getting the photos
-            getFlickrImagesAndSaveContext(pin: pin, annotationView: annotationView)
+            getFlickrImagesAndSaveContext(pin: pin)
         }
     }
 }
@@ -209,7 +225,7 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
             CoreDataStackManager.sharedInstance().saveContext()
 
             // Get Flickr images and Save context
-            getFlickrImagesAndSaveContext(pin: pinToBeAdded, annotationView: view!)
+            getFlickrImagesAndSaveContext(pin: pinToBeAdded)
             
         default:
             break
@@ -373,8 +389,8 @@ extension TravelLocationsMapViewController {
             }.first!
     }
     
-    func getFlickrImagesAndSaveContext(#pin: Pin, annotationView: MKAnnotationView) {
-        FlickrClient.sharedInstance().getPhotosForCoordinate(latitude: annotationView.annotation.coordinate.latitude, longitude: annotationView.annotation.coordinate.longitude, page: pin.page) { photosArray, error in
+    func getFlickrImagesAndSaveContext(#pin: Pin) {
+        FlickrClient.sharedInstance().getPhotosForCoordinate(latitude: pin.lat as Double, longitude: pin.lon as Double, page: pin.page) { photosArray, error in
             
             /* Photo objects are bing downloaded, so user cannot delete neiher pin not any of the downloaded images - until done downloading */
             pin.isDownloadingPhotos = true
@@ -462,9 +478,6 @@ extension TravelLocationsMapViewController {
                                 dispatch_async(dispatch_get_main_queue()) {
                                     photo.image = image
 
-                                    /* Save photo's relation to this pin */
-                                    CoreDataStackManager.sharedInstance().saveContext()
-
                                     /* Post notification to PhotoAlbumViewController to reload photoCollectionView and newly downloaded image. */
                                     NSNotificationCenter.defaultCenter().postNotificationName("reloadData", object: self)
                                 }
@@ -478,7 +491,7 @@ extension TravelLocationsMapViewController {
                                         /* Now user can delete pin and any of its associated images */
                                         pin.isDownloadingPhotos = false
                                         
-                                        /* Save the new isDownloadingPhotos managed property for next time this pin is tapped */
+                                        /* Save Save photo's relation to this pin and save the new isDownloadingPhotos managed property for next time this pin is tapped */
                                         CoreDataStackManager.sharedInstance().saveContext()
                                     
                                         /* Inform PhotoAlbumViewController to toggle enabled property of newCollectionButton */
