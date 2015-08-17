@@ -156,13 +156,13 @@ class PhotoAlbumViewController: UIViewController {
     
     @IBAction func refreshNotYetDownloadedImages(sender: UIBarButtonItem) {
         
-        /* In case the app terminates while some images are still being downloaded. User can tap the refresh button to re-start requests for the pin's images that have not been downloaded the last time the app ran */
+        /* In case the app terminates while some images are still being downloaded. User can tap the refresh button to re-start task for the pin's images that have not been downloaded the last time the app ran */
         
         var counter = 0
         var photosWithNilImages = 0
         
         for photo in fetchedResultsController.fetchedObjects as! [Photo] {
-            if photo.image == nil {     // i.e. not set
+            if photo.image == nil && !photo.error {     // i.e. image not set and avoid making duplicate dataTaskWithURL
                 photosWithNilImages++
                 
                 // Start a task for URL here
