@@ -142,7 +142,11 @@ class PhotoAlbumViewController: UIViewController {
                         handler: nil
                     )
                     alertController.addAction(okAction)
-                    self.presentViewController(alertController, animated: true, completion: nil)
+                    
+                    /* Do not show on detached view Controllers in case user goes back to TravelLocationsMapViewController */
+                    if self.navigationController?.visibleViewController is PhotoAlbumViewController {
+                        self.presentViewController(alertController, animated: true, completion: nil)
+                    }
                 } else {
                     
                     /* Another error */

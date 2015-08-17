@@ -418,7 +418,11 @@ extension TravelLocationsMapViewController {
                         handler: nil
                     )
                     alertController.addAction(okAction)
-                    self.presentViewController(alertController, animated: true, completion: nil)
+                    
+                    // Show alert only if user is on this view (Avoid error of presenting on detached view controller)
+                    if self.navigationController?.visibleViewController is TravelLocationsMapViewController {
+                        self.presentViewController(alertController, animated: true, completion: nil)
+                    }
                 } else {
                     
                     /* Another error */
