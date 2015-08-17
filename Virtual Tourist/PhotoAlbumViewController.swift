@@ -540,7 +540,7 @@ extension PhotoAlbumViewController {
                 activityIndicator.startAnimating()
                 
                 /* Another case of Flickr API call did't return and pin isDownloadingPhotos is true is when the Fickr API call is never actually invoked because app just started - Pin exists from previous run where app was terminated before saving its photos to Core Data */
-                /* Handled in viewWillAppear(_:) TravelLocationsMapViewController */
+                /* Handled in viewDidLoad() TravelLocationsMapViewController */
             }
             
             /* Flickr API call was not invoked and pin is not downloading images becuase there are actually no images for the location */

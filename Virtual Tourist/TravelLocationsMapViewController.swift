@@ -92,8 +92,16 @@ class TravelLocationsMapViewController: UIViewController {
             Although isDownloadingPhotos property is set to true upon intializaing the Pin object */
             if !pin.flickrAPICallDidReturn && pin.isDownloadingPhotos {
                 
-                // Get its images
-                getFlickrImagesAndSaveContext(pin: pin)
+                if pin.photos.count == 0 {
+                
+                    // Get its images
+                    getFlickrImagesAndSaveContext(pin: pin)
+                }
+                else {
+                    
+                    // Get only the remaining images
+                    getRemainingImagesForPin(pin: pin)
+                }
             }
         }
     }
@@ -490,6 +498,60 @@ extension TravelLocationsMapViewController {
             println("error code: \(error.code)")
             println("error domain: \(error.domain)")
             println("error description: \(error.localizedDescription)")
+        }
+    }
+
+    func getRemainingImagesForPin(#pin: Pin) {
+        
+        var counter = 0
+        var imagesRemainingCounter = 0
+        
+        for object in pin.photos {
+            let photo = object as! Photo
+            
+            if photo.image == nil {
+                imagesRemainingCounter++
+
+                // Get that image on a background thread
+                let session = FlickrClient.sharedInstance().session
+                let url = NSURL(string: photo.imageURL)!
+                
+                let task = session.dataTaskWithURL(url) { data, response, error in
+                    if let error = error {
+                        
+                        /* If error is related to bad Internet connection, photo object must set its error property to true. And will then be downlaoded next time PhotoAlbumViewController appears (viewWillAppear) */
+                        self.handleErrors(photo: photo, error: error)
+                    }
+                    else {
+                        let image = UIImage(data: data)
+                        
+                        dispatch_async(dispatch_get_main_queue()) {
+                            photo.image = image
+                            
+                            /* Post notification to PhotoAlbumViewController to reload photoCollectionView and newly downloaded image. */
+                            NSNotificationCenter.defaultCenter().postNotificationName("reloadData", object: self)
+                        }
+                        
+                        counter++
+                        
+                        /* If done downloading all remaining images */
+                        if counter == imagesRemainingCounter {
+                            dispatch_async(dispatch_get_main_queue()) {
+                                
+                                /* Now user can delete pin and any of its associated images */
+                                pin.isDownloadingPhotos = false
+                                
+                                /* Save Save photo's relation to this pin and save the new isDownloadingPhotos managed property for next time this pin is tapped */
+                                CoreDataStackManager.sharedInstance().saveContext()
+                                
+                                /* Inform PhotoAlbumViewController to toggle enabled property of newCollectionButton */
+                                NSNotificationCenter.defaultCenter().postNotificationName("enableOrDisableNewCollectionButton", object: self)
+                            }
+                        }
+                    }
+                }
+                task.resume()
+            }
         }
     }
 }
